@@ -231,19 +231,26 @@ export default function ProductPage({ product }) {
 }
 
 export async function getServerSideProps(context) {
-  await mongooseConnect();
-  const { id } = context.query;
-  const product = await Product.findById(id);
+  try {
+    await mongooseConnect();
+    const { id } = context.query;
+    const product = await Product.findById(id);
 
-  if (!product) {
+    if (!product) {
+      return {
+        notFound: true,
+      };
+    }
+
+    return {
+      props: {
+        product: JSON.parse(JSON.stringify(product)),
+      },
+    };
+  } catch (error) {
+    console.error("Product page SSR error:", error);
     return {
       notFound: true,
     };
   }
-
-  return {
-    props: {
-      product: JSON.parse(JSON.stringify(product)),
-    },
-  };
 }

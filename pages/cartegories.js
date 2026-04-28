@@ -82,21 +82,31 @@ export default function CategoriesPage({ categories, productsByCategory }) {
 }
 
 export async function getServerSideProps() {
-  await mongooseConnect();
-  const products = await Product.find({}, null, { sort: { _id: -1 } });
-  const plainProducts = JSON.parse(JSON.stringify(products));
+  try {
+    await mongooseConnect();
+    const products = await Product.find({}, null, { sort: { _id: -1 } });
+    const plainProducts = JSON.parse(JSON.stringify(products));
 
-  const productsByCategory = {};
-  for (const product of plainProducts) {
-    const cat = product.category || "Uncategorized";
-    if (!productsByCategory[cat]) productsByCategory[cat] = [];
-    productsByCategory[cat].push(product);
+    const productsByCategory = {};
+    for (const product of plainProducts) {
+      const cat = product.category || "Uncategorized";
+      if (!productsByCategory[cat]) productsByCategory[cat] = [];
+      productsByCategory[cat].push(product);
+    }
+
+    return {
+      props: {
+        categories: Object.keys(productsByCategory),
+        productsByCategory,
+      },
+    };
+  } catch (error) {
+    console.error("Categories page SSR error:", error);
+    return {
+      props: {
+        categories: [],
+        productsByCategory: {},
+      },
+    };
   }
-
-  return {
-    props: {
-      categories: Object.keys(productsByCategory),
-      productsByCategory,
-    },
-  };
 }

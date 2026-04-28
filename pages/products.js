@@ -42,12 +42,20 @@ export default function ProductsPage({ products }) {
 }
 
 export async function getServerSideProps() {
-  await mongooseConnect();
-  const products = await Product.find({}, null, { sort: { _id: -1 } });
-  // Convert products to JSON format for Next.js
-  return {
-    props: {
-      products: JSON.parse(JSON.stringify(products)),
-    },
-  };
+  try {
+    await mongooseConnect();
+    const products = await Product.find({}, null, { sort: { _id: -1 } });
+    return {
+      props: {
+        products: JSON.parse(JSON.stringify(products)),
+      },
+    };
+  } catch (error) {
+    console.error("Products page SSR error:", error);
+    return {
+      props: {
+        products: [],
+      },
+    };
+  }
 }

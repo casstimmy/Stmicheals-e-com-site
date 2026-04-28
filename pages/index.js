@@ -21,23 +21,36 @@ export default function HomePage({ featuredProduct, newProducts }) {
 }
 
 export async function getServerSideProps() {
-  
-  await mongooseConnect();
+  try {
+    await mongooseConnect();
 
-  const featuredProductId = process.env.FEATURED_PRODUCT_ID;
-  let featuredProduct = null;
-  if (featuredProductId) {
-    featuredProduct = await Product.findById(featuredProductId);
-  }
-  if (!featuredProduct) {
-    featuredProduct = await Product.findOne({}, null, { sort: { _id: -1 } });
-  }
-  const newProducts = await Product.find({}, null, { sort: { '_id': -1 }, limit: 10 });
+    const featuredProductId = process.env.FEATURED_PRODUCT_ID;
+    let featuredProduct = null;
+    if (featuredProductId) {
+      try {
+        featuredProduct = await Product.findById(featuredProductId);
+      } catch {
+        featuredProduct = null;
+      }
+    }
+    if (!featuredProduct) {
+      featuredProduct = await Product.findOne({}, null, { sort: { _id: -1 } });
+    }
+    const newProducts = await Product.find({}, null, { sort: { '_id': -1 }, limit: 10 });
 
-  return {
-    props: {
-      featuredProduct: JSON.parse(JSON.stringify(featuredProduct)),
-      newProducts: JSON.parse(JSON.stringify(newProducts)),
-    },
-  };
+    return {
+      props: {
+        featuredProduct: JSON.parse(JSON.stringify(featuredProduct)),
+        newProducts: JSON.parse(JSON.stringify(newProducts)),
+      },
+    };
+  } catch (error) {
+    console.error("Home page SSR error:", error);
+    return {
+      props: {
+        featuredProduct: null,
+        newProducts: [],
+      },
+    };
+  }
 }
