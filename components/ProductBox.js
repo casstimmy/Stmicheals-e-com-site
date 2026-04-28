@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { useContext } from "react";
 import { CartContext } from "./CartContext";
 
@@ -50,9 +51,11 @@ export default function ProductBox({ _id, name, description, images, salePriceIn
         <div className="product-box bg-white shadow-sm rounded-lg overflow-hidden transition hover:shadow-md">
             <div className="w-full h-40 bg-white flex items-center justify-center">
                 <Link href={url} className="w-full h-full flex items-center justify-center" onClick={handleClick}>
-                    <img
+                    <Image
                         src={images?.[0] || "/placeholder.jpg"}
                         alt={name}
+                        width={160}
+                        height={160}
                         className="h-full object-contain"
                     />
                 </Link>

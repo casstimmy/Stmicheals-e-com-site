@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import Image from "next/image";
 import { CartContext } from "@/components/CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
@@ -192,7 +193,7 @@ export default function CartPage() {
       >
         <td className="py-3 px-2 sm:px-3">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-center sm:text-left">
-            <img
+            <Image
               src={imageSrc}
               alt={product.name || "Product"}
               width={50}

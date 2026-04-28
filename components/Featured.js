@@ -1,4 +1,5 @@
 import { useContext } from "react";
+import Image from "next/image";
 import Center from "./Center";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
@@ -46,9 +47,11 @@ export default function Featured({ product }) {
 
           {/* Image */}
           <div className="w-full md:w-1/2">
-            <img
+            <Image
               src={product.images?.[0] || "/placeholder.jpg"}
               alt={product.name || "Featured Product"}
+              width={600}
+              height={400}
               className="w-full h-auto rounded-xl shadow-xl object-cover border border-gray-200"
             />
           </div>

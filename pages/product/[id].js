@@ -1,5 +1,6 @@
 import Center from "@/components/Center";
 import Header from "@/components/Header";
+import Image from "next/image";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Product } from "@/models/Product";
 import { useContext, useState, useRef } from "react";
@@ -89,9 +90,11 @@ export default function ProductPage({ product }) {
                         : "border-transparent hover:border-gray-300"
                     }`}
                   >
-                    <img
+                    <Image
                       src={image}
                       alt={`Product thumbnail ${index + 1}`}
+                      width={80}
+                      height={80}
                       className="w-full h-full object-cover"
                     />
                   </button>
@@ -212,9 +215,11 @@ export default function ProductPage({ product }) {
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center"
           onClick={() => setLightboxOpen(false)}
         >
-          <img
+          <Image
             src={activeImage}
             alt="Full View"
+            width={1200}
+            height={900}
             className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
           />
         </div>

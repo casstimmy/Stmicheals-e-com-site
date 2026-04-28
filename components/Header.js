@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Center from "./Center";
 import { useContext, useState } from "react";
 import { CartContext } from "./CartContext";
@@ -16,9 +17,11 @@ export default function Header() {
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
             <div className="p-2 rounded-md bg-[linear-gradient(to_bottom,_#002a2d,_#0b3e3e)]">
-              <img
+              <Image
                 src="/images/st-micheals-logo.png"
                 alt="St. Michael's Logo"
+                width={40}
+                height={40}
                 className="h-10 w-auto object-contain"
               />
             </div>

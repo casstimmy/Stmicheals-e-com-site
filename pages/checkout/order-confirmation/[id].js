@@ -1,5 +1,6 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
@@ -75,9 +76,11 @@ export default function OrderConfirmationPage() {
         <div className="max-w-3xl mx-auto my-16 px-6 py-10 bg-white rounded-2xl shadow-lg border border-gray-200">
           {/* Logo */}
           <div className="flex justify-center mb-8">
-            <img
+            <Image
               src="/images/st-micheals-logo.png"
               alt="St Micheal's Logo"
+              width={80}
+              height={80}
               className="h-20 w-auto"
             />
           </div>
@@ -125,9 +128,11 @@ export default function OrderConfirmationPage() {
                       >
                         <div className="flex gap-4">
                           {image && (
-                            <img
+                            <Image
                               src={image}
                               alt={name}
+                              width={64}
+                              height={64}
                               className="w-16 h-16 object-cover rounded border"
                             />
                           )}
