@@ -1,0 +1,20 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "/^git remote -v; git status --short --branch$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^Test-Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\Projects\\\\Inventory-sales\\\\\\.git\"; Test-Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\Projects\\\\Inventory-sales\\\\Inventory\\\\\\.git\"; Test-Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\Projects\\\\Inventory-sales\\\\Inventory\\\\webpage-app\\\\\\.git\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^git init$/": {
+            "approve": true,
+            "matchCommandLine": true
+        },
+        "/^git config --get user\\.name; git config --get user\\.email$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    }
+}
