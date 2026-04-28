@@ -23,7 +23,7 @@ export default function Header() {
               />
             </div>
             <span className="text-xl font-bold text-gray-800 hidden sm:inline">
-              St. Michael's Store
+              St. Michael&apos;s Store
             </span>
           </Link>
 

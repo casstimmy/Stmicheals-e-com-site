@@ -1,4 +1,5 @@
 import { useRouter } from "next/router";
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
@@ -162,12 +163,12 @@ export default function OrderConfirmationPage() {
 
           {/* Continue Shopping */}
           <div className="mt-8 text-center">
-            <a
-              href="/"
+              <Link
+                href="/"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-3 px-6 rounded-md transition-all duration-200"
             >
               Continue Shopping
-            </a>
+              </Link>
           </div>
         </div>
       </Center>
