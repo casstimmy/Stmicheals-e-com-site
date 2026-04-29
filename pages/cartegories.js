@@ -5,6 +5,7 @@ import ProductBox from "@/components/ProductBox";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Product } from "@/models/Product";
 import { useState } from "react";
+import { attachCategoryNames } from "@/lib/productCategories";
 
 export default function CategoriesPage({ categories, productsByCategory }) {
   const [activeCategory, setActiveCategory] = useState(null);
@@ -84,12 +85,12 @@ export default function CategoriesPage({ categories, productsByCategory }) {
 export async function getServerSideProps() {
   try {
     await mongooseConnect();
-    const products = await Product.find({}, null, { sort: { _id: -1 } });
-    const plainProducts = JSON.parse(JSON.stringify(products));
+    const products = await Product.find({}, null, { sort: { _id: -1 } }).lean();
+    const plainProducts = await attachCategoryNames(products);
 
     const productsByCategory = {};
     for (const product of plainProducts) {
-      const cat = product.category || "Uncategorized";
+      const cat = product.categoryName || product.category || "Uncategorized";
       if (!productsByCategory[cat]) productsByCategory[cat] = [];
       productsByCategory[cat].push(product);
     }

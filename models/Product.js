@@ -19,7 +19,7 @@ const ProductSchema = new Schema({
   margin: { type: Number, default: 0 },
   barcode: { type: String },
   quantity: { type: Number, default: 0 },
-  category: { type: Schema.Types.ObjectId, ref: 'Category', default: null },
+  category: { type: String, default: "Top Level" },
   images: [
     {
       full: { type: String, required: true },

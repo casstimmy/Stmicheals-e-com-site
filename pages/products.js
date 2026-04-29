@@ -4,6 +4,7 @@ import Header from "@/components/Header";
 import ProductBox from "@/components/ProductBox";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Product } from "@/models/Product";
+import { attachCategoryNames } from "@/lib/productCategories";
 
 
 export default function ProductsPage({ products }) {
@@ -44,10 +45,11 @@ export default function ProductsPage({ products }) {
 export async function getServerSideProps() {
   try {
     await mongooseConnect();
-    const products = await Product.find({}, null, { sort: { _id: -1 } }).populate('category', 'name');
+    const products = await Product.find({}, null, { sort: { _id: -1 } }).lean();
+    const resolvedProducts = await attachCategoryNames(products);
     return {
       props: {
-        products: JSON.parse(JSON.stringify(products)),
+        products: JSON.parse(JSON.stringify(resolvedProducts)),
       },
     };
   } catch (error) {

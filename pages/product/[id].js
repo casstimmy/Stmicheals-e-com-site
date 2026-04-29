@@ -13,6 +13,7 @@ import {
   normalizeProductImages,
   PRODUCT_IMAGE_PLACEHOLDER,
 } from "@/lib/productImages";
+import { attachCategoryNames } from "@/lib/productCategories";
 
 export default function ProductPage({ product }) {
   const galleryImages = normalizeProductImages(product.images);
@@ -127,7 +128,7 @@ export default function ProductPage({ product }) {
               <div className="grid grid-cols-1 gap-2 text-sm text-gray-500">
                 <p>
                   <span className="font-medium text-gray-700">Category:</span>{" "}
-                  {product.category?.name || product.category || "Uncategorized"}
+                  {product.categoryName || product.category || "Uncategorized"}
                 </p>
                 <p>
                   <span className="font-medium text-gray-700">SKU:</span>{" "}
@@ -241,7 +242,7 @@ export async function getServerSideProps(context) {
   try {
     await mongooseConnect();
     const { id } = context.query;
-    const product = await Product.findById(id).populate('category', 'name');
+    const product = await Product.findById(id).lean();
 
     if (!product) {
       return {
@@ -249,9 +250,11 @@ export async function getServerSideProps(context) {
       };
     }
 
+    const resolvedProduct = await attachCategoryNames(product);
+
     return {
       props: {
-        product: JSON.parse(JSON.stringify(product)),
+        product: JSON.parse(JSON.stringify(resolvedProduct)),
       },
     };
   } catch (error) {

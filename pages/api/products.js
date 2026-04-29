@@ -1,6 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import { Product } from "@/models/Product";
 import { ObjectId } from "mongodb";
+import { attachCategoryNames } from "@/lib/productCategories";
 
 export default async function handle(req, res) {
   const { method } = req;
@@ -9,16 +10,18 @@ export default async function handle(req, res) {
   if (method === "GET") {
     if (req.query?.id) {
       try {
-        const product = await Product.findOne({ _id: req.query.id }).populate('category', 'name');
-        return res.json(product);
+        const product = await Product.findOne({ _id: req.query.id }).lean();
+        const resolvedProduct = await attachCategoryNames(product);
+        return res.json(resolvedProduct);
       } catch (error) {
         console.error("Error fetching product:", error);
         return res.status(500).json({ success: false, message: "Failed to fetch this product" });
       }
     } else {
       try {
-        const products = await Product.find().populate('category', 'name');
-        return res.json(products);
+        const products = await Product.find().lean();
+        const resolvedProducts = await attachCategoryNames(products);
+        return res.json(resolvedProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
         return res.status(500).json({ success: false, message: "Failed to fetch products" });
@@ -34,8 +37,9 @@ export default async function handle(req, res) {
       }
       // Convert to ObjectId array safely
       const objectIds = ids.map(id => new ObjectId(id));
-      const products = await Product.find({ _id: { $in: objectIds } }).populate('category', 'name');
-      return res.json({ products });
+      const products = await Product.find({ _id: { $in: objectIds } }).lean();
+      const resolvedProducts = await attachCategoryNames(products);
+      return res.json({ products: resolvedProducts });
     } catch (error) {
       console.error("Error fetching multiple products:", error);
       return res.status(500).json({ success: false, message: "Failed to fetch products" });
