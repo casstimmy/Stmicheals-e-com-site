@@ -7,19 +7,28 @@ export default async function handler(req, res) {
 
   if (req.method === "POST") {
     const { title, text, rating, customerName, customerId } = req.body;
+    const normalizedTitle = typeof title === "string" ? title.trim() : "";
+    const normalizedText = typeof text === "string" ? text.trim() : "";
+    const normalizedCustomerName =
+      typeof customerName === "string" ? customerName.trim() : "Anonymous";
+    const normalizedRating = Number(rating);
 
-    if (!title || !text || !rating) {
+    if (!normalizedTitle || !normalizedText || !normalizedRating) {
       return res.status(400).json({ error: "Missing fields" });
+    }
+
+    if (normalizedRating < 1 || normalizedRating > 5) {
+      return res.status(400).json({ error: "Rating must be between 1 and 5" });
     }
 
     const product = await Product.findById(id);
     if (!product) return res.status(404).json({ error: "Product not found" });
 
     const review = {
-      title,
-      text,
-      rating,
-      customerName,
+      title: normalizedTitle,
+      text: normalizedText,
+      rating: normalizedRating,
+      customerName: normalizedCustomerName || "Anonymous",
       customerId,
       createdAt: new Date(),
     };

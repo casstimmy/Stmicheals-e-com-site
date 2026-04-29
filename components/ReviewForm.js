@@ -1,27 +1,54 @@
 import { useState } from "react";
 
-export default function ReviewForm({ productId }) {
+export default function ReviewForm({ productId, onSubmitted }) {
   const [reviewData, setReviewData] = useState({
     title: "",
     text: "",
     rating: 0,
     customerName: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedback, setFeedback] = useState({ type: "", message: "" });
 
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
 
-    const response = await fetch(`/api/product/${productId}/reviews`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(reviewData),
-    });
+    if (!reviewData.rating) {
+      setFeedback({ type: "error", message: "Please choose a rating before submitting." });
+      return;
+    }
 
-    if (response.ok) {
-      alert("Review submitted!");
-      location.reload();
-    } else {
-      alert("Failed to submit review");
+    setIsSubmitting(true);
+    setFeedback({ type: "", message: "" });
+
+    try {
+      const response = await fetch(`/api/product/${productId}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reviewData),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error || "Failed to submit review");
+      }
+
+      setFeedback({ type: "success", message: "Review submitted successfully." });
+      setReviewData({
+        title: "",
+        text: "",
+        rating: 0,
+        customerName: "",
+      });
+      onSubmitted?.(payload.review);
+    } catch (error) {
+      setFeedback({
+        type: "error",
+        message: error.message || "Failed to submit review.",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -77,12 +104,27 @@ export default function ReviewForm({ productId }) {
         className="w-full p-2 border rounded"
         required
       />
+
+      {feedback.message && (
+        <div className={`rounded-lg px-4 py-3 text-sm ${
+          feedback.type === "success"
+            ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+            : "border border-red-200 bg-red-50 text-red-700"
+        }`}>
+          {feedback.message}
+        </div>
+      )}
       
       <button
         type="submit"
-        className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 mt-4"
+        disabled={isSubmitting}
+        className={`mt-4 py-2 px-4 rounded-full ${
+          isSubmitting
+            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+            : "bg-blue-600 text-white hover:bg-blue-700"
+        }`}
       >
-        Submit Review
+        {isSubmitting ? "Submitting..." : "Submit Review"}
       </button>
     </form>
   );

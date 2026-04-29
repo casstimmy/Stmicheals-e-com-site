@@ -14,14 +14,19 @@ import {
   PRODUCT_IMAGE_PLACEHOLDER,
 } from "@/lib/productImages";
 import { attachCategoryNames } from "@/lib/productCategories";
+import { getReviewSummary } from "@/lib/reviews";
+import ProductBox from "@/components/ProductBox";
 
-export default function ProductPage({ product }) {
+export default function ProductPage({ product, relatedProducts }) {
   const galleryImages = normalizeProductImages(product.images);
   const defaultImage = getPrimaryProductImage(product.images);
   const [activeImage, setActiveImage] = useState(defaultImage);
   const { addProductToCart } = useContext(CartContext);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [reviews, setReviews] = useState(product.reviews || []);
   const mainImageRef = useRef(null);
+  const reviewSummary = getReviewSummary(reviews);
+  const isInStock = (product.quantity || 0) > 0;
 
   const handleAddToCart = () => {
     const productImage = mainImageRef.current;
@@ -59,18 +64,22 @@ export default function ProductPage({ product }) {
     addProductToCart(product._id);
   };
 
+  const handleReviewSubmitted = (review) => {
+    setReviews((previousReviews) => [review, ...previousReviews]);
+  };
+
   return (
     <>
       <Head>
-        <title>{product.name} | MyStore</title>
+        <title>{product.name} | St Michael&apos;s Store</title>
       </Head>
       <Header />
       <Center>
-        <div className="min-h-screen py-8 px-4 sm:px-8 bg-gradient-to-br from-blue-50 to-blue-100">
+        <div className="min-h-screen py-8 px-4 sm:px-8">
           <div className="max-w-7xl mx-auto grid md:grid-cols-[3fr_2fr] gap-12 items-start">
 
             {/* Product Images */}
-            <div className="product-box bg-white rounded-2xl shadow-xl p-6">
+            <div className="product-box panel-surface rounded-[2rem] p-6">
               <div className="cursor-zoom-in" onClick={() => setLightboxOpen(true)}>
                 <AnimatePresence mode="wait">
                   <motion.img
@@ -111,13 +120,38 @@ export default function ProductPage({ product }) {
             </div>
 
             {/* Product Details */}
-            <div className="bg-white rounded-2xl shadow-xl p-8">
+            <div className="panel-surface rounded-[2rem] p-8 md:sticky md:top-32">
+              <div className="mb-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+                <span className="rounded-full bg-white/80 px-3 py-2 shadow-sm">
+                  {product.categoryName || product.category || "Uncategorized"}
+                </span>
+                <span className={`rounded-full px-3 py-2 shadow-sm ${
+                  isInStock ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+                }`}>
+                  {isInStock ? `${product.quantity} in stock` : "Currently unavailable"}
+                </span>
+              </div>
               <h1 className="text-3xl font-bold text-gray-800 mb-4">
                 {product.name}
               </h1>
               <p className="text-gray-600 text-base mb-6 leading-relaxed">
                 {product.description}
               </p>
+
+              <div className="mb-6 flex flex-wrap gap-4 rounded-2xl bg-white/80 p-4 text-sm text-slate-600 shadow-sm">
+                <div>
+                  <p className="font-semibold text-slate-900">Rating</p>
+                  <p>{reviewSummary.count ? `${reviewSummary.averageLabel} / 5` : "No ratings yet"}</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">Reviews</p>
+                  <p>{reviewSummary.count} published</p>
+                </div>
+                <div>
+                  <p className="font-semibold text-slate-900">SKU</p>
+                  <p>{product.sku || "Not provided"}</p>
+                </div>
+              </div>
 
               <div className="mb-6">
                 <p className="text-2xl text-blue-600 font-semibold">
@@ -131,28 +165,48 @@ export default function ProductPage({ product }) {
                   {product.categoryName || product.category || "Uncategorized"}
                 </p>
                 <p>
-                  <span className="font-medium text-gray-700">SKU:</span>{" "}
-                  {product.sku}
+                  <span className="font-medium text-gray-700">Availability:</span>{" "}
+                  {isInStock ? "Ready for delivery" : "Out of stock"}
                 </p>
               </div>
 
               <button
                 onClick={handleAddToCart}
-                className="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white text-lg font-medium py-3 rounded-xl transition duration-200"
+                disabled={!isInStock}
+                className={`mt-8 w-full text-white text-lg font-medium py-3 rounded-xl transition duration-200 ${
+                  isInStock
+                    ? "bg-blue-600 hover:bg-blue-700"
+                    : "bg-gray-300 cursor-not-allowed text-gray-600"
+                }`}
               >
-                Add to Cart
+                {isInStock ? "Add to Cart" : "Unavailable"}
               </button>
             </div>
           </div>
-          <div className="bg-white max-w-7xl mx-auto mt-12 rounded-2xl shadow-lg p-10">
+          <div className="panel-surface max-w-7xl mx-auto mt-12 rounded-[2rem] p-10">
   <h2 className="text-3xl font-extrabold mb-10 text-gray-900 border-b border-gray-200 pb-4">
     Customer Reviews
   </h2>
 
+  <div className="mb-8 grid gap-4 rounded-[1.5rem] bg-white/75 p-6 shadow-sm md:grid-cols-3">
+    <div>
+      <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Average rating</p>
+      <p className="mt-2 text-3xl font-bold text-slate-900">{reviewSummary.count ? reviewSummary.averageLabel : "New"}</p>
+    </div>
+    <div>
+      <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Published reviews</p>
+      <p className="mt-2 text-3xl font-bold text-slate-900">{reviewSummary.count}</p>
+    </div>
+    <div>
+      <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Fulfillment</p>
+      <p className="mt-2 text-3xl font-bold text-slate-900">{isInStock ? "Ready" : "Paused"}</p>
+    </div>
+  </div>
+
   <div className="flex flex-col md:flex-row gap-8">
     {/* Review Form - 50% width on md+ */}
     <div className="md:w-1/2 bg-gray-50 p-8 rounded-lg shadow-inner">
-      <ReviewForm productId={product._id} />
+      <ReviewForm productId={product._id} onSubmitted={handleReviewSubmitted} />
     </div>
 
     {/* Reviews List - 50% width on md+ */}
@@ -161,8 +215,8 @@ export default function ProductPage({ product }) {
     All Reviews
   </h3>
 
-  {product.reviews?.length > 0 ? (
-    product.reviews.map((review, index) => (
+  {reviews.length > 0 ? (
+    reviews.map((review, index) => (
       <div
         key={index}
         className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
@@ -215,6 +269,28 @@ export default function ProductPage({ product }) {
 
 
         </div>
+
+        {relatedProducts?.length > 0 && (
+          <div className="max-w-7xl mx-auto mt-12">
+            <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Recommended next</p>
+                <h2 className="text-3xl font-bold text-slate-900">You may also like</h2>
+              </div>
+              <p className="text-sm text-slate-600">
+                More products from the same catalog flow.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+              {relatedProducts.map((relatedProduct) => (
+                <div key={relatedProduct._id}>
+                  <ProductBox {...relatedProduct} />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </Center>
 
       {/* Lightbox Overlay */}
@@ -250,11 +326,24 @@ export async function getServerSideProps(context) {
       };
     }
 
-    const resolvedProduct = await attachCategoryNames(product);
+    const relatedProductsQuery = product.category
+      ? { _id: { $ne: product._id }, category: product.category }
+      : { _id: { $ne: product._id } };
+
+    const relatedProducts = await Product.find(relatedProductsQuery, null, {
+      sort: { _id: -1 },
+      limit: 4,
+    }).lean();
+
+    const [resolvedProduct, resolvedRelatedProducts] = await Promise.all([
+      attachCategoryNames(product),
+      attachCategoryNames(relatedProducts),
+    ]);
 
     return {
       props: {
         product: JSON.parse(JSON.stringify(resolvedProduct)),
+        relatedProducts: JSON.parse(JSON.stringify(resolvedRelatedProducts)),
       },
     };
   } catch (error) {

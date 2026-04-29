@@ -3,6 +3,10 @@ import { Product } from "@/models/Product";
 import mongoose from "mongoose";
 
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   await mongooseConnect();
 
   const { ids } = req.body;
@@ -12,7 +16,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    const objectIds = ids.map(id => new mongoose.Types.ObjectId(id));
+    const objectIds = ids
+      .filter((id) => mongoose.Types.ObjectId.isValid(id))
+      .map((id) => new mongoose.Types.ObjectId(id));
+
+    if (!objectIds.length) {
+      return res.status(200).json({ products: [] });
+    }
+
     const products = await Product.find({ _id: { $in: objectIds } });
     res.status(200).json({ products });
   } catch (error) {

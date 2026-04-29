@@ -2,7 +2,12 @@ import { useContext } from "react";
 import Image from "next/image";
 import Center from "./Center";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBolt,
+  faCartShopping,
+  faLeaf,
+  faShieldHeart,
+} from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { CartContext } from "./CartContext";
 import { getPrimaryProductImage } from "@/lib/productImages";
@@ -22,26 +27,57 @@ export default function Featured({ product }) {
   const productImage = getPrimaryProductImage(product.images);
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 py-20">
+    <div className="py-20">
       <Center>
-        <div className="flex flex-col-reverse md:flex-row items-center justify-between gap-16 max-w-7xl mx-auto px-4">
+        <div className="panel-surface relative overflow-hidden rounded-[2rem] px-6 py-8 md:px-10 md:py-12">
+          <div className="pointer-events-none absolute -left-16 top-10 h-48 w-48 rounded-full bg-[rgba(217,157,78,0.16)] blur-3xl" />
+          <div className="pointer-events-none absolute -right-12 bottom-6 h-56 w-56 rounded-full bg-[rgba(18,56,60,0.14)] blur-3xl" />
+          <div className="relative flex flex-col-reverse md:flex-row items-center justify-between gap-16 max-w-7xl mx-auto">
           {/* Text Content */}
           <div className="text-center md:text-left md:w-1/2">
-            <h1 className="text-4xl lg:text-5xl font-extrabold text-gray-800 leading-snug mb-4">
-              {product.description}
+            <span className="inline-flex rounded-full border border-[rgba(18,56,60,0.12)] bg-white/70 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-600">
+              Curated weekly feature
+            </span>
+            <h1 className="mt-5 text-4xl lg:text-6xl font-extrabold text-slate-900 leading-[1.02] mb-4">
+              Fresh essentials, refined service, fewer checkout frictions.
             </h1>
-            <p className="text-base lg:text-lg text-gray-600 mb-6">
-            Fresh groceries and everyday essentials — delivered to your doorstep.
-            St Michael’s Hub and Stores brings the full supermarket experience to your home, anywhere in Lagos.
+            <p className="text-base lg:text-lg text-slate-600 mb-6 max-w-xl">
+              {product.description} Shop premium groceries and household staples with cleaner navigation,
+              safer payment handling, and delivery-ready stock visibility.
             </p>
+            <div className="mb-8 flex flex-wrap justify-center gap-3 md:justify-start">
+              {[
+                { icon: faShieldHeart, label: "Server-verified checkout" },
+                { icon: faLeaf, label: "Fresh curated inventory" },
+                { icon: faBolt, label: "Fast category discovery" },
+              ].map((feature) => (
+                <span
+                  key={feature.label}
+                  className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 shadow-sm"
+                >
+                  <FontAwesomeIcon icon={feature.icon} className="text-[var(--accent)]" />
+                  {feature.label}
+                </span>
+              ))}
+            </div>
+            <div className="mb-8 flex flex-wrap items-end justify-center gap-8 md:justify-start">
+              <div>
+                <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Featured product</p>
+                <p className="text-2xl font-bold text-slate-900">{product.name}</p>
+              </div>
+              <div>
+                <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Price</p>
+                <p className="text-3xl font-bold text-[var(--brand)]">₦{product.salePriceIncTax?.toLocaleString()}</p>
+              </div>
+            </div>
             <div className="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
               <Link href={`/product/${product._id}`}>
-                <button className="bg-gray-800 text-white px-6 py-3 rounded-lg shadow hover:bg-gray-700 hover:scale-105 transition duration-300 ease-in-out font-semibold cursor-pointer">
-                  Read More
+                <button className="bg-slate-900 text-white px-6 py-3 rounded-full shadow hover:bg-slate-800 transition duration-300 ease-in-out font-semibold cursor-pointer">
+                  View Product Details
                 </button>
               </Link>
 
-              <button onClick={addFeatureProductToCart} className="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 hover:scale-105 transition duration-300 ease-in-out font-semibold flex items-center gap-2 cursor-pointer">
+              <button onClick={addFeatureProductToCart} className="bg-[var(--brand)] text-white px-6 py-3 rounded-full shadow hover:bg-[#0d2b2d] transition duration-300 ease-in-out font-semibold flex items-center gap-2 cursor-pointer">
                 <FontAwesomeIcon icon={faCartShopping} />
                 Add to Cart
               </button>
@@ -55,9 +91,10 @@ export default function Featured({ product }) {
               alt={product.name || "Featured Product"}
               width={600}
               height={400}
-              className="w-full h-auto rounded-xl shadow-xl object-cover border border-gray-200"
+              className="w-full h-auto rounded-[1.75rem] shadow-2xl object-cover border border-white/70"
             />
           </div>
+        </div>
         </div>
       </Center>
     </div>

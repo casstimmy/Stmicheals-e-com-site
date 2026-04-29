@@ -1,39 +1,77 @@
 // pages/api/initiate-paystack.js
 
 import axios from 'axios';
+import { mongooseConnect } from "@/lib/mongoose";
+import Order from "@/models/Order";
+
+function getSiteUrl(req) {
+  const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (configuredUrl) {
+    return configuredUrl.replace(/\/$/, "");
+  }
+
+  const host = req.headers["x-forwarded-host"] || req.headers.host;
+  const protocol = req.headers["x-forwarded-proto"] || (host?.includes("localhost") ? "http" : "https");
+
+  return host ? `${protocol}://${host}` : "";
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method Not Allowed' });
   }
 
-  const { email, amount, customer, cartProducts, orderId } = req.body;
+  await mongooseConnect();
 
-  if (!email || !amount || !customer || !Array.isArray(cartProducts)) {
-  return res.status(400).json({ error: "Missing required fields" });
-}
+  const { orderId } = req.body;
+
+  if (!orderId) {
+    return res.status(400).json({ error: "Order ID is required" });
+  }
 
   try {
+    const order = await Order.findById(orderId).populate("customer");
+    if (!order) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    if (order.paid) {
+      return res.status(400).json({ error: "This order has already been paid for" });
+    }
+
+    if (!order.customer?.email) {
+      return res.status(400).json({ error: "Order customer details are incomplete" });
+    }
+
+    const siteUrl = getSiteUrl(req);
+    const amount = Math.round((order.total || 0) * 100);
+    if (amount <= 0) {
+      return res.status(400).json({ error: "Order total must be greater than zero" });
+    }
+
     const paystackRes = await axios.post(
       'https://api.paystack.co/transaction/initialize',
       {
-        email,
+        email: order.customer.email,
         amount,
-        callback_url: `${process.env.NEXT_PUBLIC_SITE_URL}/checkout/order-confirmation/${orderId}`,
+        callback_url: `${siteUrl}/checkout/order-confirmation/${orderId}`,
         metadata: {
-          customer,
-          cartProducts,
-          orderId,
+          orderId: String(order._id),
+          customer: {
+            name: order.customer.name,
+            email: order.customer.email,
+            phone: order.customer.phone,
+          },
           custom_fields: [
             {
               display_name: 'Customer Name',
               variable_name: 'customer_name',
-              value: customer.name,
+              value: order.customer.name,
             },
             {
               display_name: 'Customer Phone',
               variable_name: 'customer_phone',
-              value: customer.phone,
+              value: order.customer.phone,
             },
           ],
         },
@@ -48,7 +86,7 @@ export default async function handler(req, res) {
 
     const { authorization_url: authorizationUrl } = paystackRes.data.data;
 
-    res.status(200).json({ authorizationUrl });
+    res.status(200).json({ authorizationUrl, orderId: order._id });
   } catch (error) {
     console.error('Paystack Init Error:', error.response?.data || error.message);
     res.status(500).json({ message: 'Failed to initiate Paystack payment.' });

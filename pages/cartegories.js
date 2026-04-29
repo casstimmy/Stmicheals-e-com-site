@@ -4,15 +4,42 @@ import Header from "@/components/Header";
 import ProductBox from "@/components/ProductBox";
 import { mongooseConnect } from "@/lib/mongoose";
 import { Product } from "@/models/Product";
-import { useState } from "react";
+import { useDeferredValue, useState } from "react";
 import { attachCategoryNames } from "@/lib/productCategories";
 
 export default function CategoriesPage({ categories, productsByCategory }) {
   const [activeCategory, setActiveCategory] = useState(null);
+  const [query, setQuery] = useState("");
+  const deferredQuery = useDeferredValue(query);
+  const normalizedQuery = deferredQuery.trim().toLowerCase();
 
   const displayCategories = activeCategory
     ? { [activeCategory]: productsByCategory[activeCategory] }
     : productsByCategory;
+
+  const filteredCategories = Object.entries(displayCategories).reduce(
+    (accumulator, [category, products]) => {
+      const filteredProducts = products.filter((product) => {
+        if (!normalizedQuery) {
+          return true;
+        }
+
+        const haystack = [product.name, product.description, category]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+
+        return haystack.includes(normalizedQuery);
+      });
+
+      if (filteredProducts.length) {
+        accumulator[category] = filteredProducts;
+      }
+
+      return accumulator;
+    },
+    {}
+  );
 
   return (
     <>
@@ -21,20 +48,38 @@ export default function CategoriesPage({ categories, productsByCategory }) {
       </Head>
       <Header />
       <Center>
-        <div className="min-h-screen py-8 px-4 sm:px-8 bg-gradient-to-br from-blue-50 to-blue-100">
-          <div className="bg-white rounded-2xl shadow-lg p-8">
-            <h1 className="text-3xl font-extrabold text-gray-800 mb-6 border-b pb-4">
+        <div className="min-h-screen py-8 px-4 sm:px-8">
+          <div className="panel-surface rounded-[2rem] p-8">
+            <div className="border-b border-slate-200 pb-6">
+              <span className="inline-flex rounded-full bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 shadow-sm">
+                Guided browsing
+              </span>
+              <h1 className="mt-4 text-3xl font-extrabold text-slate-900 mb-3">
               Shop by Category
             </h1>
+              <p className="max-w-2xl text-slate-600">
+                Jump into a category, then narrow results with a live keyword search.
+              </p>
+            </div>
+
+            <div className="mt-6 rounded-[1.5rem] bg-white/70 p-4 shadow-sm">
+              <input
+                type="search"
+                value={query}
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search inside categories"
+                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none"
+              />
+            </div>
 
             {/* Category Filter Pills */}
-            <div className="flex flex-wrap gap-2 mb-8">
+            <div className="mt-6 flex flex-wrap gap-2 mb-8">
               <button
                 onClick={() => setActiveCategory(null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                   activeCategory === null
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-slate-900 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100"
                 }`}
               >
                 All
@@ -45,8 +90,8 @@ export default function CategoriesPage({ categories, productsByCategory }) {
                   onClick={() => setActiveCategory(cat)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                     activeCategory === cat
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                      ? "bg-slate-900 text-white"
+                      : "bg-white text-gray-700 hover:bg-gray-100"
                   }`}
                 >
                   {cat}
@@ -55,9 +100,9 @@ export default function CategoriesPage({ categories, productsByCategory }) {
             </div>
 
             {/* Products by Category */}
-            {Object.entries(displayCategories).map(([category, products]) => (
+            {Object.entries(filteredCategories).map(([category, products]) => (
               <div key={category} className="mb-10">
-                <h2 className="text-xl font-bold text-gray-700 mb-4">
+                <h2 className="text-xl font-bold text-slate-800 mb-4">
                   {category}
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -70,9 +115,9 @@ export default function CategoriesPage({ categories, productsByCategory }) {
               </div>
             ))}
 
-            {categories.length === 0 && (
-              <p className="text-center text-gray-500 py-12">
-                No categories available yet.
+            {Object.keys(filteredCategories).length === 0 && (
+              <p className="text-center text-slate-500 py-12">
+                No products match the current category filter.
               </p>
             )}
           </div>

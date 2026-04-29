@@ -36,7 +36,10 @@ export default async function handle(req, res) {
         return res.status(400).json({ success: false, message: "Invalid 'ids' array" });
       }
       // Convert to ObjectId array safely
-      const objectIds = ids.map(id => new ObjectId(id));
+      const objectIds = ids.filter((id) => ObjectId.isValid(id)).map((id) => new ObjectId(id));
+      if (!objectIds.length) {
+        return res.json({ products: [] });
+      }
       const products = await Product.find({ _id: { $in: objectIds } }).lean();
       const resolvedProducts = await attachCategoryNames(products);
       return res.json({ products: resolvedProducts });

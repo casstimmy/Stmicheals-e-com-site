@@ -9,27 +9,37 @@ import Head from "next/head";
 import Center from "@/components/Center";
 import axios from "axios";
 import { getPrimaryProductImage } from "@/lib/productImages";
+import { SUPPORTED_SHIPPING_DESTINATIONS } from "@/lib/shipping";
 
 export default function CartPage() {
   const { cartProducts, setCartProducts } = useContext(CartContext);
   const [products, setProducts] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState("");
+  const [shippingDetails, setShippingDetails] = useState(null);
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
-    city: "",
+    city: SUPPORTED_SHIPPING_DESTINATIONS[0] || "",
   });
   const [shippingCost, setShippingCost] = useState(2000);
 
   // Fetch shipping cost when city changes
   useEffect(() => {
     if (customer.city) {
-      axios.post("/api/shipping-cost", { destination: customer.city })
-        .then((res) => setShippingCost(res.data.cost))
-        .catch(() => setShippingCost(2000)); // fallback
+      axios
+        .post("/api/shipping-cost", { destination: customer.city })
+        .then((res) => {
+          setShippingCost(res.data.cost);
+          setShippingDetails(res.data);
+        })
+        .catch(() => {
+          setShippingCost(2000);
+          setShippingDetails(null);
+        });
     }
   }, [customer.city]);
 
@@ -65,33 +75,32 @@ export default function CartPage() {
   };
 
   const handleCheckout = async () => {
+    setCheckoutError("");
+
     const requiredFields = ["name", "email", "phone", "address", "city"];
     const missing = requiredFields.find((field) => !customer[field]);
     if (missing) {
-      alert(`Please enter your ${missing}`);
+      setCheckoutError(`Please enter your ${missing}.`);
       return;
     }
 
     // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(customer.email)) {
-      alert("Please enter a valid email address");
+      setCheckoutError("Please enter a valid email address.");
       return;
     }
 
     // Validate phone
     const phoneDigits = customer.phone.replace(/\D/g, "");
     if (phoneDigits.length < 10) {
-      alert("Please enter a valid phone number (at least 10 digits)");
+      setCheckoutError("Please enter a valid phone number with at least 10 digits.");
       return;
     }
 
     setIsLoading(true);
-    const totalAmount = subtotal + shippingCost;
     const fullCartProducts = products.map((product) => ({
       _id: product._id,
-      title: product.name,
-      price: product.salePriceIncTax || 0,
       quantity: cartProducts.find((item) => item.id === product._id)?.qty || 1,
     }));
 
@@ -99,41 +108,31 @@ export default function CartPage() {
       const orderRes = await axios.post("/api/orders", {
         customer,
         cartProducts: fullCartProducts,
-        subtotal,
-        shippingCost,
-        total: totalAmount,
       });
 
       const { orderId } = orderRes.data;
 
       if (!orderRes.data.success) {
-        alert("Failed to save order.");
-        setIsLoading(false);
-        return;
-      }
-
-      const amountInKobo = Math.round(totalAmount * 100);
-      if (amountInKobo <= 0) {
-        alert("Total amount must be greater than zero.");
+        setCheckoutError("Failed to save your order.");
         setIsLoading(false);
         return;
       }
 
       const payRes = await axios.post("/api/paystack/initiate", {
-        email: customer.email,
-        amount: amountInKobo,
-        customer,
-        cartProducts,
         orderId,
       });
 
       if (payRes.data?.authorizationUrl) {
         window.location.href = payRes.data.authorizationUrl;
       } else {
-        alert("Failed to initiate payment.");
+        setCheckoutError("Failed to initiate payment.");
       }
     } catch (error) {
-      alert("Something went wrong. Please try again.");
+      setCheckoutError(
+        error.response?.data?.message ||
+          error.response?.data?.error ||
+          "Something went wrong. Please try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -302,6 +301,13 @@ export default function CartPage() {
                 </div>
               </div>
 
+              {shippingDetails && (
+                <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                  Delivery quote for {shippingDetails.destination}: ₦{shippingCost.toLocaleString()}
+                  {shippingDetails.isFallback ? " (standard rate applied)" : ""}
+                </div>
+              )}
+
               <div className="border-t pt-6">
                 <h3 className="text-lg font-semibold mb-4 text-gray-800">
                   Customer Information
@@ -343,16 +349,33 @@ export default function CartPage() {
                       setCustomer({ ...customer, address: e.target.value })
                     }
                   />
-                  <input
-                    type="text"
-                    placeholder="City"
-                    className="w-full border rounded-md p-2"
-                    value={customer.city}
-                    onChange={(e) =>
-                      setCustomer({ ...customer, city: e.target.value })
-                    }
-                  />
+                  <label className="block text-sm font-medium text-gray-700">
+                    Delivery City
+                    <select
+                      className="mt-1 w-full border rounded-md p-2"
+                      value={customer.city}
+                      onChange={(e) =>
+                        setCustomer({ ...customer, city: e.target.value })
+                      }
+                    >
+                      {SUPPORTED_SHIPPING_DESTINATIONS.map((city) => (
+                        <option key={city} value={city}>
+                          {city}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
+              </div>
+
+              {checkoutError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {checkoutError}
+                </div>
+              )}
+
+              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+                Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts.
               </div>
 
               <button

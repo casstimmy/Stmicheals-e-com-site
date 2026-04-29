@@ -1,36 +1,76 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
 import Center from "@/components/Center";
 import { getPrimaryProductImage } from "@/lib/productImages";
+import { CartContext } from "@/components/CartContext";
 
 export default function OrderConfirmationPage() {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, reference, trxref } = router.query;
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [verificationError, setVerificationError] = useState("");
+  const verificationStartedRef = useRef(false);
+  const { clearCart } = useContext(CartContext);
 
   useEffect(() => {
-    localStorage.removeItem("cart");
-  }, []);
+    if (!router.isReady || !id) {
+      return;
+    }
 
-  useEffect(() => {
-    if (!id) return;
+    let cancelled = false;
 
-    axios
-      .get(`/api/orders/${id}`)
-      .then((res) => {
-        setOrder(res.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Order fetch error:", err);
-        setLoading(false);
-      });
-  }, [id]);
+    async function finalizeOrder() {
+      setLoading(true);
+      setVerificationError("");
+
+      try {
+        const paymentReference =
+          typeof reference === "string" && reference.trim()
+            ? reference.trim()
+            : typeof trxref === "string" && trxref.trim()
+              ? trxref.trim()
+              : "";
+
+        if (paymentReference && !verificationStartedRef.current) {
+          verificationStartedRef.current = true;
+          await axios.post("/api/paystack/verify", { reference: paymentReference });
+          clearCart();
+        }
+
+        const response = await axios.get(`/api/orders/${id}`);
+        if (!cancelled) {
+          setOrder(response.data);
+          if (response.data?.paid) {
+            clearCart();
+          }
+        }
+      } catch (error) {
+        console.error("Order finalization error:", error);
+        if (!cancelled) {
+          setVerificationError(
+            error.response?.data?.error ||
+              error.response?.data?.message ||
+              "We could not confirm this payment yet."
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
+      }
+    }
+
+    finalizeOrder();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [id, reference, router.isReady, trxref]);
 
   if (loading) {
     return (
@@ -38,8 +78,25 @@ export default function OrderConfirmationPage() {
         <Header />
         <Center>
           <p className="text-gray-500 text-center mt-20 text-lg">
-            Fetching your order...
+            Confirming your order...
           </p>
+        </Center>
+      </>
+    );
+  }
+
+  if (verificationError && !order) {
+    return (
+      <>
+        <Header />
+        <Center>
+          <div className="max-w-xl mx-auto my-16 rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center shadow-sm">
+            <h1 className="text-2xl font-bold text-red-800">Payment confirmation pending</h1>
+            <p className="mt-3 text-red-700">{verificationError}</p>
+            <p className="mt-3 text-sm text-red-600">
+              If payment was completed, your order will remain available once verification succeeds.
+            </p>
+          </div>
         </Center>
       </>
     );
@@ -75,6 +132,12 @@ export default function OrderConfirmationPage() {
       <Header />
       <Center>
         <div className="max-w-3xl mx-auto my-16 px-6 py-10 bg-white rounded-2xl shadow-lg border border-gray-200">
+          {verificationError && (
+            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              {verificationError}
+            </div>
+          )}
+
           {/* Logo */}
           <div className="flex justify-center mb-8">
             <Image
@@ -93,6 +156,17 @@ export default function OrderConfirmationPage() {
           <p className="text-center text-gray-600 mb-8 text-lg">
             Order <strong>#{order._id}</strong> placed on <em>{orderDate}</em>.
           </p>
+
+          <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
+            <span className={`rounded-full px-4 py-2 text-sm font-semibold ${
+              order.paid ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+            }`}>
+              Payment: {order.paid ? "Confirmed" : order.paymentStatus || "Pending"}
+            </span>
+            <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+              Fulfillment: {order.status}
+            </span>
+          </div>
 
           {/* Order Summary */}
           <section className="bg-gray-50 rounded-xl p-6 space-y-4">

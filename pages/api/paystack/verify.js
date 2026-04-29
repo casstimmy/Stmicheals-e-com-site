@@ -7,6 +7,10 @@ import axios from "axios";
 import nodemailer from "nodemailer";
 
 export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
+  }
+
   await mongooseConnect();
 
   const { reference } = req.body;
@@ -31,8 +35,30 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Payment verification failed" });
     }
 
+    const orderId = data.metadata?.orderId;
+    if (!orderId) {
+      return res.status(400).json({ error: "Missing order metadata" });
+    }
+
+    const existingOrder = await Order.findById(orderId)
+      .populate("customer")
+      .populate("items.productId");
+
+    if (!existingOrder) {
+      return res.status(404).json({ error: "Order not found" });
+    }
+
+    const expectedAmount = Math.round((existingOrder.total || 0) * 100);
+    if (expectedAmount <= 0 || data.amount !== expectedAmount) {
+      return res.status(400).json({ error: "Payment amount mismatch" });
+    }
+
+    if (existingOrder.paid) {
+      return res.json({ success: true, order: existingOrder, alreadyProcessed: true });
+    }
+
     const order = await Order.findOneAndUpdate(
-      { _id: data.metadata.orderId },
+      { _id: orderId, paid: false },
       {
         paid: true,
         paymentReference: data.reference,
@@ -43,6 +69,14 @@ export default async function handler(req, res) {
     ).populate("customer").populate("items.productId");
 
     if (!order) {
+      const refreshedOrder = await Order.findById(orderId)
+        .populate("customer")
+        .populate("items.productId");
+
+      if (refreshedOrder?.paid) {
+        return res.json({ success: true, order: refreshedOrder, alreadyProcessed: true });
+      }
+
       return res.status(404).json({ error: "Order not found" });
     }
 
