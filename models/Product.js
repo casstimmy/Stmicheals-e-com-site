@@ -20,7 +20,12 @@ const ProductSchema = new Schema({
   barcode: { type: String },
   quantity: { type: Number, default: 0 },
   category: { type: String, default: "Top Level" },
-  images: { type: [String] },
+  images: [
+    {
+      full: { type: String, required: true },
+      thumb: { type: String, required: true },
+    },
+  ],
   properties: [{ type: Object }, []],
   reviews: [ReviewSchema], // ✅ Add this
 }, { timestamps: true });

@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import { CartContext } from "./CartContext";
+import { getPrimaryProductImage } from "@/lib/productImages";
 
 export default function Featured({ product }) {
 
@@ -17,6 +18,8 @@ export default function Featured({ product }) {
   if (!product) {
     return <div className="text-center text-gray-500">Loading...</div>;
   }
+
+  const productImage = getPrimaryProductImage(product.images);
 
   return (
     <div className="bg-gradient-to-br from-blue-50 to-blue-100 py-20">
@@ -48,7 +51,7 @@ export default function Featured({ product }) {
           {/* Image */}
           <div className="w-full md:w-1/2">
             <Image
-              src={product.images?.[0] || "/placeholder.jpg"}
+              src={productImage}
               alt={product.name || "Featured Product"}
               width={600}
               height={400}

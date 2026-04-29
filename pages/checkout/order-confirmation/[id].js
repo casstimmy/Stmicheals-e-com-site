@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
 import Center from "@/components/Center";
+import { getPrimaryProductImage } from "@/lib/productImages";
 
 export default function OrderConfirmationPage() {
   const router = useRouter();
@@ -119,7 +120,7 @@ export default function OrderConfirmationPage() {
                     const name = productId?.name || "Unnamed Product";
                     const unitPrice = productId?.salePriceIncTax ?? price ?? 0;
                     const totalPrice = unitPrice * quantity;
-                    const image = productId?.images?.[0];
+                    const image = getPrimaryProductImage(productId?.images);
 
                     return (
                       <li
@@ -127,15 +128,13 @@ export default function OrderConfirmationPage() {
                         className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4"
                       >
                         <div className="flex gap-4">
-                          {image && (
-                            <Image
-                              src={image}
-                              alt={name}
-                              width={64}
-                              height={64}
-                              className="w-16 h-16 object-cover rounded border"
-                            />
-                          )}
+                          <Image
+                            src={image}
+                            alt={name}
+                            width={64}
+                            height={64}
+                            className="w-16 h-16 object-cover rounded border"
+                          />
                           <div>
                             <p className="font-medium text-lg">{name}</p>
                             <p className="text-sm text-gray-500">

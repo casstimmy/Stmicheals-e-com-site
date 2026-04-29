@@ -8,9 +8,16 @@ import Head from "next/head";
 import { motion, AnimatePresence } from "framer-motion";
 import { CartContext } from "@/components/CartContext";
 import ReviewForm from "@/components/ReviewForm";
+import {
+  getPrimaryProductImage,
+  normalizeProductImages,
+  PRODUCT_IMAGE_PLACEHOLDER,
+} from "@/lib/productImages";
 
 export default function ProductPage({ product }) {
-  const [activeImage, setActiveImage] = useState(product.images?.[0]);
+  const galleryImages = normalizeProductImages(product.images);
+  const defaultImage = getPrimaryProductImage(product.images);
+  const [activeImage, setActiveImage] = useState(defaultImage);
   const { addProductToCart } = useContext(CartContext);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const mainImageRef = useRef(null);
@@ -68,7 +75,7 @@ export default function ProductPage({ product }) {
                   <motion.img
                     key={activeImage}
                     ref={mainImageRef}
-                    src={activeImage || "/placeholder.jpg"}
+                    src={activeImage || PRODUCT_IMAGE_PLACEHOLDER}
                     alt={product.name}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -80,18 +87,18 @@ export default function ProductPage({ product }) {
               </div>
 
               <div className="flex mt-4 gap-3 overflow-x-auto">
-                {product.images?.map((image, index) => (
+                {(galleryImages.length ? galleryImages : [{ full: PRODUCT_IMAGE_PLACEHOLDER, thumb: PRODUCT_IMAGE_PLACEHOLDER }]).map((image, index) => (
                   <button
                     key={index}
-                    onClick={() => setActiveImage(image)}
+                    onClick={() => setActiveImage(image.full)}
                     className={`w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border-2 ${
-                      image === activeImage
+                      image.full === activeImage
                         ? "border-blue-500"
                         : "border-transparent hover:border-gray-300"
                     }`}
                   >
                     <Image
-                      src={image}
+                      src={image.thumb}
                       alt={`Product thumbnail ${index + 1}`}
                       width={80}
                       height={80}
@@ -216,7 +223,7 @@ export default function ProductPage({ product }) {
           onClick={() => setLightboxOpen(false)}
         >
           <Image
-            src={activeImage}
+            src={activeImage || PRODUCT_IMAGE_PLACEHOLDER}
             alt="Full View"
             width={1200}
             height={900}

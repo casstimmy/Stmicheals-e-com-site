@@ -8,6 +8,7 @@ import Link from "next/link";
 import Head from "next/head";
 import Center from "@/components/Center";
 import axios from "axios";
+import { getPrimaryProductImage } from "@/lib/productImages";
 
 export default function CartPage() {
   const { cartProducts, setCartProducts } = useContext(CartContext);
@@ -182,7 +183,7 @@ export default function CartPage() {
   {products.map((product, index) => {
     const cartItem = cartProducts.find((item) => item.id === product._id);
     const quantity = cartItem?.qty || 1;
-    const imageSrc = product?.images?.[0] || "/images/placeholder.jpg";
+    const imageSrc = getPrimaryProductImage(product?.images);
 
     return (
       <tr

@@ -2,10 +2,12 @@ import Link from "next/link";
 import Image from "next/image";
 import { useContext } from "react";
 import { CartContext } from "./CartContext";
+import { getPrimaryProductImage } from "@/lib/productImages";
 
 export default function ProductBox({ _id, name, description, images, salePriceIncTax }) {
     const { addProductToCart } = useContext(CartContext);
     const url = '/product/' + _id;
+    const productImage = getPrimaryProductImage(images);
 
     const handleClick = () => {
         window.location.href = url;
@@ -52,7 +54,7 @@ export default function ProductBox({ _id, name, description, images, salePriceIn
             <div className="w-full h-40 bg-white flex items-center justify-center">
                 <Link href={url} className="w-full h-full flex items-center justify-center" onClick={handleClick}>
                     <Image
-                        src={images?.[0] || "/placeholder.jpg"}
+                        src={productImage}
                         alt={name}
                         width={160}
                         height={160}
