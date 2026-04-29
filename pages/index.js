@@ -28,15 +28,15 @@ export async function getServerSideProps() {
     let featuredProduct = null;
     if (featuredProductId) {
       try {
-        featuredProduct = await Product.findById(featuredProductId);
+        featuredProduct = await Product.findById(featuredProductId).populate('category', 'name');
       } catch {
         featuredProduct = null;
       }
     }
     if (!featuredProduct) {
-      featuredProduct = await Product.findOne({}, null, { sort: { _id: -1 } });
+      featuredProduct = await Product.findOne({}, null, { sort: { _id: -1 } }).populate('category', 'name');
     }
-    const newProducts = await Product.find({}, null, { sort: { '_id': -1 }, limit: 10 });
+    const newProducts = await Product.find({}, null, { sort: { '_id': -1 }, limit: 10 }).populate('category', 'name');
 
     return {
       props: {

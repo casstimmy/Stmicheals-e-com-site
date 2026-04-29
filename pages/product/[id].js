@@ -127,7 +127,7 @@ export default function ProductPage({ product }) {
               <div className="grid grid-cols-1 gap-2 text-sm text-gray-500">
                 <p>
                   <span className="font-medium text-gray-700">Category:</span>{" "}
-                  {product.category}
+                  {product.category?.name || product.category || "Uncategorized"}
                 </p>
                 <p>
                   <span className="font-medium text-gray-700">SKU:</span>{" "}
@@ -241,7 +241,7 @@ export async function getServerSideProps(context) {
   try {
     await mongooseConnect();
     const { id } = context.query;
-    const product = await Product.findById(id);
+    const product = await Product.findById(id).populate('category', 'name');
 
     if (!product) {
       return {

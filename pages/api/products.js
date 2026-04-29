@@ -9,7 +9,7 @@ export default async function handle(req, res) {
   if (method === "GET") {
     if (req.query?.id) {
       try {
-        const product = await Product.findOne({ _id: req.query.id });
+        const product = await Product.findOne({ _id: req.query.id }).populate('category', 'name');
         return res.json(product);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -17,7 +17,7 @@ export default async function handle(req, res) {
       }
     } else {
       try {
-        const products = await Product.find();
+        const products = await Product.find().populate('category', 'name');
         return res.json(products);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -34,7 +34,7 @@ export default async function handle(req, res) {
       }
       // Convert to ObjectId array safely
       const objectIds = ids.map(id => new ObjectId(id));
-      const products = await Product.find({ _id: { $in: objectIds } });
+      const products = await Product.find({ _id: { $in: objectIds } }).populate('category', 'name');
       return res.json({ products });
     } catch (error) {
       console.error("Error fetching multiple products:", error);
