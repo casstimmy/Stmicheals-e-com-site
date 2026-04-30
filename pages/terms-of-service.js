@@ -35,7 +35,7 @@ export default function TermsOfServicePage() {
   return (
     <PolicyPageLayout
       title="Terms of Service"
-      intro="These terms describe the basic rules governing use of the storefront, customer accounts, ordering, and payment initiation through St Michael's Store."
+      intro="These terms describe the basic rules governing use of the storefront, customer accounts, ordering, and payment initiation through St Michael's Food & Drinks Warehouse."
       sections={sections}
     />
   );

@@ -85,7 +85,7 @@ export default function ProductPage({ product, relatedProducts }) {
   return (
     <>
       <Head>
-        <title>{`${product.name} | St Michael's Store`}</title>
+        <title>{`${product.name} | St Michael's Food & Drinks Warehouse`}</title>
       </Head>
       <Header />
       <Center>

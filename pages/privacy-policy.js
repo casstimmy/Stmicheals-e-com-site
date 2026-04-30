@@ -35,7 +35,7 @@ export default function PrivacyPolicyPage() {
   return (
     <PolicyPageLayout
       title="Privacy Policy"
-      intro="This policy explains how St Michael's Store handles customer information used for orders, account access, delivery coordination, and payment-related communication."
+      intro="This policy explains how St Michael's Food & Drinks Warehouse handles customer information used for orders, account access, delivery coordination, and payment-related communication."
       sections={sections}
     />
   );

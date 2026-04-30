@@ -4,7 +4,7 @@ const sections = [
   {
     heading: "What the store is built for",
     body: [
-      "St Michael's Store is structured to help customers move from discovery to checkout with clearer product visibility, stock-aware ordering, and dependable payment initiation.",
+      "St Michael's Food & Drinks Warehouse is structured to help customers move from discovery to checkout with clearer product visibility, stock-aware ordering, and dependable payment initiation.",
       "The storefront focuses on practical essentials, organized browsing, and a cleaner customer journey for repeat grocery and household purchasing.",
     ],
   },
@@ -28,7 +28,7 @@ export default function AboutPage() {
   return (
     <PolicyPageLayout
       title="About Us"
-      intro="Learn how St Michael's Store approaches catalog browsing, secure checkout, and customer support for everyday grocery and household orders."
+      intro="Learn how St Michael's Food & Drinks Warehouse approaches catalog browsing, secure checkout, and customer support for everyday grocery and household orders."
       sections={sections}
       eyebrow="About the store"
       backHref="/products"

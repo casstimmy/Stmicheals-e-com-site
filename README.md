@@ -1,6 +1,6 @@
-## St Michael's Store
+## St Michael's Food & Drinks Warehouse
 
-This repository contains the storefront for St Michael's Store, built with Next.js pages router, MongoDB/Mongoose, Paystack checkout, and OTP-based customer account access.
+This repository contains the storefront for St Michael's Food & Drinks Warehouse, built with Next.js pages router, MongoDB/Mongoose, Paystack checkout, and OTP-based customer account access.
 
 ## Local Setup
 

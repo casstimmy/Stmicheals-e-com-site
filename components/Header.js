@@ -133,10 +133,10 @@ export default function Header() {
               </div>
               <div className="min-w-0">
                 <span className="block truncate text-[0.98rem] font-bold text-[var(--foreground-strong)] sm:text-xl">
-                  St. Michael&apos;s Store
+                  St. Michael&apos;s Food & Drinks Warehouse
                 </span>
                 <span className="block truncate text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.56)] sm:text-xs sm:tracking-[0.26em]">
-                  Premium essentials marketplace
+                  Essentials marketplace
                 </span>
               </div>
             </Link>

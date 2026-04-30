@@ -35,7 +35,7 @@ export default function ReturnsAndRefundsPage() {
   return (
     <PolicyPageLayout
       title="Returns & Refunds"
-      intro="This policy explains how St Michael's Store reviews issues with delivered goods and how return or refund requests are handled where appropriate."
+      intro="This policy explains how St Michael's Food & Drinks Warehouse reviews issues with delivered goods and how return or refund requests are handled where appropriate."
       sections={sections}
     />
   );
