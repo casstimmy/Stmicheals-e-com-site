@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import Center from "./Center";
-import { COMPANY_LINKS, POLICY_LINKS, PRIMARY_FOOTER_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
+import { COMPANY_LINKS, POLICY_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
 import {
   getPublicScopedHref,
   getPublicSiteConfig,
@@ -13,11 +13,7 @@ export default function Footer() {
   const router = useRouter();
   const activeSiteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
   const site = getPublicSiteConfig(activeSiteKey);
-  const serviceHighlights = [
-    `${site.shortLabel} OTP-based account access`,
-    "Server-validated payment flow",
-    `${site.shortLabel} stock-aware ordering and delivery pricing`,
-  ];
+  const serviceHighlights = site.serviceHighlights || [];
   const companyLinks = COMPANY_LINKS.map((link) => ({
     ...link,
     href: getPublicScopedHref(activeSiteKey, link.href),
@@ -26,7 +22,7 @@ export default function Footer() {
     ...link,
     href: getPublicScopedHref(activeSiteKey, link.href),
   }));
-  const primaryLinks = PRIMARY_FOOTER_LINKS.map((link) => ({
+  const primaryLinks = (site.primaryFooterLinks || []).map((link) => ({
     ...link,
     href: link.href === "/" ? "/" : getPublicScopedHref(activeSiteKey, link.href),
   }));
@@ -45,8 +41,9 @@ export default function Footer() {
                 {site.displayName}
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-8 theme-muted-page">
-                Industrial-standard public foundations for the {site.shortLabel.toLowerCase()} side: clear navigation, policy access, secure checkout,
-                and direct business contact details in one footer.
+                {site.key === "hotel"
+                  ? "A refined hotel-side foundation with room browsing, lounge presentation, direct reservation requests, and business contact details in one footer."
+                  : `Industrial-standard public foundations for the ${site.shortLabel.toLowerCase()} side: clear navigation, policy access, secure checkout, and direct business contact details in one footer.`}
               </p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -110,7 +107,7 @@ export default function Footer() {
               </p>
               <div className="mt-5 grid gap-4 min-[460px]:grid-cols-2 xl:grid-cols-1">
                 <div className="theme-card-light rounded-[1.25rem] px-5 py-4 shadow-sm">
-                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">Store details</p>
+                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">{site.shortLabel} details</p>
                   <div className="mt-3 space-y-2 text-sm leading-7 theme-muted-page">
                     <p>{STORE_DETAILS.displayName}</p>
                     <p>{STORE_DETAILS.country}</p>
@@ -118,13 +115,13 @@ export default function Footer() {
                   </div>
                 </div>
                 <div className="theme-card-light rounded-[1.25rem] px-5 py-4 shadow-sm">
-                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">Reach the store</p>
+                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">{site.contactPanelTitle || "Reach the team"}</p>
                   <div className="mt-3 space-y-2 text-sm leading-7">
                     <Link
                       href={getPublicScopedHref(activeSiteKey, "/contact")}
                       className="theme-footer-link mb-3 w-full justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)]"
                     >
-                      Open contact page
+                      {site.key === "hotel" ? "Contact reservations" : "Open contact page"}
                     </Link>
                     <a className="block break-all text-[var(--brand-strong)]" href={`mailto:${STORE_DETAILS.email}`}>
                       {STORE_DETAILS.email}

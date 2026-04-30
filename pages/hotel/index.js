@@ -1,28 +1,26 @@
-import SiteHomePage from "@/components/SiteHomePage";
-import { getCatalogInsights } from "@/lib/storefront";
+import HotelLandingPage from "@/components/HotelHomePage";
+import { resolveHotelCatalogSections } from "@/lib/hotelStorefront";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig } from "@/lib/publicSite";
-import { getStorefrontProductById, getStorefrontProducts } from "@/lib/storefrontCatalog";
+import { getStorefrontProducts } from "@/lib/storefrontCatalog";
 
 export default function HotelHomePage(props) {
-  return <SiteHomePage {...props} />;
+  return <HotelLandingPage {...props} />;
 }
 
 export async function getServerSideProps() {
   try {
     const siteKey = PUBLIC_SITE_KEYS.HOTEL;
-    const featuredProductId = process.env.HOTEL_FEATURED_PRODUCT_ID || process.env.FEATURED_PRODUCT_ID;
-    const [resolvedFeaturedProduct, resolvedNewProducts] = await Promise.all([
-      getStorefrontProductById(featuredProductId, { fallbackToLatest: true, site: siteKey }),
-      getStorefrontProducts({ limit: 12, site: siteKey }),
-    ]);
-    const catalogInsights = getCatalogInsights(resolvedNewProducts);
+    const resolvedProducts = await getStorefrontProducts({ limit: 12, site: siteKey });
+    const sections = resolveHotelCatalogSections(resolvedProducts);
+    const featuredRoom = sections.featuredRoom;
 
     return {
       props: {
         site: getPublicSiteConfig(siteKey),
-        featuredProduct: JSON.parse(JSON.stringify(resolvedFeaturedProduct)),
-        newProducts: JSON.parse(JSON.stringify(resolvedNewProducts)),
-        catalogInsights,
+        featuredRoom: JSON.parse(JSON.stringify(featuredRoom)),
+        rooms: JSON.parse(JSON.stringify(sections.rooms)),
+        dining: JSON.parse(JSON.stringify(sections.dining)),
+        sections: JSON.parse(JSON.stringify(sections)),
       },
     };
   } catch (error) {
@@ -30,9 +28,10 @@ export async function getServerSideProps() {
     return {
       props: {
         site: getPublicSiteConfig(PUBLIC_SITE_KEYS.HOTEL),
-        featuredProduct: null,
-        newProducts: [],
-        catalogInsights: getCatalogInsights([]),
+        featuredRoom: null,
+        rooms: [],
+        dining: [],
+        sections: resolveHotelCatalogSections([]),
       },
     };
   }

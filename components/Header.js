@@ -27,17 +27,16 @@ export default function Header({ siteKey }) {
   const router = useRouter();
   const activeSiteKey = normalizePublicSite(siteKey || inferPublicSiteFromPath(router.pathname));
   const site = getPublicSiteConfig(activeSiteKey);
-  const navLinks = [
-    { href: getPublicScopedHref(activeSiteKey, "/"), label: "Home" },
-    { href: getPublicScopedHref(activeSiteKey, "/products"), label: "All Products" },
-    { href: getPublicScopedHref(activeSiteKey, "/categories"), label: "Categories" },
-    { href: getPublicScopedHref(activeSiteKey, "/account"), label: "Account" },
-  ];
+  const navLinks = (site.navLinks || []).map((link) => ({
+    ...link,
+    href: getPublicScopedHref(activeSiteKey, link.href),
+  }));
   const companyLinks = COMPANY_LINKS.map((link) => ({
     ...link,
     href: getPublicScopedHref(activeSiteKey, link.href),
   }));
   const cartHref = getPublicScopedHref(activeSiteKey, "/cart");
+  const showCart = site.showCart !== false;
   const cartIsActive = router.asPath === cartHref || router.asPath.startsWith(`${cartHref}?`);
 
   useEffect(() => {
@@ -123,7 +122,7 @@ export default function Header({ siteKey }) {
               <span className="sm:hidden">{site.topBarCopy}</span>
               <span className="hidden sm:inline">{site.topBarCopy}</span>
             </span>
-            <Link href={getPublicScopedHref(activeSiteKey, "/products")} className="inline-flex items-center gap-2 font-semibold text-white/90 transition hover:text-[var(--accent)]">
+            <Link href={getPublicScopedHref(activeSiteKey, site.topBarCtaHref || "/products")} className="inline-flex items-center gap-2 font-semibold text-white/90 transition hover:text-[var(--accent)]">
               <span className="sm:hidden">{site.topBarCta}</span>
               <span className="hidden sm:inline">{site.topBarCta}</span>
               <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
@@ -156,23 +155,25 @@ export default function Header({ siteKey }) {
             </Link>
 
             <div className="flex shrink-0 items-center gap-2 md:hidden">
-              <Link
-                href={cartHref}
-                data-cart-icon
-                className={`inline-flex h-11 min-w-[3rem] items-center justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm transition ${
-                  cartIsActive
-                    ? "theme-button-accent"
-                    : "theme-button-primary"
-                }`}
-                aria-label="View cart"
-              >
-                <span className="relative inline-flex items-center justify-center">
-                  <FontAwesomeIcon icon={faCartShopping} className="text-sm" />
-                  <span className="absolute -right-3 -top-3 rounded-full bg-[var(--foreground-strong)] px-1.5 py-[1px] text-[0.62rem] font-semibold text-white shadow-sm">
-                    {cartCount || 0}
+              {showCart ? (
+                <Link
+                  href={cartHref}
+                  data-cart-icon
+                  className={`inline-flex h-11 min-w-[3rem] items-center justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm transition ${
+                    cartIsActive
+                      ? "theme-button-accent"
+                      : "theme-button-primary"
+                  }`}
+                  aria-label="View cart"
+                >
+                  <span className="relative inline-flex items-center justify-center">
+                    <FontAwesomeIcon icon={faCartShopping} className="text-sm" />
+                    <span className="absolute -right-3 -top-3 rounded-full bg-[var(--foreground-strong)] px-1.5 py-[1px] text-[0.62rem] font-semibold text-white shadow-sm">
+                      {cartCount || 0}
+                    </span>
                   </span>
-                </span>
-              </Link>
+                </Link>
+              ) : null}
 
               <button
                 type="button"
@@ -205,17 +206,19 @@ export default function Header({ siteKey }) {
                   {link.label}
                 </Link>
               ))}
-              <Link
-                href={cartHref}
-                data-cart-icon
-                className="theme-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2 transition shadow-lg"
-              >
-                <FontAwesomeIcon icon={faCartShopping} />
-                <span>Cart</span>
-                <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
-                  {cartCount || 0}
-                </span>
-              </Link>
+              {showCart ? (
+                <Link
+                  href={cartHref}
+                  data-cart-icon
+                  className="theme-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2 transition shadow-lg"
+                >
+                  <FontAwesomeIcon icon={faCartShopping} />
+                  <span>Cart</span>
+                  <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
+                    {cartCount || 0}
+                  </span>
+                </Link>
+              ) : null}
             </nav>
           </div>
 
@@ -237,25 +240,36 @@ export default function Header({ siteKey }) {
                         </p>
                       </div>
                       <span className="rounded-full bg-[rgba(20,148,182,0.12)] px-3 py-1 text-xs font-semibold text-[var(--brand-strong)]">
-                        {cartCount || 0} in cart
+                        {showCart ? `${cartCount || 0} in cart` : site.tagLine}
                       </span>
                     </div>
 
-                    <Link
-                      href={cartHref}
-                      onClick={() => setNavOpen(false)}
-                      className={`mt-4 flex items-center justify-between rounded-[1.2rem] px-4 py-3 text-sm font-semibold transition ${
-                        cartIsActive ? "theme-button-accent" : "theme-button-primary"
-                      }`}
-                    >
-                      <span className="flex items-center gap-2">
-                        <FontAwesomeIcon icon={faCartShopping} />
-                        Review cart
-                      </span>
-                      <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
-                        {cartCount || 0}
-                      </span>
-                    </Link>
+                    {showCart ? (
+                      <Link
+                        href={cartHref}
+                        onClick={() => setNavOpen(false)}
+                        className={`mt-4 flex items-center justify-between rounded-[1.2rem] px-4 py-3 text-sm font-semibold transition ${
+                          cartIsActive ? "theme-button-accent" : "theme-button-primary"
+                        }`}
+                      >
+                        <span className="flex items-center gap-2">
+                          <FontAwesomeIcon icon={faCartShopping} />
+                          Review cart
+                        </span>
+                        <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
+                          {cartCount || 0}
+                        </span>
+                      </Link>
+                    ) : (
+                      <Link
+                        href={getPublicScopedHref(activeSiteKey, site.topBarCtaHref || "/")}
+                        onClick={() => setNavOpen(false)}
+                        className="theme-button-accent mt-4 flex items-center justify-between rounded-[1.2rem] px-4 py-3 text-sm font-semibold transition"
+                      >
+                        <span>{site.topBarCta}</span>
+                        <FontAwesomeIcon icon={faArrowRight} />
+                      </Link>
+                    )}
 
                     <div className="mt-3 grid grid-cols-2 gap-3">
                       {navLinks.map((link) => (
@@ -281,13 +295,13 @@ export default function Header({ siteKey }) {
                         Company pages
                       </p>
                       <div className="mt-3 grid gap-3">
-                        {COMPANY_LINKS.map((link) => (
+                        {companyLinks.map((link) => (
                           <Link
                             key={link.href}
-                            href={getPublicScopedHref(activeSiteKey, link.href)}
+                            href={link.href}
                             onClick={() => setNavOpen(false)}
                             className={`rounded-[1.15rem] px-4 py-3 text-sm font-semibold transition ${
-                              isActiveRoute(getPublicScopedHref(activeSiteKey, link.href))
+                              isActiveRoute(link.href)
                                 ? "theme-button-accent"
                                 : "theme-footer-link text-[var(--foreground-strong)]"
                             }`}

@@ -23,6 +23,11 @@ const nextConfig = {
         destination: "/store/checkout/order-confirmation/:id",
         permanent: false,
       },
+      { source: "/hotel/products", destination: "/hotel/rooms", permanent: false },
+      { source: "/hotel/categories", destination: "/hotel/lounge", permanent: false },
+      { source: "/hotel/product/:id", destination: "/hotel/rooms/:id", permanent: false },
+      { source: "/hotel/cart", destination: "/hotel/booking", permanent: false },
+      { source: "/hotel/account", destination: "/hotel/contact", permanent: false },
     ];
   },
 };
