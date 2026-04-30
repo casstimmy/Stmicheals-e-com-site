@@ -1,15 +1,16 @@
 import CartProvider from "@/components/CartContext";
 import "@/styles/globals.css";
 import Head from "next/head";
-import { Manrope, Fraunces } from "next/font/google";
+import { Sora, Rajdhani } from "next/font/google";
 
-const manrope = Manrope({
+const sora = Sora({
   subsets: ["latin"],
   variable: "--font-sans",
 });
 
-const fraunces = Fraunces({
+const rajdhani = Rajdhani({
   subsets: ["latin"],
+  weight: ["500", "600", "700"],
   variable: "--font-display",
 });
 
@@ -33,7 +34,7 @@ export default function App({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CartProvider>
-        <div className={`${manrope.variable} ${fraunces.variable} app-shell`}>
+        <div className={`${sora.variable} ${rajdhani.variable} app-shell`}>
           <a href="#main-content" className="skip-link">
             Skip to content
           </a>

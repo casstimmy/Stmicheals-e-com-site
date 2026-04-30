@@ -1,7 +1,11 @@
 import Customer from "@/models/Customer";
-import Order from "@/models/Order";
 import { mongooseConnect } from "@/lib/mongoose";
 import { buildOrderDraft } from "@/lib/checkout";
+import {
+  createReservedOrder,
+  releaseExpiredReservations,
+  RESERVATION_WINDOW_MINUTES,
+} from "@/lib/orderLifecycle";
 
 export default async function handler(req, res) {
   await mongooseConnect();
@@ -11,6 +15,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    await releaseExpiredReservations();
+
     const { customer, cartProducts } = req.body;
     const orderDraft = await buildOrderDraft({ customer, cartProducts });
 
@@ -23,7 +29,7 @@ export default async function handler(req, res) {
 
     const existingCustomer = await Customer.findOneAndUpdate(
       { email: orderDraft.customer.email },
-      { $set: orderDraft.customer },
+      { $set: { ...orderDraft.customer, type: "ONLINE" } },
       {
         new: true,
         upsert: true,
@@ -31,16 +37,10 @@ export default async function handler(req, res) {
       }
     );
 
-    // Create order
-    const newOrder = await Order.create({
-      customer: existingCustomer._id,
-      items: orderDraft.orderItems,
-      subtotal: orderDraft.subtotal,
-      shippingCost: orderDraft.shippingCost,
-      total: orderDraft.total,
-      status: "Pending Payment",
-      paid: false,
-      paymentStatus: "Pending",
+    const newOrder = await createReservedOrder({
+      customer: existingCustomer,
+      customerId: existingCustomer._id,
+      orderDraft,
     });
 
     return res.status(201).json({
@@ -51,12 +51,16 @@ export default async function handler(req, res) {
         shippingCost: orderDraft.shippingCost,
         total: orderDraft.total,
       },
+      reservation: {
+        expiresAt: newOrder.reservationExpiresAt,
+        windowMinutes: RESERVATION_WINDOW_MINUTES,
+      },
       shippingQuote: orderDraft.shippingQuote,
       message: "Order successfully created",
     });
   } catch (error) {
     console.error("Error creating order:", error);
-    return res.status(500).json({
+    return res.status(error.statusCode || 500).json({
       message: "Error creating order",
       error: error.message,
     });

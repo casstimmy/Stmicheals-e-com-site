@@ -3,6 +3,7 @@
 import axios from 'axios';
 import { mongooseConnect } from "@/lib/mongoose";
 import Order from "@/models/Order";
+import { releaseExpiredReservations } from "@/lib/orderLifecycle";
 
 function getSiteUrl(req) {
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -30,6 +31,8 @@ export default async function handler(req, res) {
   }
 
   try {
+    await releaseExpiredReservations();
+
     const order = await Order.findById(orderId).populate("customer");
     if (!order) {
       return res.status(404).json({ error: "Order not found" });
@@ -41,6 +44,12 @@ export default async function handler(req, res) {
 
     if (!order.customer?.email) {
       return res.status(400).json({ error: "Order customer details are incomplete" });
+    }
+
+    if (order.reservationStatus !== "active") {
+      return res.status(409).json({
+        error: "This reservation is no longer active. Please rebuild your cart and try again.",
+      });
     }
 
     const siteUrl = getSiteUrl(req);
@@ -57,6 +66,7 @@ export default async function handler(req, res) {
         callback_url: `${siteUrl}/checkout/order-confirmation/${orderId}`,
         metadata: {
           orderId: String(order._id),
+          reservationExpiresAt: order.reservationExpiresAt,
           customer: {
             name: order.customer.name,
             email: order.customer.email,

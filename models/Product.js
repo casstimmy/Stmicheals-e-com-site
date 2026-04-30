@@ -19,6 +19,7 @@ const ProductSchema = new Schema({
   margin: { type: Number, default: 0 },
   barcode: { type: String },
   quantity: { type: Number, default: 0 },
+  reservedQuantity: { type: Number, default: 0 },
   category: { type: String, default: "Top Level" },
   images: [
     {

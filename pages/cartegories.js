@@ -50,25 +50,25 @@ export default function CategoriesPage({ categories, productsByCategory }) {
       <Center>
         <div className="min-h-screen py-8 px-4 sm:px-8">
           <div className="panel-surface rounded-[2rem] p-8">
-            <div className="border-b border-slate-200 pb-6">
-              <span className="inline-flex rounded-full bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 shadow-sm">
+            <div className="border-b border-cyan-200/10 pb-6">
+              <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
                 Guided browsing
               </span>
-              <h1 className="mt-4 text-3xl font-extrabold text-slate-900 mb-3">
+              <h1 className="mt-4 text-3xl font-extrabold text-white mb-3">
               Shop by Category
             </h1>
-              <p className="max-w-2xl text-slate-600">
+              <p className="max-w-2xl theme-muted">
                 Jump into a category, then narrow results with a live keyword search.
               </p>
             </div>
 
-            <div className="mt-6 rounded-[1.5rem] bg-white/70 p-4 shadow-sm">
+            <div className="theme-card-soft mt-6 rounded-[1.5rem] p-4 shadow-sm">
               <input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search inside categories"
-                className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none"
+                className="theme-input w-full rounded-2xl px-4 py-3 outline-none"
               />
             </div>
 
@@ -78,8 +78,8 @@ export default function CategoriesPage({ categories, productsByCategory }) {
                 onClick={() => setActiveCategory(null)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                   activeCategory === null
-                    ? "bg-slate-900 text-white"
-                    : "bg-white text-gray-700 hover:bg-gray-100"
+                    ? "theme-button-accent"
+                    : "theme-button-secondary"
                 }`}
               >
                 All
@@ -90,8 +90,8 @@ export default function CategoriesPage({ categories, productsByCategory }) {
                   onClick={() => setActiveCategory(cat)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                     activeCategory === cat
-                      ? "bg-slate-900 text-white"
-                      : "bg-white text-gray-700 hover:bg-gray-100"
+                      ? "theme-button-accent"
+                      : "theme-button-secondary"
                   }`}
                 >
                   {cat}
@@ -102,7 +102,7 @@ export default function CategoriesPage({ categories, productsByCategory }) {
             {/* Products by Category */}
             {Object.entries(filteredCategories).map(([category, products]) => (
               <div key={category} className="mb-10">
-                <h2 className="text-xl font-bold text-slate-800 mb-4">
+                <h2 className="text-xl font-bold text-white mb-4">
                   {category}
                 </h2>
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
@@ -116,7 +116,7 @@ export default function CategoriesPage({ categories, productsByCategory }) {
             ))}
 
             {Object.keys(filteredCategories).length === 0 && (
-              <p className="text-center text-slate-500 py-12">
+              <p className="text-center theme-muted py-12">
                 No products match the current category filter.
               </p>
             )}

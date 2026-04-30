@@ -16,6 +16,7 @@ import {
 import { attachCategoryNames } from "@/lib/productCategories";
 import { getReviewSummary } from "@/lib/reviews";
 import ProductBox from "@/components/ProductBox";
+import { getAvailableInventoryQuantity } from "@/lib/inventory";
 
 export default function ProductPage({ product, relatedProducts }) {
   const galleryImages = normalizeProductImages(product.images);
@@ -26,7 +27,8 @@ export default function ProductPage({ product, relatedProducts }) {
   const [reviews, setReviews] = useState(product.reviews || []);
   const mainImageRef = useRef(null);
   const reviewSummary = getReviewSummary(reviews);
-  const isInStock = (product.quantity || 0) > 0;
+  const availableQuantity = getAvailableInventoryQuantity(product);
+  const isInStock = availableQuantity > 0;
 
   const handleAddToCart = () => {
     const productImage = mainImageRef.current;
@@ -121,62 +123,62 @@ export default function ProductPage({ product, relatedProducts }) {
 
             {/* Product Details */}
             <div className="panel-surface rounded-[2rem] p-8 md:sticky md:top-32">
-              <div className="mb-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
-                <span className="rounded-full bg-white/80 px-3 py-2 shadow-sm">
+              <div className="mb-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/70">
+                <span className="theme-card-soft rounded-full px-3 py-2 shadow-sm text-cyan-50">
                   {product.categoryName || product.category || "Uncategorized"}
                 </span>
                 <span className={`rounded-full px-3 py-2 shadow-sm ${
-                  isInStock ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
+                  isInStock ? "bg-emerald-200/15 text-emerald-100" : "bg-rose-200/15 text-rose-100"
                 }`}>
-                  {isInStock ? `${product.quantity} in stock` : "Currently unavailable"}
+                  {isInStock ? `${availableQuantity} ready now` : "Currently unavailable"}
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-gray-800 mb-4">
+              <h1 className="text-3xl font-bold text-white mb-4">
                 {product.name}
               </h1>
-              <p className="text-gray-600 text-base mb-6 leading-relaxed">
+              <p className="theme-muted text-base mb-6 leading-relaxed">
                 {product.description}
               </p>
 
-              <div className="mb-6 flex flex-wrap gap-4 rounded-2xl bg-white/80 p-4 text-sm text-slate-600 shadow-sm">
+              <div className="theme-card-soft mb-6 flex flex-wrap gap-4 rounded-2xl p-4 text-sm text-cyan-50 shadow-sm">
                 <div>
-                  <p className="font-semibold text-slate-900">Rating</p>
+                  <p className="font-semibold text-white">Rating</p>
                   <p>{reviewSummary.count ? `${reviewSummary.averageLabel} / 5` : "No ratings yet"}</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">Reviews</p>
+                  <p className="font-semibold text-white">Reviews</p>
                   <p>{reviewSummary.count} published</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-slate-900">SKU</p>
+                  <p className="font-semibold text-white">SKU</p>
                   <p>{product.sku || "Not provided"}</p>
                 </div>
               </div>
 
               <div className="mb-6">
-                <p className="text-2xl text-blue-600 font-semibold">
+                <p className="text-2xl text-[var(--accent)] font-semibold">
                   ₦{product.salePriceIncTax?.toLocaleString()}
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 gap-2 text-sm text-gray-500">
+              <div className="grid grid-cols-1 gap-2 text-sm theme-muted">
                 <p>
-                  <span className="font-medium text-gray-700">Category:</span>{" "}
+                  <span className="font-medium text-white">Category:</span>{" "}
                   {product.categoryName || product.category || "Uncategorized"}
                 </p>
                 <p>
-                  <span className="font-medium text-gray-700">Availability:</span>{" "}
-                  {isInStock ? "Ready for delivery" : "Out of stock"}
+                  <span className="font-medium text-white">Availability:</span>{" "}
+                  {isInStock ? `${availableQuantity} item(s) available for delivery` : "Out of stock"}
                 </p>
               </div>
 
               <button
                 onClick={handleAddToCart}
                 disabled={!isInStock}
-                className={`mt-8 w-full text-white text-lg font-medium py-3 rounded-xl transition duration-200 ${
+                className={`mt-8 w-full text-lg font-medium py-3 rounded-xl transition duration-200 ${
                   isInStock
-                    ? "bg-blue-600 hover:bg-blue-700"
-                    : "bg-gray-300 cursor-not-allowed text-gray-600"
+                    ? "theme-button-accent"
+                    : "bg-white/10 cursor-not-allowed text-cyan-100/45"
                 }`}
               >
                 {isInStock ? "Add to Cart" : "Unavailable"}
@@ -184,34 +186,34 @@ export default function ProductPage({ product, relatedProducts }) {
             </div>
           </div>
           <div className="panel-surface max-w-7xl mx-auto mt-12 rounded-[2rem] p-10">
-  <h2 className="text-3xl font-extrabold mb-10 text-gray-900 border-b border-gray-200 pb-4">
+  <h2 className="text-3xl font-extrabold mb-10 text-white border-b border-cyan-200/10 pb-4">
     Customer Reviews
   </h2>
 
-  <div className="mb-8 grid gap-4 rounded-[1.5rem] bg-white/75 p-6 shadow-sm md:grid-cols-3">
+  <div className="theme-card-soft mb-8 grid gap-4 rounded-[1.5rem] p-6 shadow-sm md:grid-cols-3">
     <div>
-      <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Average rating</p>
-      <p className="mt-2 text-3xl font-bold text-slate-900">{reviewSummary.count ? reviewSummary.averageLabel : "New"}</p>
+      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Average rating</p>
+      <p className="mt-2 text-3xl font-bold text-white">{reviewSummary.count ? reviewSummary.averageLabel : "New"}</p>
     </div>
     <div>
-      <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Published reviews</p>
-      <p className="mt-2 text-3xl font-bold text-slate-900">{reviewSummary.count}</p>
+      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Published reviews</p>
+      <p className="mt-2 text-3xl font-bold text-white">{reviewSummary.count}</p>
     </div>
     <div>
-      <p className="text-sm uppercase tracking-[0.22em] text-slate-500">Fulfillment</p>
-      <p className="mt-2 text-3xl font-bold text-slate-900">{isInStock ? "Ready" : "Paused"}</p>
+      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Fulfillment</p>
+      <p className="mt-2 text-3xl font-bold text-white">{isInStock ? "Ready" : "Paused"}</p>
     </div>
   </div>
 
   <div className="flex flex-col md:flex-row gap-8">
     {/* Review Form - 50% width on md+ */}
-    <div className="md:w-1/2 bg-gray-50 p-8 rounded-lg shadow-inner">
+    <div className="md:w-1/2 theme-card-soft p-8 rounded-lg shadow-inner">
       <ReviewForm productId={product._id} onSubmitted={handleReviewSubmitted} />
     </div>
 
     {/* Reviews List - 50% width on md+ */}
-    <div className="md:w-1/2 space-y-8 bg-gray-50 p-8 rounded-lg shadow-inner">
-  <h3 className="text-2xl font-bold text-gray-900 border-b border-gray-300 pb-4 mb-6">
+    <div className="md:w-1/2 space-y-8 theme-card-soft p-8 rounded-lg shadow-inner">
+  <h3 className="text-2xl font-bold text-white border-b border-cyan-200/10 pb-4 mb-6">
     All Reviews
   </h3>
 
@@ -219,10 +221,10 @@ export default function ProductPage({ product, relatedProducts }) {
     reviews.map((review, index) => (
       <div
         key={index}
-        className="bg-white border border-gray-200 rounded-2xl p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
+        className="rounded-2xl border border-cyan-200/10 bg-white/6 p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
       >
         <div className="flex justify-between items-center mb-3">
-          <p className="font-semibold text-gray-900 text-lg tracking-wide">
+          <p className="font-semibold text-white text-lg tracking-wide">
             {review.customerName || "Anonymous"}
           </p>
           <div className="flex items-center space-x-1">
@@ -242,13 +244,13 @@ export default function ProductPage({ product, relatedProducts }) {
           </div>
         </div>
 
-        <h4 className="font-semibold text-xl text-gray-800 mb-2 tracking-tight">
+        <h4 className="font-semibold text-xl text-white mb-2 tracking-tight">
           {review.title}
         </h4>
 
-        <p className="text-gray-700 leading-relaxed mb-4">{review.text}</p>
+        <p className="theme-muted leading-relaxed mb-4">{review.text}</p>
 
-        <p className="text-xs text-gray-400 tracking-wide font-mono">
+        <p className="text-xs text-cyan-100/45 tracking-wide font-mono">
           {new Date(review.createdAt).toLocaleDateString(undefined, {
             year: "numeric",
             month: "short",
@@ -258,7 +260,7 @@ export default function ProductPage({ product, relatedProducts }) {
       </div>
     ))
   ) : (
-    <p className="text-gray-500 italic text-center mt-12 text-lg">
+    <p className="theme-muted italic text-center mt-12 text-lg">
       No reviews yet. Be the first to review this product!
     </p>
   )}
@@ -274,10 +276,10 @@ export default function ProductPage({ product, relatedProducts }) {
           <div className="max-w-7xl mx-auto mt-12">
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-slate-500">Recommended next</p>
-                <h2 className="text-3xl font-bold text-slate-900">You may also like</h2>
+                <p className="text-sm uppercase tracking-[0.24em] text-cyan-100/70">Recommended next</p>
+                <h2 className="text-3xl font-bold text-white">You may also like</h2>
               </div>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm theme-muted">
                 More products from the same catalog flow.
               </p>
             </div>

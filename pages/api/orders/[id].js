@@ -1,4 +1,5 @@
 import { mongooseConnect } from "@/lib/mongoose";
+import { releaseExpiredReservations } from "@/lib/orderLifecycle";
 import Order from "@/models/Order";
 
 export default async function handler(req, res) {
@@ -10,6 +11,8 @@ export default async function handler(req, res) {
     if (req.method !== "GET") {
       return res.status(405).json({ message: "Method Not Allowed" });
     }
+
+    await releaseExpiredReservations();
 
     const order = await Order.findById(id)
       .populate("customer")

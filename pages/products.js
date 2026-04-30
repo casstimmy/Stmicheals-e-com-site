@@ -54,35 +54,35 @@ export default function ProductsPage({ products }) {
       <Center>
         <div className="min-h-screen py-8 px-4 sm:px-8">
           <div className="panel-surface rounded-[2rem] p-8">
-            <div className="flex flex-col gap-6 border-b border-slate-200 pb-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="flex flex-col gap-6 border-b border-cyan-200/10 pb-6 lg:flex-row lg:items-end lg:justify-between">
               <div>
-                <span className="inline-flex rounded-full bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-slate-500 shadow-sm">
+                <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
                   Complete catalog
                 </span>
-                <h1 className="mt-4 text-3xl font-extrabold text-slate-900 mb-2">
+                <h1 className="mt-4 text-3xl font-extrabold text-white mb-2">
               All Products
             </h1>
-                <p className="max-w-2xl text-slate-600">
+                <p className="max-w-2xl theme-muted">
                   Filter by category, search by keyword, and sort the catalog without leaving the page.
                 </p>
               </div>
-              <div className="rounded-2xl bg-white/75 px-4 py-3 text-sm text-slate-600 shadow-sm">
+              <div className="theme-card-soft rounded-2xl px-4 py-3 text-sm text-cyan-50 shadow-sm">
                 {filteredProducts.length} result{filteredProducts.length === 1 ? "" : "s"}
               </div>
             </div>
 
-            <div className="mt-6 grid gap-4 rounded-[1.5rem] bg-white/70 p-4 shadow-sm md:grid-cols-[2fr_1fr_1fr]">
+            <div className="theme-card-soft mt-6 grid gap-4 rounded-[1.5rem] p-4 shadow-sm md:grid-cols-[2fr_1fr_1fr]">
               <input
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search products, categories, and keywords"
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none"
+                className="theme-input rounded-2xl px-4 py-3 outline-none"
               />
               <select
                 value={categoryFilter}
                 onChange={(event) => setCategoryFilter(event.target.value)}
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none"
+                className="theme-input rounded-2xl px-4 py-3 outline-none"
               >
                 <option value="all">All categories</option>
                 {categories.map((category) => (
@@ -94,7 +94,7 @@ export default function ProductsPage({ products }) {
               <select
                 value={sortBy}
                 onChange={(event) => setSortBy(event.target.value)}
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none"
+                className="theme-input rounded-2xl px-4 py-3 outline-none"
               >
                 <option value="featured">Newest first</option>
                 <option value="price-asc">Price: low to high</option>
@@ -112,7 +112,7 @@ export default function ProductsPage({ products }) {
                     </div>
                   ))
                 ) : (
-                  <p className="text-center col-span-4 text-slate-500 py-12">
+                  <p className="text-center col-span-4 theme-muted py-12">
                     No products match your current filters.
                   </p>
                 )}

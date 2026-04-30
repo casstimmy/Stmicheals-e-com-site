@@ -131,9 +131,9 @@ export default function OrderConfirmationPage() {
     <>
       <Header />
       <Center>
-        <div className="max-w-3xl mx-auto my-16 px-6 py-10 bg-white rounded-2xl shadow-lg border border-gray-200">
+        <div className="panel-surface max-w-3xl mx-auto my-16 px-6 py-10 rounded-2xl">
           {verificationError && (
-            <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            <div className="mb-6 rounded-xl border border-amber-200/30 bg-amber-200/10 px-4 py-3 text-sm text-amber-100">
               {verificationError}
             </div>
           )}
@@ -150,41 +150,41 @@ export default function OrderConfirmationPage() {
           </div>
 
           {/* Thank You Header */}
-          <h1 className="text-3xl md:text-4xl font-bold text-green-700 text-center mb-4">
+          <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
             Thank you for your purchase!
           </h1>
-          <p className="text-center text-gray-600 mb-8 text-lg">
+          <p className="text-center theme-muted mb-8 text-lg">
             Order <strong>#{order._id}</strong> placed on <em>{orderDate}</em>.
           </p>
 
           <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
             <span className={`rounded-full px-4 py-2 text-sm font-semibold ${
-              order.paid ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"
+              order.paid ? "bg-emerald-200/15 text-emerald-100" : "bg-amber-200/15 text-amber-100"
             }`}>
               Payment: {order.paid ? "Confirmed" : order.paymentStatus || "Pending"}
             </span>
-            <span className="rounded-full bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700">
+            <span className="theme-card-soft rounded-full px-4 py-2 text-sm font-semibold text-cyan-50">
               Fulfillment: {order.status}
             </span>
           </div>
 
           {/* Order Summary */}
-          <section className="bg-gray-50 rounded-xl p-6 space-y-4">
-            <h2 className="text-xl font-semibold border-b border-gray-300 pb-2">
+          <section className="theme-card-soft rounded-xl p-6 space-y-4">
+            <h2 className="text-xl font-semibold border-b border-cyan-200/10 pb-2 text-white">
               Customer Details
             </h2>
-            <p><span className="font-medium">Name:</span> {order.customer?.name}</p>
-            <p><span className="font-medium">Email:</span> {order.customer?.email}</p>
-            <p><span className="font-medium">Phone:</span> {order.customer?.phone}</p>
+            <p><span className="font-medium">Name:</span> {order.customerSnapshot?.name || order.customer?.name}</p>
+            <p><span className="font-medium">Email:</span> {order.customerSnapshot?.email || order.customer?.email}</p>
+            <p><span className="font-medium">Phone:</span> {order.customerSnapshot?.phone || order.customer?.phone}</p>
             <p>
               <span className="font-medium">Address:</span>{" "}
-              {order.customer?.address}
-              {order.customer?.city ? `, ${order.customer.city}` : ""}
+              {order.customerSnapshot?.address || order.customer?.address}
+              {(order.customerSnapshot?.city || order.customer?.city) ? `, ${order.customerSnapshot?.city || order.customer?.city}` : ""}
             </p>
 
             {/* Items */}
             <div className="pt-6">
-              <h3 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4">
+              <h3 className="text-lg font-semibold border-b border-cyan-200/10 pb-2 mb-4 text-white">
                 Items in Your Order
               </h3>
 
@@ -199,7 +199,7 @@ export default function OrderConfirmationPage() {
                     return (
                       <li
                         key={_id}
-                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4"
+                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-200/10 pb-4"
                       >
                         <div className="flex gap-4">
                           <Image
@@ -210,13 +210,13 @@ export default function OrderConfirmationPage() {
                             className="w-16 h-16 object-cover rounded border"
                           />
                           <div>
-                            <p className="font-medium text-lg">{name}</p>
-                            <p className="text-sm text-gray-500">
+                            <p className="font-medium text-lg text-white">{name}</p>
+                            <p className="text-sm theme-muted">
                               {quantity} × ₦{unitPrice.toLocaleString()}
                             </p>
                           </div>
                         </div>
-                        <div className="text-right font-bold text-gray-800">
+                        <div className="text-right font-bold text-white">
                           ₦{totalPrice.toLocaleString()}
                         </div>
                       </li>
@@ -224,17 +224,17 @@ export default function OrderConfirmationPage() {
                   })}
                 </ul>
               ) : (
-                <p className="text-sm text-gray-500">No items found in this order.</p>
+                <p className="text-sm theme-muted">No items found in this order.</p>
               )}
             </div>
 
             {/* Totals */}
-            <div className="border-t pt-4 space-y-2">
+            <div className="border-t border-cyan-200/10 pt-4 space-y-2">
               <p className="text-lg font-medium">
-                Shipping Cost: <span className="text-green-600">{shippingCost}</span>
+                Shipping Cost: <span className="text-[var(--accent)]">{shippingCost}</span>
               </p>
-              <p className="text-xl font-bold">
-                Total Paid: <span className="text-green-700">{totalAmount}</span>
+              <p className="text-xl font-bold text-white">
+                Total Paid: <span className="text-[var(--accent)]">{totalAmount}</span>
               </p>
             </div>
           </section>
@@ -243,7 +243,7 @@ export default function OrderConfirmationPage() {
           <div className="mt-8 text-center">
               <Link
                 href="/"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-lg font-semibold py-3 px-6 rounded-md transition-all duration-200"
+              className="theme-button-accent inline-block text-lg font-semibold py-3 px-6 rounded-md transition-all duration-200"
             >
               Continue Shopping
               </Link>

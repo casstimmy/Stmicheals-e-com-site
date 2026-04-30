@@ -10,6 +10,7 @@ import Center from "@/components/Center";
 import axios from "axios";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { SUPPORTED_SHIPPING_DESTINATIONS } from "@/lib/shipping";
+import { getAvailableInventoryQuantity } from "@/lib/inventory";
 
 export default function CartPage() {
   const { cartProducts, setCartProducts } = useContext(CartContext);
@@ -26,6 +27,27 @@ export default function CartPage() {
     city: SUPPORTED_SHIPPING_DESTINATIONS[0] || "",
   });
   const [shippingCost, setShippingCost] = useState(2000);
+
+  useEffect(() => {
+    axios
+      .get("/api/account/session")
+      .then((response) => {
+        if (!response.data?.authenticated) {
+          return;
+        }
+
+        const accountCustomer = response.data.customer;
+        setCustomer((currentValue) => ({
+          ...currentValue,
+          name: currentValue.name || accountCustomer.name || "",
+          email: currentValue.email || accountCustomer.email || "",
+          phone: currentValue.phone || accountCustomer.phone || "",
+          address: currentValue.address || accountCustomer.address || "",
+          city: currentValue.city || accountCustomer.city || currentValue.city,
+        }));
+      })
+      .catch(() => {});
+  }, []);
 
   // Fetch shipping cost when city changes
   useEffect(() => {
@@ -146,22 +168,22 @@ export default function CartPage() {
 
       <Header />
       <Center>
-        <div className="min-h-screen py-8 px-4 sm:px-8 bg-gradient-to-br from-blue-50 to-blue-100">
+        <div className="min-h-screen py-8 px-4 sm:px-8">
           <div className="max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {/* Cart Items */}
-            <div className="md:col-span-2 bg-white rounded-2xl shadow-lg p-6 sm:p-8">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-800 mb-6 border-b pb-4">
+            <div className="panel-surface md:col-span-2 rounded-2xl p-6 sm:p-8">
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-6 border-b border-cyan-200/10 pb-4">
                 Shopping Cart
               </h1>
 
               {products.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="text-gray-500 text-lg mb-6">
+                  <p className="theme-muted text-lg mb-6">
                     Your cart is currently empty.
                   </p>
                   <Link
                     href="/"
-                    className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+                    className="theme-button-accent inline-block px-6 py-3 rounded-lg transition"
                   >
                     Continue Shopping
                   </Link>
@@ -169,27 +191,28 @@ export default function CartPage() {
               ) : (
                 <>
                   <div className="overflow-x-auto mb-8">
-                    <table className="min-w-full text-sm text-left text-gray-600">
+                    <table className="min-w-full text-sm text-left text-cyan-50/90">
                       <thead>
-                        <tr className="bg-gray-100 text-gray-500 text-xs uppercase tracking-wider">
+                        <tr className="bg-white/8 text-cyan-100/70 text-xs uppercase tracking-wider">
                           <th className="py-3 px-3 rounded-tl-xl">Product</th>
                           <th className="py-3 px-3 text-center">Quantity</th>
                           <th className="py-3 px-3 text-center">Price</th>
                           <th className="py-3 px-3 text-right rounded-tr-xl">Remove</th>
                         </tr>
                       </thead>
-                     <tbody className="bg-white shadow-md rounded-b-xl divide-y divide-gray-100">
+                     <tbody className="rounded-b-xl divide-y divide-cyan-200/10">
   {products.map((product, index) => {
     const cartItem = cartProducts.find((item) => item.id === product._id);
     const quantity = cartItem?.qty || 1;
     const imageSrc = getPrimaryProductImage(product?.images);
+    const availableQuantity = getAvailableInventoryQuantity(product);
 
     return (
       <tr
         key={product._id}
         className={`transition duration-200 ${
-          index % 2 === 0 ? "bg-white" : "bg-gray-50"
-        } hover:bg-gray-100`}
+          index % 2 === 0 ? "bg-white/4" : "bg-white/8"
+        } hover:bg-white/10`}
       >
         <td className="py-3 px-2 sm:px-3">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-center sm:text-left">
@@ -201,11 +224,14 @@ export default function CartPage() {
               className="rounded-md object-cover border border-gray-200"
             />
             <div>
-              <h2 className="text-sm sm:text-base font-medium text-gray-900">
+              <h2 className="text-sm sm:text-base font-medium text-white">
                 {product.name}
               </h2>
-              <p className="text-xs sm:text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-cyan-100/65">
                 ₦{(product.salePriceIncTax || 0).toLocaleString()}
+              </p>
+              <p className="text-xs sm:text-sm text-cyan-100/55">
+                {availableQuantity} available for this reservation window
               </p>
             </div>
           </div>
@@ -216,7 +242,7 @@ export default function CartPage() {
             <button
               onClick={() => updateQuantity(product._id, -1)}
               aria-label="Decrease quantity"
-              className="w-8 h-8 text-lg font-bold bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="theme-button-secondary w-8 h-8 text-lg font-bold rounded-md focus:outline-none"
             >
               −
             </button>
@@ -226,14 +252,14 @@ export default function CartPage() {
             <button
               onClick={() => updateQuantity(product._id, 1)}
               aria-label="Increase quantity"
-              className="w-8 h-8 text-lg font-bold bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-400"
+              className="theme-button-secondary w-8 h-8 text-lg font-bold rounded-md focus:outline-none"
             >
               +
             </button>
           </div>
         </td>
 
-        <td className="py-3 px-2 sm:px-3 text-center font-semibold text-gray-800 text-sm sm:text-base">
+        <td className="py-3 px-2 sm:px-3 text-center font-semibold text-white text-sm sm:text-base">
           ₦{((product.salePriceIncTax || 0) * quantity).toLocaleString()}
         </td>
 
@@ -244,7 +270,7 @@ export default function CartPage() {
                 prev.filter((item) => item.id !== product._id)
               )
             }
-            className="text-red-600 hover:text-red-800 text-lg sm:text-xl"
+            className="text-rose-300 hover:text-rose-200 text-lg sm:text-xl"
             aria-label="Remove item"
           >
             <FontAwesomeIcon icon={faTrash} />
@@ -259,7 +285,7 @@ export default function CartPage() {
                   </div>
 
                   <div className="flex flex-col sm:flex-row justify-between items-center border-t pt-6 gap-4">
-                    <div className="text-lg sm:text-xl text-gray-800">
+                    <div className="text-lg sm:text-xl text-white">
                       Subtotal:{" "}
                       <span className="font-semibold">
                         ₦{subtotal.toLocaleString()}
@@ -267,7 +293,7 @@ export default function CartPage() {
                     </div>
                     <Link
                       href="/"
-                      className="inline-block bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition"
+                      className="theme-button-secondary inline-block px-6 py-3 rounded-lg transition"
                     >
                       Continue Shopping
                     </Link>
@@ -277,21 +303,21 @@ export default function CartPage() {
             </div>
 
             {/* Order Info + Customer Details */}
-            <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 space-y-6">
-              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">
+            <div className="panel-surface rounded-2xl p-6 sm:p-8 space-y-6">
+              <h2 className="text-xl sm:text-2xl font-bold text-white">
                 Order Information
               </h2>
 
-              <div className="space-y-4 text-gray-700 text-sm sm:text-base">
-                <div className="flex justify-between border-b pb-2">
+              <div className="space-y-4 text-cyan-50/90 text-sm sm:text-base">
+                <div className="flex justify-between border-b border-cyan-200/10 pb-2">
                   <span>Items:</span>
                   <span>{cartProducts.reduce((sum, i) => sum + i.qty, 0)}</span>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="flex justify-between border-b border-cyan-200/10 pb-2">
                   <span>Subtotal:</span>
                   <span>₦{subtotal.toLocaleString()}</span>
                 </div>
-                <div className="flex justify-between border-b pb-2">
+                <div className="flex justify-between border-b border-cyan-200/10 pb-2">
                   <span>Shipping:</span>
                   <span>₦{shippingCost.toLocaleString()}</span>
                 </div>
@@ -302,21 +328,21 @@ export default function CartPage() {
               </div>
 
               {shippingDetails && (
-                <div className="rounded-xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-900">
+                <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50">
                   Delivery quote for {shippingDetails.destination}: ₦{shippingCost.toLocaleString()}
                   {shippingDetails.isFallback ? " (standard rate applied)" : ""}
                 </div>
               )}
 
-              <div className="border-t pt-6">
-                <h3 className="text-lg font-semibold mb-4 text-gray-800">
+              <div className="border-t border-cyan-200/10 pt-6">
+                <h3 className="text-lg font-semibold mb-4 text-white">
                   Customer Information
                 </h3>
                 <div className="space-y-3">
                   <input
                     type="text"
                     placeholder="Full Name"
-                    className="w-full border rounded-md p-2"
+                    className="theme-input w-full rounded-md p-2"
                     value={customer.name}
                     onChange={(e) =>
                       setCustomer({ ...customer, name: e.target.value })
@@ -325,7 +351,7 @@ export default function CartPage() {
                   <input
                     type="email"
                     placeholder="Email Address"
-                    className="w-full border rounded-md p-2"
+                    className="theme-input w-full rounded-md p-2"
                     value={customer.email}
                     onChange={(e) =>
                       setCustomer({ ...customer, email: e.target.value })
@@ -334,7 +360,7 @@ export default function CartPage() {
                   <input
                     type="tel"
                     placeholder="Phone Number"
-                    className="w-full border rounded-md p-2"
+                    className="theme-input w-full rounded-md p-2"
                     value={customer.phone}
                     onChange={(e) =>
                       setCustomer({ ...customer, phone: e.target.value })
@@ -343,16 +369,16 @@ export default function CartPage() {
                   <input
                     type="text"
                     placeholder="Street Address"
-                    className="w-full border rounded-md p-2"
+                    className="theme-input w-full rounded-md p-2"
                     value={customer.address}
                     onChange={(e) =>
                       setCustomer({ ...customer, address: e.target.value })
                     }
                   />
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-cyan-50/85">
                     Delivery City
                     <select
-                      className="mt-1 w-full border rounded-md p-2"
+                      className="theme-input mt-1 w-full rounded-md p-2"
                       value={customer.city}
                       onChange={(e) =>
                         setCustomer({ ...customer, city: e.target.value })
@@ -369,12 +395,12 @@ export default function CartPage() {
               </div>
 
               {checkoutError && (
-                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <div className="rounded-lg border border-red-200/30 bg-red-200/10 px-4 py-3 text-sm text-red-100">
                   {checkoutError}
                 </div>
               )}
 
-              <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-600">
+              <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50/85">
                 Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts.
               </div>
 
@@ -383,8 +409,8 @@ export default function CartPage() {
                 disabled={isLoading || products.length === 0}
                 className={`w-full py-3 rounded-lg font-semibold text-white transition ${
                   isLoading || products.length === 0
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-700"
+                    ? "bg-white/10 text-cyan-100/45 cursor-not-allowed"
+                    : "theme-button-accent"
                 }`}
               >
                 {isLoading ? "Processing..." : "Proceed to Payment"}

@@ -75,7 +75,7 @@ export default function ReviewForm({ productId, onSubmitted }) {
 
   return (
     <form onSubmit={handleReviewSubmit} className="space-y-4">
-     <h3 className="text-2xl font-bold text-gray-900 border-b border-gray-300 pb-4 mb-6">
+     <h3 className="text-2xl font-bold text-white border-b border-cyan-200/10 pb-4 mb-6">
     Add a Review
   </h3>
       <StarInput />
@@ -86,7 +86,7 @@ export default function ReviewForm({ productId, onSubmitted }) {
         onChange={(e) =>
           setReviewData({ ...reviewData, customerName: e.target.value })
         }
-        className="w-full p-2 border rounded"
+        className="theme-input w-full p-2 rounded"
         required
       />
       <input
@@ -94,22 +94,22 @@ export default function ReviewForm({ productId, onSubmitted }) {
         placeholder="Review Title"
         value={reviewData.title}
         onChange={(e) => setReviewData({ ...reviewData, title: e.target.value })}
-        className="w-full p-2 border rounded"
+        className="theme-input w-full p-2 rounded"
         required
       />
       <textarea
         placeholder="Write your review here..."
         value={reviewData.text}
         onChange={(e) => setReviewData({ ...reviewData, text: e.target.value })}
-        className="w-full p-2 border rounded"
+        className="theme-input w-full p-2 rounded min-h-32"
         required
       />
 
       {feedback.message && (
         <div className={`rounded-lg px-4 py-3 text-sm ${
           feedback.type === "success"
-            ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
-            : "border border-red-200 bg-red-50 text-red-700"
+            ? "border border-emerald-200/30 bg-emerald-200/10 text-emerald-100"
+            : "border border-red-200/30 bg-red-200/10 text-red-100"
         }`}>
           {feedback.message}
         </div>
@@ -120,8 +120,8 @@ export default function ReviewForm({ productId, onSubmitted }) {
         disabled={isSubmitting}
         className={`mt-4 py-2 px-4 rounded-full ${
           isSubmitting
-            ? "bg-gray-300 text-gray-600 cursor-not-allowed"
-            : "bg-blue-600 text-white hover:bg-blue-700"
+            ? "bg-white/10 text-cyan-100/45 cursor-not-allowed"
+            : "theme-button-accent"
         }`}
       >
         {isSubmitting ? "Submitting..." : "Submit Review"}

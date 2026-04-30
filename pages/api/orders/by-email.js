@@ -1,6 +1,7 @@
 import { mongooseConnect } from "@/lib/mongoose";
 import Order from "@/models/Order";
-import Customer from "@/models/Customer";
+import { requireAuthenticatedCustomer } from "@/lib/customerAuth";
+import { releaseExpiredReservations } from "@/lib/orderLifecycle";
 
 export default async function handler(req, res) {
   if (req.method !== "GET") {
@@ -8,16 +9,12 @@ export default async function handler(req, res) {
   }
 
   await mongooseConnect();
-
-  const { email } = req.query;
-  if (!email) {
-    return res.status(400).json({ message: "Email is required" });
-  }
+  await releaseExpiredReservations();
 
   try {
-    const customer = await Customer.findOne({ email });
+    const customer = await requireAuthenticatedCustomer(req, res);
     if (!customer) {
-      return res.status(200).json([]);
+      return;
     }
 
     const orders = await Order.find({ customer: customer._id })

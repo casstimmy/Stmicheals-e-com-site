@@ -1,10 +1,8 @@
 // pages/api/paystack/verify.js
 
 import { mongooseConnect } from "@/lib/mongoose";
-import Order from "@/models/Order";
-import { Product } from "@/models/Product";
 import axios from "axios";
-import nodemailer from "nodemailer";
+import { finalizeOrderPayment } from "@/lib/orderLifecycle";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -40,85 +38,19 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Missing order metadata" });
     }
 
-    const existingOrder = await Order.findById(orderId)
-      .populate("customer")
-      .populate("items.productId");
+    const result = await finalizeOrderPayment({
+      orderId,
+      reference: data.reference,
+      amountInKobo: data.amount,
+      paymentStatus: data.status,
+      paymentChannel: data.channel || "paystack",
+    });
 
-    if (!existingOrder) {
-      return res.status(404).json({ error: "Order not found" });
-    }
-
-    const expectedAmount = Math.round((existingOrder.total || 0) * 100);
-    if (expectedAmount <= 0 || data.amount !== expectedAmount) {
-      return res.status(400).json({ error: "Payment amount mismatch" });
-    }
-
-    if (existingOrder.paid) {
-      return res.json({ success: true, order: existingOrder, alreadyProcessed: true });
-    }
-
-    const order = await Order.findOneAndUpdate(
-      { _id: orderId, paid: false },
-      {
-        paid: true,
-        paymentReference: data.reference,
-        paymentStatus: data.status,
-        status: "Processing",
-      },
-      { new: true }
-    ).populate("customer").populate("items.productId");
-
-    if (!order) {
-      const refreshedOrder = await Order.findById(orderId)
-        .populate("customer")
-        .populate("items.productId");
-
-      if (refreshedOrder?.paid) {
-        return res.json({ success: true, order: refreshedOrder, alreadyProcessed: true });
-      }
-
-      return res.status(404).json({ error: "Order not found" });
-    }
-
-    // Deduct inventory for each ordered item
-    for (const item of order.items) {
-      if (item.productId) {
-        await Product.findByIdAndUpdate(
-          item.productId._id || item.productId,
-          { $inc: { quantity: -(item.quantity || 1) } }
-        );
-      }
-    }
-
-    // Send confirmation email (non-blocking - don't fail order if email fails)
-    try {
-      if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
-
-        const itemList = order.items.map(
-          (item) => `${item.name} (x${item.quantity}) - ₦${item.price}`
-        ).join("\n");
-
-        await transporter.sendMail({
-          from: `Shop <${process.env.EMAIL_USER}>`,
-          to: order.customer.email,
-          subject: "Order Confirmation",
-          text: `Hi ${order.customer.name},\n\nThank you for your order!\n\nOrder ID: ${order._id}\nReference: ${order.paymentReference}\nTotal: ₦${order.total}\n\nItems:\n${itemList}\n\nWe are processing your order.\n\nThank you for shopping with us.`,
-        });
-      }
-    } catch (emailError) {
-      console.error("Email send failed (non-critical):", emailError.message);
-    }
-
-    return res.json({ success: true, order });
+    return res.json({ success: true, ...result });
   } catch (error) {
     console.error("Verify Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(error.statusCode || 500).json({
+      error: error.message || "Internal Server Error",
+    });
   }
 }
