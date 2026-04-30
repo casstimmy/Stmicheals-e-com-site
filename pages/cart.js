@@ -192,10 +192,10 @@ export default function CartPage() {
 
       <Header />
       <Center>
-        <div className="min-h-screen py-8 px-4 sm:px-8">
-          <div className="max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+        <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
+          <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 md:grid-cols-3 md:gap-8">
             {/* Cart Items */}
-            <div className="theme-shell-light md:col-span-2 rounded-2xl p-6 sm:p-8">
+            <div className="theme-shell-light rounded-[1.75rem] p-4 sm:rounded-2xl sm:p-8 md:col-span-2">
               <h1 className="mb-6 border-b border-[rgba(20,109,126,0.12)] pb-4 text-2xl font-extrabold text-[var(--foreground-strong)] sm:text-3xl">
                 Shopping Cart
               </h1>
@@ -242,7 +242,103 @@ export default function CartPage() {
                     </div>
                   )}
 
-                  <div className="overflow-x-auto mb-8">
+                  <div className="mb-6 space-y-4 sm:hidden">
+                    {cartLines.map((line) => (
+                      <div key={line.product._id} className="theme-card-light rounded-[1.35rem] p-4 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <Image
+                            src={line.imageSrc}
+                            alt={line.product.name || "Product"}
+                            width={72}
+                            height={72}
+                            className="h-[4.5rem] w-[4.5rem] rounded-xl border border-[rgba(20,109,126,0.14)] object-cover"
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <h2 className="line-clamp-2 text-sm font-semibold text-[var(--foreground-strong)]">
+                                  {line.product.name}
+                                </h2>
+                                <p className="mt-1 text-sm text-[rgba(18,52,60,0.72)]">
+                                  ₦{(line.product.salePriceIncTax || 0).toLocaleString()} each
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => removeProductFromCart(line.product._id)}
+                                className="text-lg text-rose-600 transition hover:text-rose-700"
+                                aria-label="Remove item"
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            </div>
+
+                            <p
+                              className={`mt-2 text-xs leading-6 ${
+                                line.isSoldOut
+                                  ? "text-rose-600"
+                                  : line.exceedsStock
+                                    ? "text-amber-700"
+                                    : "theme-muted-page"
+                              }`}
+                            >
+                              {line.isSoldOut
+                                ? "Currently unavailable. Remove before checkout."
+                                : line.exceedsStock
+                                  ? `Reduce quantity to ${line.availableQuantity} to continue.`
+                                  : `${line.availableQuantity} available for this reservation window`}
+                            </p>
+
+                            <div className="mt-4 flex items-end justify-between gap-3">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      line.product._id,
+                                      line.quantity - 1,
+                                      line.availableQuantity
+                                    )
+                                  }
+                                  aria-label="Decrease quantity"
+                                  disabled={line.quantity <= 1 || line.isSoldOut}
+                                  className="theme-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-xl text-lg font-bold disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  −
+                                </button>
+                                <span className="min-w-[2rem] text-center text-sm font-semibold text-[var(--foreground-strong)]">
+                                  {line.quantity}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      line.product._id,
+                                      line.quantity + 1,
+                                      line.availableQuantity
+                                    )
+                                  }
+                                  aria-label="Increase quantity"
+                                  disabled={line.isSoldOut || line.quantity >= line.availableQuantity}
+                                  className="theme-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-xl text-lg font-bold disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  +
+                                </button>
+                              </div>
+
+                              <div className="text-right">
+                                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.46)]">
+                                  Line total
+                                </p>
+                                <p className="mt-1 text-sm font-semibold text-[var(--foreground-strong)]">
+                                  ₦{((line.product.salePriceIncTax || 0) * line.quantity).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="mb-8 hidden overflow-x-auto sm:block">
                     <table className="min-w-full text-left text-sm text-[var(--foreground)]">
                       <thead>
                         <tr className="bg-[rgba(20,148,182,0.08)] text-xs uppercase tracking-wider text-[rgba(18,52,60,0.62)]">
@@ -360,7 +456,7 @@ export default function CartPage() {
                     </div>
                     <Link
                       href="/"
-                      className="theme-button-secondary inline-block px-6 py-3 rounded-lg transition"
+                      className="theme-button-secondary inline-block w-full rounded-lg px-6 py-3 text-center transition sm:w-auto"
                     >
                       Continue Shopping
                     </Link>
@@ -370,7 +466,7 @@ export default function CartPage() {
             </div>
 
             {/* Order Info + Customer Details */}
-            <div className="panel-surface rounded-2xl p-6 sm:p-8 space-y-6">
+            <div className="panel-surface space-y-5 rounded-[1.75rem] p-5 sm:space-y-6 sm:rounded-2xl sm:p-8">
               <h2 className="text-xl sm:text-2xl font-bold text-white">
                 Order Information
               </h2>
@@ -409,7 +505,7 @@ export default function CartPage() {
                   <input
                     type="text"
                     placeholder="Full Name"
-                    className="theme-input w-full rounded-md p-2"
+                    className="theme-input w-full rounded-xl px-4 py-3"
                     value={customer.name}
                     onChange={(e) =>
                       setCustomer({ ...customer, name: e.target.value })
@@ -418,7 +514,7 @@ export default function CartPage() {
                   <input
                     type="email"
                     placeholder="Email Address"
-                    className="theme-input w-full rounded-md p-2"
+                    className="theme-input w-full rounded-xl px-4 py-3"
                     value={customer.email}
                     onChange={(e) =>
                       setCustomer({ ...customer, email: e.target.value })
@@ -427,7 +523,7 @@ export default function CartPage() {
                   <input
                     type="tel"
                     placeholder="Phone Number"
-                    className="theme-input w-full rounded-md p-2"
+                    className="theme-input w-full rounded-xl px-4 py-3"
                     value={customer.phone}
                     onChange={(e) =>
                       setCustomer({ ...customer, phone: e.target.value })
@@ -436,7 +532,7 @@ export default function CartPage() {
                   <input
                     type="text"
                     placeholder="Street Address"
-                    className="theme-input w-full rounded-md p-2"
+                    className="theme-input w-full rounded-xl px-4 py-3"
                     value={customer.address}
                     onChange={(e) =>
                       setCustomer({ ...customer, address: e.target.value })
@@ -445,7 +541,7 @@ export default function CartPage() {
                   <label className="block text-sm font-medium text-cyan-50/85">
                     Delivery City
                     <select
-                      className="theme-input mt-1 w-full rounded-md p-2"
+                      className="theme-input mt-1 w-full rounded-xl px-4 py-3"
                       value={customer.city}
                       onChange={(e) =>
                         setCustomer({ ...customer, city: e.target.value })
@@ -475,7 +571,7 @@ export default function CartPage() {
               <button
                 onClick={handleCheckout}
                 disabled={isLoading || displayedProducts.length === 0 || hasInventoryIssues}
-                className={`w-full py-3 rounded-lg font-semibold text-white transition ${
+                className={`w-full min-h-[3.35rem] rounded-xl py-3 font-semibold text-white transition ${
                   isLoading || displayedProducts.length === 0 || hasInventoryIssues
                     ? "bg-white/10 text-cyan-100/45 cursor-not-allowed"
                     : "theme-button-accent"

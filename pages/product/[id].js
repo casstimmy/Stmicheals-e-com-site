@@ -40,7 +40,11 @@ export default function ProductPage({ product, relatedProducts }) {
     }
 
     const productImage = mainImageRef.current;
-    const cartIcon = document.getElementById("cart-icon");
+    const cartIcon = Array.from(document.querySelectorAll("[data-cart-icon]"))
+      .find((element) => {
+        const rect = element.getBoundingClientRect();
+        return rect.width > 0 && rect.height > 0;
+      });
 
     if (productImage && cartIcon) {
       const imgClone = productImage.cloneNode(true);
@@ -81,15 +85,15 @@ export default function ProductPage({ product, relatedProducts }) {
   return (
     <>
       <Head>
-        <title>{product.name} | St Michael&apos;s Store</title>
+        <title>{`${product.name} | St Michael's Store`}</title>
       </Head>
       <Header />
       <Center>
-        <div className="min-h-screen py-8 px-4 sm:px-8">
-          <div className="max-w-7xl mx-auto grid md:grid-cols-[3fr_2fr] gap-12 items-start">
+        <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
+          <div className="mx-auto grid max-w-7xl items-start gap-6 sm:gap-8 md:grid-cols-[3fr_2fr] lg:gap-12">
 
             {/* Product Images */}
-            <div className="theme-shell-light rounded-[2rem] p-6">
+            <div className="theme-shell-light rounded-[1.75rem] p-4 sm:rounded-[2rem] sm:p-6">
               <div className="cursor-zoom-in" onClick={() => setLightboxOpen(true)}>
                 <AnimatePresence mode="wait">
                   <motion.img
@@ -101,17 +105,17 @@ export default function ProductPage({ product, relatedProducts }) {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.3 }}
-                    className="h-[450px] w-full rounded-xl border border-white/80 bg-white/60 object-cover shadow-[0_24px_48px_rgba(18,52,60,0.14)]"
+                    className="h-[320px] w-full rounded-xl border border-white/80 bg-white/60 object-cover shadow-[0_24px_48px_rgba(18,52,60,0.14)] sm:h-[450px]"
                   />
                 </AnimatePresence>
               </div>
 
-              <div className="flex mt-4 gap-3 overflow-x-auto">
+              <div className="mt-4 flex gap-2 overflow-x-auto sm:gap-3">
                 {(galleryImages.length ? galleryImages : [{ full: PRODUCT_IMAGE_PLACEHOLDER, thumb: PRODUCT_IMAGE_PLACEHOLDER }]).map((image, index) => (
                   <button
                     key={index}
                     onClick={() => setActiveImage(image.full)}
-                    className={`w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border-2 ${
+                    className={`h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border-2 sm:h-20 sm:w-20 ${
                       image.full === activeImage
                         ? "border-[var(--brand)]"
                         : "border-transparent hover:border-[rgba(20,109,126,0.28)]"
@@ -130,7 +134,7 @@ export default function ProductPage({ product, relatedProducts }) {
             </div>
 
             {/* Product Details */}
-            <div className="theme-shell-light rounded-[2rem] p-8 md:sticky md:top-32">
+            <div className="theme-shell-light rounded-[1.75rem] p-5 sm:rounded-[2rem] sm:p-8 md:sticky md:top-32">
               <div className="mb-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.54)]">
                 <span className="theme-card-light rounded-full px-3 py-2 shadow-sm text-[var(--foreground-strong)]">
                   {product.categoryName || product.category || "Uncategorized"}
@@ -143,14 +147,14 @@ export default function ProductPage({ product, relatedProducts }) {
                   {isInStock ? `${availableQuantity} ready now` : "Currently unavailable"}
                 </span>
               </div>
-              <h1 className="mb-4 text-3xl font-bold text-[var(--foreground-strong)]">
+              <h1 className="mb-4 text-2xl font-bold text-[var(--foreground-strong)] sm:text-3xl">
                 {product.name}
               </h1>
               <p className="mb-6 text-base leading-relaxed theme-muted-page">
                 {product.description}
               </p>
 
-              <div className="theme-card-light mb-6 flex flex-wrap gap-4 rounded-2xl p-4 text-sm shadow-sm">
+              <div className="theme-card-light mb-6 grid grid-cols-2 gap-3 rounded-2xl p-4 text-sm shadow-sm sm:flex sm:flex-wrap sm:gap-4">
                 <div>
                   <p className="font-semibold text-[var(--foreground-strong)]">Rating</p>
                   <p>{reviewSummary.count ? `${reviewSummary.averageLabel} / 5` : "No ratings yet"}</p>
@@ -170,7 +174,7 @@ export default function ProductPage({ product, relatedProducts }) {
               </div>
 
               <div className="mb-6">
-                <p className="text-2xl text-[var(--accent)] font-semibold">
+                <p className="text-xl font-semibold text-[var(--accent)] sm:text-2xl">
                   ₦{product.salePriceIncTax?.toLocaleString()}
                 </p>
               </div>
@@ -223,18 +227,18 @@ export default function ProductPage({ product, relatedProducts }) {
                   pathname: "/products",
                   query: { category: product.categoryName || product.category || "" },
                 }}
-                className="mt-3 inline-flex text-sm font-medium text-[var(--brand-strong)]"
+                className="mt-4 inline-flex text-sm font-medium text-[var(--brand-strong)]"
               >
                 Explore more in this category
               </Link>
             </div>
           </div>
-          <div className="theme-shell-light max-w-7xl mx-auto mt-12 rounded-[2rem] p-10">
-  <h2 className="mb-10 border-b border-[rgba(20,109,126,0.12)] pb-4 text-3xl font-extrabold text-[var(--foreground-strong)]">
+          <div className="theme-shell-light mx-auto mt-8 max-w-7xl rounded-[1.75rem] p-5 sm:mt-12 sm:rounded-[2rem] sm:p-10">
+  <h2 className="mb-8 border-b border-[rgba(20,109,126,0.12)] pb-4 text-2xl font-extrabold text-[var(--foreground-strong)] sm:mb-10 sm:text-3xl">
     Customer Reviews
   </h2>
 
-  <div className="theme-card-light mb-8 grid gap-4 rounded-[1.5rem] p-6 shadow-sm md:grid-cols-3">
+  <div className="theme-card-light mb-8 grid gap-4 rounded-[1.5rem] p-4 shadow-sm sm:p-6 md:grid-cols-3">
     <div>
       <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Average rating</p>
       <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{reviewSummary.count ? reviewSummary.averageLabel : "New"}</p>
@@ -250,12 +254,12 @@ export default function ProductPage({ product, relatedProducts }) {
   </div>
 
   <div className="flex flex-col md:flex-row gap-8">
-    <div className="theme-card-light rounded-[1.5rem] p-8 shadow-sm md:w-1/2">
+    <div className="theme-card-light rounded-[1.5rem] p-5 shadow-sm sm:p-8 md:w-1/2">
       <ReviewForm productId={product._id} onSubmitted={handleReviewSubmitted} />
     </div>
 
-    <div className="theme-card-light space-y-8 rounded-[1.5rem] p-8 shadow-sm md:w-1/2">
-  <h3 className="mb-6 border-b border-[rgba(20,109,126,0.12)] pb-4 text-2xl font-bold text-[var(--foreground-strong)]">
+    <div className="theme-card-light space-y-6 rounded-[1.5rem] p-5 shadow-sm sm:space-y-8 sm:p-8 md:w-1/2">
+  <h3 className="mb-6 border-b border-[rgba(20,109,126,0.12)] pb-4 text-xl font-bold text-[var(--foreground-strong)] sm:text-2xl">
     All Reviews
   </h3>
 
@@ -263,7 +267,7 @@ export default function ProductPage({ product, relatedProducts }) {
     reviews.map((review, index) => (
       <div
         key={index}
-        className="rounded-2xl border border-[rgba(20,109,126,0.12)] bg-white/80 p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg"
+        className="rounded-2xl border border-[rgba(20,109,126,0.12)] bg-white/80 p-4 shadow-sm transition-shadow duration-300 hover:shadow-lg sm:p-6"
       >
         <div className="flex justify-between items-center mb-3">
           <p className="text-lg font-semibold tracking-wide text-[var(--foreground-strong)]">
@@ -326,7 +330,7 @@ export default function ProductPage({ product, relatedProducts }) {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-6">
               {relatedProducts.map((relatedProduct) => (
                 <div key={relatedProduct._id}>
                   <ProductBox {...relatedProduct} />

@@ -113,14 +113,14 @@ export default function ProductsPage({ products }) {
       </Head>
       <Header />
       <Center>
-        <div className="min-h-screen py-8 px-4 sm:px-8">
-          <div className="theme-shell-light rounded-[2rem] p-8">
+        <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
+          <div className="theme-shell-light rounded-[1.75rem] p-4 sm:rounded-[2rem] sm:p-8">
             <div className="flex flex-col gap-6 border-b border-[rgba(20,109,126,0.12)] pb-6 lg:flex-row lg:items-end lg:justify-between">
               <div>
                 <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
                   Complete catalog
                 </span>
-                <h1 className="mb-2 mt-4 text-3xl font-extrabold text-[var(--foreground-strong)]">
+                <h1 className="mb-2 mt-4 text-2xl font-extrabold text-[var(--foreground-strong)] sm:text-3xl">
               All Products
             </h1>
                 <p className="max-w-2xl theme-muted-page">
@@ -148,7 +148,7 @@ export default function ProductsPage({ products }) {
               </div>
             </div>
 
-            <div className="theme-card-light mt-6 grid gap-4 rounded-[1.5rem] p-4 shadow-sm md:grid-cols-[2fr_1fr_1fr]">
+            <div className="theme-card-light mt-6 grid gap-3 rounded-[1.5rem] p-3 shadow-sm sm:gap-4 sm:p-4 md:grid-cols-[2fr_1fr_1fr]">
               <input
                 type="search"
                 value={query}
@@ -180,11 +180,11 @@ export default function ProductsPage({ products }) {
               </select>
             </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 flex gap-3 overflow-x-auto pb-1 sm:flex-wrap">
               <button
                 type="button"
                 onClick={() => setCategoryFilter("all")}
-                className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
                   normalizedCategoryFilter === "all"
                     ? "theme-button-accent"
                     : "theme-card-light text-[var(--foreground-strong)]"
@@ -197,7 +197,7 @@ export default function ProductsPage({ products }) {
                   key={category.name}
                   type="button"
                   onClick={() => setCategoryFilter(category.name)}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                  className={`shrink-0 rounded-full px-4 py-2 text-sm font-medium transition ${
                     normalizedCategoryFilter === category.name
                       ? "theme-button-accent"
                       : "theme-card-light text-[var(--foreground-strong)]"
@@ -208,7 +208,7 @@ export default function ProductsPage({ products }) {
               ))}
             </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:flex-wrap sm:items-center">
               {hasActiveFilters ? (
                 <>
                   <div className="theme-card-light inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm text-[var(--foreground-strong)] shadow-sm">
@@ -243,8 +243,8 @@ export default function ProductsPage({ products }) {
               </Link>
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 py-12">
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="max-w-7xl mx-auto px-1 py-8 sm:px-4 sm:py-12">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-6">
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
                     <div key={product._id}>
@@ -252,7 +252,7 @@ export default function ProductsPage({ products }) {
                     </div>
                   ))
                 ) : (
-                  <div className="col-span-4 rounded-[1.5rem] border border-dashed border-[rgba(20,109,126,0.18)] px-6 py-12 text-center">
+                  <div className="col-span-full rounded-[1.5rem] border border-dashed border-[rgba(20,109,126,0.18)] px-6 py-12 text-center">
                     <p className="theme-muted-page">No products match your current filters.</p>
                     <button
                       type="button"

@@ -9,7 +9,6 @@ import { getAvailableInventoryQuantity } from "@/lib/inventory";
 export default function ProductBox({
     _id,
     name,
-    description,
     images,
     salePriceIncTax,
     quantity,
@@ -33,7 +32,11 @@ export default function ProductBox({
         }
 
         const productImage = e.currentTarget.closest(".product-box").querySelector("img");
-        const cartIcon = document.getElementById("cart-icon");
+        const cartIcon = Array.from(document.querySelectorAll("[data-cart-icon]"))
+            .find((element) => {
+                const rect = element.getBoundingClientRect();
+                return rect.width > 0 && rect.height > 0;
+            });
 
         if (productImage && cartIcon) {
             const imgClone = productImage.cloneNode(true);
@@ -68,9 +71,9 @@ export default function ProductBox({
     };
 
     return (
-        <div className="product-box theme-card-light flex h-full flex-col overflow-hidden rounded-[1.5rem] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(18,52,60,0.14)]">
-            <div className="relative flex h-48 w-full items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_top,_rgba(20,148,182,0.12),_transparent_55%),linear-gradient(180deg,_rgba(255,255,255,0.96),_rgba(237,245,247,0.92))] px-4 pb-4 pt-14">
-                <div className="theme-card-light absolute left-3 top-3 max-w-[55%] rounded-full px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] text-[rgba(18,52,60,0.76)] shadow-sm">
+        <div className="product-box theme-card-light flex h-full flex-col overflow-hidden rounded-[1.35rem] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(18,52,60,0.14)] sm:rounded-[1.5rem]">
+            <div className="relative flex h-40 w-full items-center justify-center overflow-hidden bg-[#f4f1ea] px-3 pb-3 pt-12 sm:h-48 sm:px-4 sm:pb-4 sm:pt-14">
+                <div className="theme-card-light absolute left-3 top-3 max-w-[58%] rounded-full px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.2em] text-[rgba(18,52,60,0.76)] shadow-sm sm:max-w-[55%] sm:text-[0.68rem]">
                     {categoryName || category || "Featured"}
                 </div>
                 <div className={`absolute right-3 top-3 rounded-full border px-3 py-1 text-[0.68rem] font-semibold uppercase tracking-[0.2em] shadow-sm ${
@@ -81,48 +84,39 @@ export default function ProductBox({
                     {isInStock ? `${availableQuantity} ready` : "Sold out"}
                 </div>
                 <Link href={url} className="flex h-full w-full items-center justify-center">
-                    <div className="relative h-full w-full max-w-[10rem]">
+                    <div className="relative h-full w-full max-w-[8.5rem] sm:max-w-[10rem]">
                         <Image
                             src={productImage}
                             alt={name}
                             fill
-                            sizes="(max-width: 640px) 40vw, (max-width: 1024px) 24vw, 16vw"
+                            sizes="(max-width: 640px) 74vw, (max-width: 1024px) 30vw, 16vw"
                             className="object-contain drop-shadow-[0_14px_28px_rgba(18,52,60,0.14)]"
                         />
                     </div>
                 </Link>
             </div>
-            <div className="flex flex-1 flex-col p-4">
+            <div className="flex flex-1 flex-col p-3.5 sm:p-4">
                 <Link href={url}>
-                    <h2 className="min-h-[3.25rem] line-clamp-2 text-md font-semibold text-[var(--foreground-strong)]">{name}</h2>
-                    <p className="mt-1 min-h-12 line-clamp-2 text-sm leading-6 theme-muted-page">{description}</p>
+                    <h2 className="min-h-[2.85rem] line-clamp-2 text-base font-semibold leading-6 text-[var(--foreground-strong)] sm:min-h-[3.15rem] sm:text-md sm:leading-7">{name}</h2>
                 </Link>
-                <div className="mt-4 grid grid-cols-2 gap-3 text-sm text-[rgba(18,52,60,0.62)]">
+                <div className="mt-3 grid grid-cols-[1fr_auto] items-end gap-3 text-sm text-[rgba(18,52,60,0.62)] sm:mt-4 sm:grid-cols-2">
                     <div>
                         <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.46)]">Price</p>
                         <p className="mt-1 font-semibold text-[var(--accent)]">₦{salePriceIncTax?.toLocaleString()}</p>
                     </div>
                     <div className="text-right">
                         <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.46)]">Reviews</p>
-                        <p className="mt-1 line-clamp-2 text-sm leading-5 text-[rgba(18,52,60,0.72)]">
+                        <p className="mt-1 text-sm leading-5 text-[rgba(18,52,60,0.72)]">
                             {reviewSummary.count > 0
                                 ? `${reviewSummary.averageLabel} / 5 · ${reviewSummary.count} review${reviewSummary.count === 1 ? "" : "s"}`
                                 : "No reviews yet"}
                         </p>
                     </div>
                 </div>
-                <div className="mt-3 grid grid-cols-2 gap-3 text-xs theme-muted-page">
-                    <span className="rounded-2xl bg-[rgba(22,125,143,0.08)] px-3 py-2">
-                        {isInStock ? `${availableQuantity} available` : "Restock pending"}
-                    </span>
-                    <span className="rounded-2xl bg-[rgba(18,52,60,0.05)] px-3 py-2 text-right">
-                        {cartQuantity > 0 ? `${cartQuantity} in cart` : "Not in cart yet"}
-                    </span>
-                </div>
                 <button
                     onClick={handleAddToCart}
                     disabled={!isInStock || hasReachedCartLimit}
-                    className={`mt-auto w-full min-h-[3.35rem] rounded-[1.1rem] px-4 text-sm font-semibold transition cursor-pointer ${
+                    className={`mt-4 w-full min-h-[3rem] rounded-[1rem] px-4 text-sm font-semibold transition cursor-pointer sm:mt-auto sm:min-h-[3.2rem] sm:rounded-[1.1rem] ${
                         isInStock && !hasReachedCartLimit
                             ? "theme-button-accent"
                             : "bg-[rgba(18,52,60,0.08)] text-[rgba(18,52,60,0.4)] cursor-not-allowed"
