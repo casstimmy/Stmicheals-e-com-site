@@ -11,18 +11,21 @@ export default function Custom500() {
       </Head>
       <Header />
       <Center>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-blue-100">
-          <div className="text-center bg-white rounded-2xl shadow-lg p-12 max-w-md">
-            <h1 className="text-6xl font-extrabold text-gray-300 mb-4">500</h1>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        <div className="flex min-h-screen items-center justify-center px-4 py-12">
+          <div className="theme-shell-light max-w-md rounded-[2rem] p-12 text-center">
+            <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[rgba(18,52,60,0.52)]">
+              Service interruption
+            </p>
+            <h1 className="mb-4 mt-4 text-6xl font-extrabold text-[var(--accent)]">500</h1>
+            <h2 className="mb-4 text-2xl font-bold text-[var(--foreground-strong)]">
               Something Went Wrong
             </h2>
-            <p className="text-gray-600 mb-8">
+            <p className="mb-8 theme-muted-page">
               We&apos;re working on fixing this. Please try again later.
             </p>
             <Link
               href="/"
-              className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition font-medium"
+              className="theme-button-primary inline-block rounded-lg px-6 py-3 font-medium transition"
             >
               Back to Home
             </Link>

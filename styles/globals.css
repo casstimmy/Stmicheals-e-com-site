@@ -1,20 +1,23 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0b738c;
-  --foreground: #eff9fb;
-  --foreground-strong: #ffffff;
-  --foreground-muted: #c4e4ea;
-  --surface: rgba(8, 84, 103, 0.74);
-  --surface-strong: rgba(7, 67, 83, 0.96);
-  --surface-soft: rgba(255, 255, 255, 0.08);
-  --border-subtle: rgba(111, 220, 243, 0.16);
+  --background: #f8f4ec;
+  --foreground: #12343c;
+  --foreground-strong: #0a252c;
+  --foreground-muted: #5d7981;
+  --panel-foreground: #eff9fb;
+  --panel-foreground-strong: #ffffff;
+  --panel-foreground-muted: #c4e4ea;
+  --surface: rgba(7, 67, 83, 0.82);
+  --surface-strong: rgba(5, 49, 62, 0.96);
+  --surface-soft: rgba(255, 255, 255, 0.1);
+  --border-subtle: rgba(70, 152, 170, 0.16);
   --brand: #1494b6;
   --brand-strong: #0b6f89;
-  --brand-soft: rgba(20, 148, 182, 0.2);
+  --brand-soft: rgba(20, 148, 182, 0.14);
   --accent: #f7c32e;
   --accent-deep: #d59f00;
-  --shadow-soft: 0 30px 90px rgba(2, 27, 34, 0.34);
+  --shadow-soft: 0 28px 72px rgba(15, 39, 46, 0.14);
 }
 
 html {
@@ -23,10 +26,11 @@ html {
 
 body {
   min-height: 100vh;
+  background-color: var(--background);
   background:
-    radial-gradient(circle at top left, rgba(247, 195, 46, 0.15), transparent 22%),
-    radial-gradient(circle at top right, rgba(103, 230, 255, 0.14), transparent 22%),
-    linear-gradient(180deg, #1687a3 0%, #0f7a94 18%, #09697f 42%, #075a72 100%);
+    radial-gradient(circle at top left, rgba(247, 195, 46, 0.18), transparent 24%),
+    radial-gradient(circle at top right, rgba(20, 148, 182, 0.12), transparent 26%),
+    linear-gradient(180deg, #fffdf9 0%, #f8f1e4 38%, #eef5f6 100%);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
   text-rendering: optimizeLegibility;
@@ -82,28 +86,69 @@ h4 {
 }
 
 .panel-surface {
-  background: linear-gradient(180deg, rgba(8, 84, 103, 0.82), rgba(6, 63, 80, 0.94));
+  background: linear-gradient(180deg, rgba(8, 84, 103, 0.88), rgba(6, 63, 80, 0.96));
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(16px);
+  color: var(--panel-foreground);
+}
+
+.theme-shell-light {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 252, 245, 0.98),
+    rgba(243, 248, 249, 0.96) 52%,
+    rgba(225, 243, 246, 0.94) 100%
+  );
+  border: 1px solid rgba(20, 109, 126, 0.14);
+  box-shadow: 0 28px 72px rgba(18, 52, 60, 0.1);
   color: var(--foreground);
 }
 
 .theme-card-soft {
-  background: var(--surface-soft);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.07));
   border: 1px solid var(--border-subtle);
   box-shadow: 0 12px 32px rgba(3, 27, 34, 0.16);
   backdrop-filter: blur(12px);
+  color: var(--panel-foreground);
 }
 
-.theme-input {
-  border: 1px solid rgba(111, 220, 243, 0.18);
-  background: rgba(4, 53, 67, 0.44);
+.theme-card-light {
+  background: rgba(255, 255, 255, 0.76);
+  border: 1px solid rgba(20, 109, 126, 0.12);
+  box-shadow: 0 14px 34px rgba(18, 52, 60, 0.08);
+  backdrop-filter: blur(12px);
   color: var(--foreground);
 }
 
+.theme-muted-page {
+  color: rgba(18, 52, 60, 0.72);
+}
+
+.theme-input {
+  border: 1px solid rgba(111, 220, 243, 0.22);
+  background: rgba(4, 53, 67, 0.5);
+  color: var(--panel-foreground);
+}
+
+.theme-input-light {
+  border: 1px solid rgba(20, 109, 126, 0.16);
+  background: rgba(255, 255, 255, 0.82);
+  color: var(--foreground);
+}
+
+.theme-input-light::placeholder {
+  color: rgba(18, 52, 60, 0.48);
+}
+
+.theme-input-readonly {
+  border: 1px solid rgba(20, 109, 126, 0.16);
+  background: rgba(255, 255, 255, 0.55);
+  color: rgba(18, 52, 60, 0.76);
+}
+
 .theme-input::placeholder {
-  color: rgba(196, 228, 234, 0.62);
+  color: rgba(196, 228, 234, 0.74);
 }
 
 .theme-button-accent {
@@ -127,13 +172,13 @@ h4 {
 }
 
 .theme-button-secondary {
-  background: rgba(4, 53, 67, 0.58);
-  color: var(--foreground);
-  border: 1px solid rgba(111, 220, 243, 0.18);
+  background: rgba(4, 53, 67, 0.64);
+  color: var(--panel-foreground);
+  border: 1px solid rgba(111, 220, 243, 0.22);
 }
 
 .theme-button-secondary:hover {
-  background: rgba(4, 53, 67, 0.72);
+  background: rgba(4, 53, 67, 0.8);
 }
 
 .theme-tag {
@@ -143,7 +188,7 @@ h4 {
 }
 
 .theme-muted {
-  color: var(--foreground-muted);
+  color: var(--panel-foreground-muted);
 }
 
 

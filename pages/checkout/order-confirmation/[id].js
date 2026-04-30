@@ -70,16 +70,17 @@ export default function OrderConfirmationPage() {
     return () => {
       cancelled = true;
     };
-  }, [id, reference, router.isReady, trxref]);
+  }, [clearCart, id, reference, router.isReady, trxref]);
 
   if (loading) {
     return (
       <>
         <Header />
         <Center>
-          <p className="text-gray-500 text-center mt-20 text-lg">
-            Confirming your order...
-          </p>
+          <div className="theme-shell-light mx-auto my-16 max-w-xl rounded-[2rem] px-6 py-10 text-center">
+            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Confirming your order</h1>
+            <p className="mt-3 theme-muted-page">We are validating payment and loading your final order details.</p>
+          </div>
         </Center>
       </>
     );
@@ -107,9 +108,10 @@ export default function OrderConfirmationPage() {
       <>
         <Header />
         <Center>
-          <p className="text-red-600 text-center mt-20 text-lg">
-            Order not found.
-          </p>
+          <div className="theme-shell-light mx-auto my-16 max-w-xl rounded-[2rem] px-6 py-10 text-center">
+            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Order not found</h1>
+            <p className="mt-3 theme-muted-page">We could not locate that order record. Return to the storefront and try again from your recent orders.</p>
+          </div>
         </Center>
       </>
     );
@@ -131,9 +133,9 @@ export default function OrderConfirmationPage() {
     <>
       <Header />
       <Center>
-        <div className="panel-surface max-w-3xl mx-auto my-16 px-6 py-10 rounded-2xl">
+        <div className="theme-shell-light mx-auto my-16 max-w-3xl rounded-2xl px-6 py-10">
           {verificationError && (
-            <div className="mb-6 rounded-xl border border-amber-200/30 bg-amber-200/10 px-4 py-3 text-sm text-amber-100">
+            <div className="mb-6 rounded-xl border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               {verificationError}
             </div>
           )}
@@ -150,10 +152,10 @@ export default function OrderConfirmationPage() {
           </div>
 
           {/* Thank You Header */}
-          <h1 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
+          <h1 className="mb-4 text-center text-3xl font-bold text-[var(--foreground-strong)] md:text-4xl">
             Thank you for your purchase!
           </h1>
-          <p className="text-center theme-muted mb-8 text-lg">
+          <p className="mb-8 text-center text-lg theme-muted-page">
             Order <strong>#{order._id}</strong> placed on <em>{orderDate}</em>.
           </p>
 
@@ -163,13 +165,13 @@ export default function OrderConfirmationPage() {
             }`}>
               Payment: {order.paid ? "Confirmed" : order.paymentStatus || "Pending"}
             </span>
-            <span className="theme-card-soft rounded-full px-4 py-2 text-sm font-semibold text-cyan-50">
+            <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
               Fulfillment: {order.status}
             </span>
           </div>
 
           {/* Order Summary */}
-          <section className="theme-card-soft rounded-xl p-6 space-y-4">
+          <section className="panel-surface space-y-4 rounded-[1.5rem] p-6">
             <h2 className="text-xl font-semibold border-b border-cyan-200/10 pb-2 text-white">
               Customer Details
             </h2>
@@ -243,7 +245,7 @@ export default function OrderConfirmationPage() {
           <div className="mt-8 text-center">
               <Link
                 href="/"
-              className="theme-button-accent inline-block text-lg font-semibold py-3 px-6 rounded-md transition-all duration-200"
+              className="theme-button-primary inline-block rounded-md px-6 py-3 text-lg font-semibold transition-all duration-200"
             >
               Continue Shopping
               </Link>

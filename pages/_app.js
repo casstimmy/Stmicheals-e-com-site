@@ -23,7 +23,7 @@ export default function App({ Component, pageProps }) {
           name="description"
           content="Premium groceries, everyday essentials, and streamlined delivery from St Michael&apos;s Store."
         />
-        <meta name="theme-color" content="#12383c" />
+        <meta name="theme-color" content="#f8f1e4" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta property="og:title" content="St Michael&apos;s Store" />
         <meta

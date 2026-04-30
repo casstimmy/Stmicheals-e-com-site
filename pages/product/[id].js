@@ -81,7 +81,7 @@ export default function ProductPage({ product, relatedProducts }) {
           <div className="max-w-7xl mx-auto grid md:grid-cols-[3fr_2fr] gap-12 items-start">
 
             {/* Product Images */}
-            <div className="product-box panel-surface rounded-[2rem] p-6">
+            <div className="theme-shell-light rounded-[2rem] p-6">
               <div className="cursor-zoom-in" onClick={() => setLightboxOpen(true)}>
                 <AnimatePresence mode="wait">
                   <motion.img
@@ -93,7 +93,7 @@ export default function ProductPage({ product, relatedProducts }) {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.3 }}
-                    className="w-full h-[450px] object-cover rounded-xl border border-gray-200"
+                    className="h-[450px] w-full rounded-xl border border-white/80 bg-white/60 object-cover shadow-[0_24px_48px_rgba(18,52,60,0.14)]"
                   />
                 </AnimatePresence>
               </div>
@@ -105,8 +105,8 @@ export default function ProductPage({ product, relatedProducts }) {
                     onClick={() => setActiveImage(image.full)}
                     className={`w-20 h-20 flex-shrink-0 rounded-xl overflow-hidden border-2 ${
                       image.full === activeImage
-                        ? "border-blue-500"
-                        : "border-transparent hover:border-gray-300"
+                        ? "border-[var(--brand)]"
+                        : "border-transparent hover:border-[rgba(20,109,126,0.28)]"
                     }`}
                   >
                     <Image
@@ -122,35 +122,37 @@ export default function ProductPage({ product, relatedProducts }) {
             </div>
 
             {/* Product Details */}
-            <div className="panel-surface rounded-[2rem] p-8 md:sticky md:top-32">
-              <div className="mb-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-cyan-100/70">
-                <span className="theme-card-soft rounded-full px-3 py-2 shadow-sm text-cyan-50">
+            <div className="theme-shell-light rounded-[2rem] p-8 md:sticky md:top-32">
+              <div className="mb-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.54)]">
+                <span className="theme-card-light rounded-full px-3 py-2 shadow-sm text-[var(--foreground-strong)]">
                   {product.categoryName || product.category || "Uncategorized"}
                 </span>
-                <span className={`rounded-full px-3 py-2 shadow-sm ${
-                  isInStock ? "bg-emerald-200/15 text-emerald-100" : "bg-rose-200/15 text-rose-100"
+                <span className={`rounded-full border px-3 py-2 shadow-sm ${
+                  isInStock
+                    ? "border-emerald-200/80 bg-emerald-50 text-emerald-700"
+                    : "border-rose-200/80 bg-rose-50 text-rose-700"
                 }`}>
                   {isInStock ? `${availableQuantity} ready now` : "Currently unavailable"}
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-white mb-4">
+              <h1 className="mb-4 text-3xl font-bold text-[var(--foreground-strong)]">
                 {product.name}
               </h1>
-              <p className="theme-muted text-base mb-6 leading-relaxed">
+              <p className="mb-6 text-base leading-relaxed theme-muted-page">
                 {product.description}
               </p>
 
-              <div className="theme-card-soft mb-6 flex flex-wrap gap-4 rounded-2xl p-4 text-sm text-cyan-50 shadow-sm">
+              <div className="theme-card-light mb-6 flex flex-wrap gap-4 rounded-2xl p-4 text-sm shadow-sm">
                 <div>
-                  <p className="font-semibold text-white">Rating</p>
+                  <p className="font-semibold text-[var(--foreground-strong)]">Rating</p>
                   <p>{reviewSummary.count ? `${reviewSummary.averageLabel} / 5` : "No ratings yet"}</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-white">Reviews</p>
+                  <p className="font-semibold text-[var(--foreground-strong)]">Reviews</p>
                   <p>{reviewSummary.count} published</p>
                 </div>
                 <div>
-                  <p className="font-semibold text-white">SKU</p>
+                  <p className="font-semibold text-[var(--foreground-strong)]">SKU</p>
                   <p>{product.sku || "Not provided"}</p>
                 </div>
               </div>
@@ -161,13 +163,13 @@ export default function ProductPage({ product, relatedProducts }) {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 gap-2 text-sm theme-muted">
+              <div className="grid grid-cols-1 gap-2 text-sm theme-muted-page">
                 <p>
-                  <span className="font-medium text-white">Category:</span>{" "}
+                  <span className="font-medium text-[var(--foreground-strong)]">Category:</span>{" "}
                   {product.categoryName || product.category || "Uncategorized"}
                 </p>
                 <p>
-                  <span className="font-medium text-white">Availability:</span>{" "}
+                  <span className="font-medium text-[var(--foreground-strong)]">Availability:</span>{" "}
                   {isInStock ? `${availableQuantity} item(s) available for delivery` : "Out of stock"}
                 </p>
               </div>
@@ -178,30 +180,30 @@ export default function ProductPage({ product, relatedProducts }) {
                 className={`mt-8 w-full text-lg font-medium py-3 rounded-xl transition duration-200 ${
                   isInStock
                     ? "theme-button-accent"
-                    : "bg-white/10 cursor-not-allowed text-cyan-100/45"
+                    : "bg-[rgba(18,52,60,0.08)] cursor-not-allowed text-[rgba(18,52,60,0.4)]"
                 }`}
               >
                 {isInStock ? "Add to Cart" : "Unavailable"}
               </button>
             </div>
           </div>
-          <div className="panel-surface max-w-7xl mx-auto mt-12 rounded-[2rem] p-10">
-  <h2 className="text-3xl font-extrabold mb-10 text-white border-b border-cyan-200/10 pb-4">
+          <div className="theme-shell-light max-w-7xl mx-auto mt-12 rounded-[2rem] p-10">
+  <h2 className="mb-10 border-b border-[rgba(20,109,126,0.12)] pb-4 text-3xl font-extrabold text-[var(--foreground-strong)]">
     Customer Reviews
   </h2>
 
-  <div className="theme-card-soft mb-8 grid gap-4 rounded-[1.5rem] p-6 shadow-sm md:grid-cols-3">
+  <div className="theme-card-light mb-8 grid gap-4 rounded-[1.5rem] p-6 shadow-sm md:grid-cols-3">
     <div>
-      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Average rating</p>
-      <p className="mt-2 text-3xl font-bold text-white">{reviewSummary.count ? reviewSummary.averageLabel : "New"}</p>
+      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Average rating</p>
+      <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{reviewSummary.count ? reviewSummary.averageLabel : "New"}</p>
     </div>
     <div>
-      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Published reviews</p>
-      <p className="mt-2 text-3xl font-bold text-white">{reviewSummary.count}</p>
+      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Published reviews</p>
+      <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{reviewSummary.count}</p>
     </div>
     <div>
-      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Fulfillment</p>
-      <p className="mt-2 text-3xl font-bold text-white">{isInStock ? "Ready" : "Paused"}</p>
+      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Fulfillment</p>
+      <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{isInStock ? "Ready" : "Paused"}</p>
     </div>
   </div>
 
@@ -276,10 +278,10 @@ export default function ProductPage({ product, relatedProducts }) {
           <div className="max-w-7xl mx-auto mt-12">
             <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <p className="text-sm uppercase tracking-[0.24em] text-cyan-100/70">Recommended next</p>
-                <h2 className="text-3xl font-bold text-white">You may also like</h2>
+                <p className="text-sm uppercase tracking-[0.24em] text-[rgba(18,52,60,0.54)]">Recommended next</p>
+                <h2 className="text-3xl font-bold text-[var(--foreground-strong)]">You may also like</h2>
               </div>
-              <p className="text-sm theme-muted">
+              <p className="text-sm theme-muted-page">
                 More products from the same catalog flow.
               </p>
             </div>

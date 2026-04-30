@@ -15,7 +15,6 @@ import { getAvailableInventoryQuantity } from "@/lib/inventory";
 export default function CartPage() {
   const { cartProducts, setCartProducts } = useContext(CartContext);
   const [products, setProducts] = useState([]);
-  const [subtotal, setSubtotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
   const [shippingDetails, setShippingDetails] = useState(null);
@@ -68,23 +67,26 @@ export default function CartPage() {
   useEffect(() => {
     const ids = cartProducts.map((p) => p.id);
     if (ids.length > 0) {
+      let cancelled = false;
+
       axios.post("/api/cart", { ids }).then((res) => {
-        setProducts(res.data.products);
+        if (!cancelled) {
+          setProducts(res.data.products);
+        }
       });
-    } else {
-      setProducts([]);
-      setSubtotal(0);
+
+      return () => {
+        cancelled = true;
+      };
     }
   }, [cartProducts]);
 
-  useEffect(() => {
-    const total = products.reduce((sum, product) => {
-      const item = cartProducts.find((i) => i.id === product._id);
-      const qty = item?.qty || 1;
-      return sum + (product.salePriceIncTax || 0) * qty;
-    }, 0);
-    setSubtotal(total);
-  }, [products, cartProducts]);
+  const displayedProducts = cartProducts.length > 0 ? products : [];
+  const subtotal = displayedProducts.reduce((sum, product) => {
+    const item = cartProducts.find((cartItem) => cartItem.id === product._id);
+    const qty = item?.qty || 1;
+    return sum + (product.salePriceIncTax || 0) * qty;
+  }, 0);
 
   const updateQuantity = (productId, change) => {
     setCartProducts((prev) =>
@@ -121,7 +123,7 @@ export default function CartPage() {
     }
 
     setIsLoading(true);
-    const fullCartProducts = products.map((product) => ({
+    const fullCartProducts = displayedProducts.map((product) => ({
       _id: product._id,
       quantity: cartProducts.find((item) => item.id === product._id)?.qty || 1,
     }));
@@ -171,14 +173,14 @@ export default function CartPage() {
         <div className="min-h-screen py-8 px-4 sm:px-8">
           <div className="max-w-6xl w-full mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             {/* Cart Items */}
-            <div className="panel-surface md:col-span-2 rounded-2xl p-6 sm:p-8">
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-6 border-b border-cyan-200/10 pb-4">
+            <div className="theme-shell-light md:col-span-2 rounded-2xl p-6 sm:p-8">
+              <h1 className="mb-6 border-b border-[rgba(20,109,126,0.12)] pb-4 text-2xl font-extrabold text-[var(--foreground-strong)] sm:text-3xl">
                 Shopping Cart
               </h1>
 
-              {products.length === 0 ? (
+              {displayedProducts.length === 0 ? (
                 <div className="text-center py-16">
-                  <p className="theme-muted text-lg mb-6">
+                  <p className="mb-6 text-lg theme-muted-page">
                     Your cart is currently empty.
                   </p>
                   <Link
@@ -191,17 +193,17 @@ export default function CartPage() {
               ) : (
                 <>
                   <div className="overflow-x-auto mb-8">
-                    <table className="min-w-full text-sm text-left text-cyan-50/90">
+                    <table className="min-w-full text-left text-sm text-[var(--foreground)]">
                       <thead>
-                        <tr className="bg-white/8 text-cyan-100/70 text-xs uppercase tracking-wider">
+                        <tr className="bg-[rgba(20,148,182,0.08)] text-xs uppercase tracking-wider text-[rgba(18,52,60,0.62)]">
                           <th className="py-3 px-3 rounded-tl-xl">Product</th>
                           <th className="py-3 px-3 text-center">Quantity</th>
                           <th className="py-3 px-3 text-center">Price</th>
                           <th className="py-3 px-3 text-right rounded-tr-xl">Remove</th>
                         </tr>
                       </thead>
-                     <tbody className="rounded-b-xl divide-y divide-cyan-200/10">
-  {products.map((product, index) => {
+                     <tbody className="rounded-b-xl divide-y divide-[rgba(20,109,126,0.1)]">
+  {displayedProducts.map((product, index) => {
     const cartItem = cartProducts.find((item) => item.id === product._id);
     const quantity = cartItem?.qty || 1;
     const imageSrc = getPrimaryProductImage(product?.images);
@@ -211,8 +213,8 @@ export default function CartPage() {
       <tr
         key={product._id}
         className={`transition duration-200 ${
-          index % 2 === 0 ? "bg-white/4" : "bg-white/8"
-        } hover:bg-white/10`}
+          index % 2 === 0 ? "bg-white/55" : "bg-[rgba(20,148,182,0.04)]"
+        } hover:bg-[rgba(20,148,182,0.08)]`}
       >
         <td className="py-3 px-2 sm:px-3">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-center sm:text-left">
@@ -221,16 +223,16 @@ export default function CartPage() {
               alt={product.name || "Product"}
               width={50}
               height={50}
-              className="rounded-md object-cover border border-gray-200"
+              className="rounded-md border border-[rgba(20,109,126,0.14)] object-cover"
             />
             <div>
-              <h2 className="text-sm sm:text-base font-medium text-white">
+              <h2 className="text-sm font-medium text-[var(--foreground-strong)] sm:text-base">
                 {product.name}
               </h2>
-              <p className="text-xs sm:text-sm text-cyan-100/65">
+              <p className="text-xs text-[rgba(18,52,60,0.72)] sm:text-sm">
                 ₦{(product.salePriceIncTax || 0).toLocaleString()}
               </p>
-              <p className="text-xs sm:text-sm text-cyan-100/55">
+              <p className="text-xs sm:text-sm theme-muted-page">
                 {availableQuantity} available for this reservation window
               </p>
             </div>
@@ -259,7 +261,7 @@ export default function CartPage() {
           </div>
         </td>
 
-        <td className="py-3 px-2 sm:px-3 text-center font-semibold text-white text-sm sm:text-base">
+        <td className="py-3 px-2 text-center text-sm font-semibold text-[var(--foreground-strong)] sm:px-3 sm:text-base">
           ₦{((product.salePriceIncTax || 0) * quantity).toLocaleString()}
         </td>
 
@@ -270,7 +272,7 @@ export default function CartPage() {
                 prev.filter((item) => item.id !== product._id)
               )
             }
-            className="text-rose-300 hover:text-rose-200 text-lg sm:text-xl"
+            className="text-lg text-rose-600 transition hover:text-rose-700 sm:text-xl"
             aria-label="Remove item"
           >
             <FontAwesomeIcon icon={faTrash} />
@@ -284,8 +286,8 @@ export default function CartPage() {
                     </table>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row justify-between items-center border-t pt-6 gap-4">
-                    <div className="text-lg sm:text-xl text-white">
+                  <div className="flex flex-col items-center justify-between gap-4 border-t border-[rgba(20,109,126,0.12)] pt-6 sm:flex-row">
+                    <div className="text-lg text-[var(--foreground-strong)] sm:text-xl">
                       Subtotal:{" "}
                       <span className="font-semibold">
                         ₦{subtotal.toLocaleString()}
@@ -406,9 +408,9 @@ export default function CartPage() {
 
               <button
                 onClick={handleCheckout}
-                disabled={isLoading || products.length === 0}
+                disabled={isLoading || displayedProducts.length === 0}
                 className={`w-full py-3 rounded-lg font-semibold text-white transition ${
-                  isLoading || products.length === 0
+                  isLoading || displayedProducts.length === 0
                     ? "bg-white/10 text-cyan-100/45 cursor-not-allowed"
                     : "theme-button-accent"
                 }`}

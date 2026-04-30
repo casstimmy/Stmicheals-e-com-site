@@ -1,4 +1,4 @@
-import { createContext, useEffect, useState } from "react";
+import { createContext, startTransition, useEffect, useState } from "react";
 
 export const CartContext = createContext({});
 const CART_STORAGE_KEY = "cart";
@@ -13,7 +13,9 @@ export default function CartProvider({ children }) {
       try {
         const parsedCart = JSON.parse(savedCart);
         if (Array.isArray(parsedCart)) {
-          setCartProducts(parsedCart);
+          startTransition(() => {
+            setCartProducts(parsedCart);
+          });
         }
       } catch {
         localStorage.removeItem(CART_STORAGE_KEY);

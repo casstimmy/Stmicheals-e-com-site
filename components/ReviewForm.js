@@ -1,5 +1,25 @@
 import { useState } from "react";
 
+function StarInput({ rating, onChange }) {
+  return (
+    <div className="flex space-x-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onClick={() => onChange(star)}
+          className={`select-none text-3xl transition-colors duration-200 ${
+            star <= rating ? "text-yellow-500" : "text-gray-300"
+          }`}
+          aria-label={`${star} Star${star > 1 ? "s" : ""}`}
+        >
+          ★
+        </button>
+      ))}
+    </div>
+  );
+}
+
 export default function ReviewForm({ productId, onSubmitted }) {
   const [reviewData, setReviewData] = useState({
     title: "",
@@ -52,33 +72,15 @@ export default function ReviewForm({ productId, onSubmitted }) {
     }
   };
 
-  // Helper to render stars for input
-  const StarInput = () => {
-    return (
-      <div className="flex space-x-1">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <button
-            key={star}
-            type="button"
-            onClick={() => setReviewData({ ...reviewData, rating: star })}
-            className={`text-3xl cursor-pointer select-none transition-colors duration-200 ${
-              star <= reviewData.rating ? "text-yellow-500" : "text-gray-300"
-            }`}
-            aria-label={`${star} Star${star > 1 ? "s" : ""}`}
-          >
-            ★
-          </button>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <form onSubmit={handleReviewSubmit} className="space-y-4">
      <h3 className="text-2xl font-bold text-white border-b border-cyan-200/10 pb-4 mb-6">
     Add a Review
   </h3>
-      <StarInput />
+      <StarInput
+        rating={reviewData.rating}
+        onChange={(rating) => setReviewData((currentValue) => ({ ...currentValue, rating }))}
+      />
       <input
         type="text"
         placeholder="Your Name"

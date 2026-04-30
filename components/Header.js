@@ -33,8 +33,8 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-40 border-b border-cyan-200/10 bg-[rgba(4,48,60,0.76)] backdrop-blur-xl">
-      <div className="border-b border-cyan-200/10 bg-[linear-gradient(90deg,_rgba(10,122,146,0.98),_rgba(8,98,120,0.96))] text-[0.72rem] uppercase tracking-[0.24em] text-cyan-50">
+    <header className="sticky top-0 z-40 border-b border-[rgba(20,109,126,0.14)] bg-[rgba(255,250,243,0.86)] shadow-[0_16px_42px_rgba(18,52,60,0.08)] backdrop-blur-xl">
+      <div className="border-b border-[rgba(111,220,243,0.14)] bg-[linear-gradient(90deg,_rgba(17,124,146,0.96),_rgba(22,148,174,0.92))] text-[0.72rem] uppercase tracking-[0.24em] text-cyan-50">
         <Center>
           <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-2">
             <span>Trusted grocery delivery across major Nigerian cities</span>
@@ -51,7 +51,7 @@ export default function Header() {
           <div className="flex justify-between items-center gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2">
-            <div className="p-2 rounded-md bg-[linear-gradient(to_bottom,_#002a2d,_#0b3e3e)] shadow-lg shadow-teal-950/20">
+            <div className="rounded-2xl border border-[rgba(20,109,126,0.12)] bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(239,247,248,0.96))] p-2 shadow-[0_12px_28px_rgba(18,52,60,0.08)]">
               <Image
                 src="/images/st-micheals-logo.png"
                 alt="St. Michael's Logo"
@@ -61,10 +61,10 @@ export default function Header() {
               />
             </div>
             <div className="hidden sm:block">
-              <span className="block text-xl font-bold text-white">
+              <span className="block text-xl font-bold text-[var(--foreground-strong)]">
                 St. Michael&apos;s Store
               </span>
-              <span className="block text-xs font-medium uppercase tracking-[0.26em] text-cyan-100/70">
+              <span className="block text-xs font-medium uppercase tracking-[0.26em] text-[rgba(18,52,60,0.62)]">
                 Premium essentials marketplace
               </span>
             </div>
@@ -72,7 +72,7 @@ export default function Header() {
 
           {/* Hamburger Icon */}
           <button
-            className="md:hidden text-white"
+            className="md:hidden rounded-full border border-[rgba(20,109,126,0.14)] bg-white/70 px-3 py-2 text-[var(--foreground-strong)] shadow-sm"
             onClick={() => setNavOpen(!navOpen)}
             aria-expanded={navOpen}
             aria-label={navOpen ? "Close navigation menu" : "Open navigation menu"}
@@ -81,7 +81,7 @@ export default function Header() {
           </button>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-3 font-medium text-cyan-50">
+          <nav className="hidden md:flex items-center gap-3 font-medium text-[var(--foreground-strong)]">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -89,7 +89,7 @@ export default function Header() {
                 className={`rounded-full px-4 py-2 transition ${
                   isActiveRoute(link.href)
                     ? "theme-button-accent shadow-lg"
-                    : "hover:bg-white/10 hover:text-white"
+                    : "hover:bg-[rgba(20,148,182,0.12)] hover:text-[var(--brand-strong)]"
                 }`}
               >
                 {link.label}
@@ -98,11 +98,11 @@ export default function Header() {
             <Link
               href="/cart"
               id="cart-icon"
-              className="theme-button-accent inline-flex items-center gap-2 rounded-full px-4 py-2 transition"
+              className="theme-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2 transition shadow-lg"
             >
               <FontAwesomeIcon icon={faCartShopping} />
               <span>Cart</span>
-              <span className="rounded-full bg-black/10 px-2 py-0.5 text-xs font-semibold">
+              <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
                 {cartCount || 0}
               </span>
             </Link>
@@ -111,7 +111,7 @@ export default function Header() {
 
         {/* Mobile Nav */}
         {navOpen && (
-          <nav className="mt-4 grid gap-3 md:hidden text-cyan-50 font-medium">
+          <nav className="mt-4 grid gap-3 rounded-[1.5rem] border border-[rgba(20,109,126,0.12)] bg-[rgba(255,253,248,0.94)] p-3 shadow-[0_20px_40px_rgba(18,52,60,0.08)] md:hidden font-medium text-[var(--foreground-strong)]">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
@@ -120,7 +120,7 @@ export default function Header() {
                 className={`rounded-2xl px-4 py-3 transition ${
                   isActiveRoute(link.href)
                     ? "theme-button-accent"
-                    : "bg-white/10 hover:bg-white/15"
+                    : "bg-[rgba(20,148,182,0.08)] hover:bg-[rgba(20,148,182,0.14)]"
                 }`}
               >
                 {link.label}
@@ -130,13 +130,13 @@ export default function Header() {
               href="/cart"
               id="cart-icon"
               onClick={() => setNavOpen(false)}
-              className="theme-button-accent flex items-center justify-between rounded-2xl px-4 py-3 transition"
+              className="theme-button-primary flex items-center justify-between rounded-2xl px-4 py-3 transition"
             >
               <span className="flex items-center gap-2">
                 <FontAwesomeIcon icon={faCartShopping} />
                 Cart
               </span>
-              <span className="rounded-full bg-black/10 px-2 py-0.5 text-xs font-semibold">
+              <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
                 {cartCount || 0}
               </span>
             </Link>

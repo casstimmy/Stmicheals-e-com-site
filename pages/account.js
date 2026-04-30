@@ -24,36 +24,70 @@ export default function AccountPage() {
   const [infoMessage, setInfoMessage] = useState("");
   const [debugOtp, setDebugOtp] = useState("");
 
+  const applyAuthenticatedSession = (sessionCustomer, sessionOrders = []) => {
+    setIsAuthenticated(true);
+    setCustomer(sessionCustomer);
+    setOrders(sessionOrders);
+    setProfileForm({
+      name: sessionCustomer?.name || "",
+      phone: sessionCustomer?.phone || "",
+      address: sessionCustomer?.address || "",
+      city: sessionCustomer?.city || "",
+    });
+  };
+
+  const clearSessionState = () => {
+    setIsAuthenticated(false);
+    setCustomer(null);
+    setOrders([]);
+  };
+
   const loadSession = async () => {
     setSessionLoading(true);
     try {
       const response = await axios.get("/api/account/session");
       if (response.data?.authenticated) {
-        setIsAuthenticated(true);
-        setCustomer(response.data.customer);
-        setOrders(response.data.orders || []);
-        setProfileForm({
-          name: response.data.customer.name || "",
-          phone: response.data.customer.phone || "",
-          address: response.data.customer.address || "",
-          city: response.data.customer.city || "",
-        });
+        applyAuthenticatedSession(response.data.customer, response.data.orders || []);
       } else {
-        setIsAuthenticated(false);
-        setCustomer(null);
-        setOrders([]);
+        clearSessionState();
       }
     } catch {
-      setIsAuthenticated(false);
-      setCustomer(null);
-      setOrders([]);
+      clearSessionState();
     } finally {
       setSessionLoading(false);
     }
   };
 
   useEffect(() => {
-    loadSession();
+    let cancelled = false;
+
+    axios
+      .get("/api/account/session")
+      .then((response) => {
+        if (cancelled) {
+          return;
+        }
+
+        if (response.data?.authenticated) {
+          applyAuthenticatedSession(response.data.customer, response.data.orders || []);
+        } else {
+          clearSessionState();
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          clearSessionState();
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setSessionLoading(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleRequestOtp = async (e) => {
@@ -165,46 +199,46 @@ export default function AccountPage() {
       <Header />
       <Center>
         <div className="min-h-screen py-8 px-4 sm:px-8">
-          <div className="panel-surface max-w-4xl mx-auto rounded-[2rem] p-8">
-            <div className="border-b border-cyan-200/10 pb-6">
+          <div className="theme-shell-light mx-auto max-w-4xl rounded-[2rem] p-8">
+            <div className="border-b border-[rgba(20,109,126,0.12)] pb-6">
               <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
                 Passwordless customer account
               </span>
-              <h1 className="mt-4 text-3xl font-extrabold text-white mb-3">
+              <h1 className="mb-3 mt-4 text-3xl font-extrabold text-[var(--foreground-strong)]">
                 My Account
               </h1>
-              <p className="max-w-2xl theme-muted">
+              <p className="max-w-2xl theme-muted-page">
                 Sign in with a one-time code to manage your online customer profile and review orders securely.
               </p>
             </div>
 
             {sessionLoading ? (
-              <div className="py-16 text-center theme-muted">Loading your account...</div>
+              <div className="py-16 text-center theme-muted-page">Loading your account...</div>
             ) : !isAuthenticated ? (
               <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-                <div className="rounded-[1.75rem] bg-[linear-gradient(135deg,_rgba(18,56,60,0.96),_rgba(17,104,128,0.92))] p-8 text-white shadow-xl">
-                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-cyan-100/80">
+                <div className="theme-card-light rounded-[1.75rem] p-8 shadow-xl">
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[rgba(18,52,60,0.54)]">
                     Secure customer access
                   </p>
-                  <h2 className="mt-4 text-3xl font-bold text-white">
+                  <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">
                     One code. Full visibility into your orders.
                   </h2>
-                  <p className="mt-4 max-w-xl text-cyan-50/85">
+                  <p className="mt-4 max-w-xl theme-muted-page">
                     Use the same email you checkout with. We will send a one-time passcode so only you can view order history and update delivery details.
                   </p>
 
                   <div className="mt-8 grid gap-4 md:grid-cols-3">
-                    <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-                      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Lookup</p>
-                      <p className="mt-2 text-2xl font-bold">OTP-secured</p>
+                    <div className="rounded-2xl bg-[rgba(20,148,182,0.08)] p-4 backdrop-blur-sm">
+                      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Lookup</p>
+                      <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">OTP-secured</p>
                     </div>
-                    <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-                      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Customer type</p>
-                      <p className="mt-2 text-2xl font-bold">ONLINE</p>
+                    <div className="rounded-2xl bg-[rgba(20,148,182,0.08)] p-4 backdrop-blur-sm">
+                      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Customer type</p>
+                      <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">ONLINE</p>
                     </div>
-                    <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
-                      <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Access</p>
-                      <p className="mt-2 text-2xl font-bold">No password</p>
+                    <div className="rounded-2xl bg-[rgba(20,148,182,0.08)] p-4 backdrop-blur-sm">
+                      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Access</p>
+                      <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">No password</p>
                     </div>
                   </div>
                 </div>
@@ -282,11 +316,11 @@ export default function AccountPage() {
               </div>
             ) : (
               <>
-                <div className="mt-8 flex flex-col gap-4 rounded-[1.75rem] bg-[linear-gradient(135deg,_rgba(18,56,60,0.96),_rgba(17,104,128,0.92))] p-8 text-white shadow-xl lg:flex-row lg:items-center lg:justify-between">
+                <div className="theme-card-light mt-8 flex flex-col gap-4 rounded-[1.75rem] p-8 shadow-xl lg:flex-row lg:items-center lg:justify-between">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/80">Signed in</p>
-                    <h2 className="mt-3 text-3xl font-bold">Welcome back, {customer?.name || customer?.email}</h2>
-                    <p className="mt-3 text-cyan-50/85">
+                    <p className="text-xs uppercase tracking-[0.28em] text-[rgba(18,52,60,0.54)]">Signed in</p>
+                    <h2 className="mt-3 text-3xl font-bold text-[var(--foreground-strong)]">Welcome back, {customer?.name || customer?.email}</h2>
+                    <p className="mt-3 theme-muted-page">
                       Customer type: {customer?.type || "ONLINE"} · {customer?.email}
                     </p>
                   </div>
@@ -301,20 +335,20 @@ export default function AccountPage() {
                 </div>
 
                 <div className="mt-8 grid gap-4 md:grid-cols-4">
-                  <div className="theme-card-soft rounded-[1.5rem] p-5 shadow-sm">
-                    <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Orders found</p>
-                    <p className="mt-2 text-3xl font-bold text-white">{orders.length}</p>
+                  <div className="theme-card-light rounded-[1.5rem] p-5 shadow-sm">
+                    <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Orders found</p>
+                    <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{orders.length}</p>
                   </div>
-                  <div className="theme-card-soft rounded-[1.5rem] p-5 shadow-sm">
-                    <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Paid orders</p>
-                    <p className="mt-2 text-3xl font-bold text-white">{paidOrders}</p>
+                  <div className="theme-card-light rounded-[1.5rem] p-5 shadow-sm">
+                    <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Paid orders</p>
+                    <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{paidOrders}</p>
                   </div>
-                  <div className="theme-card-soft rounded-[1.5rem] p-5 shadow-sm">
-                    <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Pending orders</p>
-                    <p className="mt-2 text-3xl font-bold text-white">{pendingOrders}</p>
+                  <div className="theme-card-light rounded-[1.5rem] p-5 shadow-sm">
+                    <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Pending orders</p>
+                    <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{pendingOrders}</p>
                   </div>
-                  <div className="theme-card-soft rounded-[1.5rem] p-5 shadow-sm">
-                    <p className="text-sm uppercase tracking-[0.22em] text-cyan-100/70">Total spend</p>
+                  <div className="theme-card-light rounded-[1.5rem] p-5 shadow-sm">
+                    <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Total spend</p>
                     <p className="mt-2 text-3xl font-bold text-[var(--accent)]">₦{totalSpend.toLocaleString()}</p>
                   </div>
                 </div>
@@ -343,7 +377,7 @@ export default function AccountPage() {
                         type="email"
                         value={customer?.email || ""}
                         readOnly
-                          className="w-full rounded-2xl border border-cyan-200/10 bg-black/10 px-4 py-3 text-cyan-100/55"
+                          className="theme-input-readonly w-full rounded-2xl px-4 py-3"
                       />
                       <input
                         type="tel"
@@ -465,13 +499,13 @@ export default function AccountPage() {
             )}
 
             {errorMessage && (
-              <div className="mt-6 rounded-xl border border-red-200/30 bg-red-200/10 px-4 py-3 text-sm text-red-100">
+              <div className="mt-6 rounded-xl border border-red-200/80 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {errorMessage}
               </div>
             )}
 
             {infoMessage && (
-              <div className="mt-6 rounded-xl border border-emerald-200/30 bg-emerald-200/10 px-4 py-3 text-sm text-emerald-100">
+              <div className="mt-6 rounded-xl border border-emerald-200/80 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                 {infoMessage}
               </div>
             )}
