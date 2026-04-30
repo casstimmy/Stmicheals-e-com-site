@@ -2,11 +2,13 @@ import Featured from "@/components/Featured";
 import NewProducts from "@/components/NewProducts";
 import Header from "@/components/Header";
 import Head from "next/head";
-import { mongooseConnect } from "@/lib/mongoose";
-import { Product } from "@/models/Product";
-import { attachCategoryNames } from "@/lib/productCategories";
+import { getCatalogInsights } from "@/lib/storefront";
+import {
+  getStorefrontProductById,
+  getStorefrontProducts,
+} from "@/lib/storefrontCatalog";
 
-export default function HomePage({ featuredProduct, newProducts }) {
+export default function HomePage({ featuredProduct, newProducts, catalogInsights }) {
 
   return (
     <div>
@@ -15,38 +17,26 @@ export default function HomePage({ featuredProduct, newProducts }) {
         <meta name="description" content="Fresh groceries and everyday essentials delivered to your doorstep. Shop at St Michael's Hub and Stores." />
       </Head>
       <Header />
-      <Featured product={featuredProduct} />
-      <NewProducts newProducts={newProducts} />
+      <Featured product={featuredProduct} catalogInsights={catalogInsights} />
+      <NewProducts newProducts={newProducts} catalogInsights={catalogInsights} />
     </div>
   );
 }
 
 export async function getServerSideProps() {
   try {
-    await mongooseConnect();
-
     const featuredProductId = process.env.FEATURED_PRODUCT_ID;
-    let featuredProduct = null;
-    if (featuredProductId) {
-      try {
-        featuredProduct = await Product.findById(featuredProductId).lean();
-      } catch {
-        featuredProduct = null;
-      }
-    }
-    if (!featuredProduct) {
-      featuredProduct = await Product.findOne({}, null, { sort: { _id: -1 } }).lean();
-    }
-    const newProducts = await Product.find({}, null, { sort: { '_id': -1 }, limit: 10 }).lean();
     const [resolvedFeaturedProduct, resolvedNewProducts] = await Promise.all([
-      attachCategoryNames(featuredProduct),
-      attachCategoryNames(newProducts),
+      getStorefrontProductById(featuredProductId, { fallbackToLatest: true }),
+      getStorefrontProducts({ limit: 12 }),
     ]);
+    const catalogInsights = getCatalogInsights(resolvedNewProducts);
 
     return {
       props: {
         featuredProduct: JSON.parse(JSON.stringify(resolvedFeaturedProduct)),
         newProducts: JSON.parse(JSON.stringify(resolvedNewProducts)),
+        catalogInsights,
       },
     };
   } catch (error) {
@@ -55,6 +45,7 @@ export async function getServerSideProps() {
       props: {
         featuredProduct: null,
         newProducts: [],
+        catalogInsights: getCatalogInsights([]),
       },
     };
   }

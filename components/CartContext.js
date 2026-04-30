@@ -3,6 +3,10 @@ import { createContext, startTransition, useEffect, useState } from "react";
 export const CartContext = createContext({});
 const CART_STORAGE_KEY = "cart";
 
+function normalizeMaxQuantity(maxQuantity) {
+  return Number.isFinite(maxQuantity) ? Math.max(0, maxQuantity) : Number.POSITIVE_INFINITY;
+}
+
 export default function CartProvider({ children }) {
   const [cartProducts, setCartProducts] = useState([]);
 
@@ -30,24 +34,41 @@ export default function CartProvider({ children }) {
     }
   }, [cartProducts]);
 
-  function addProductToCart(productId) {
+  function addProductToCart(productId, options = {}) {
+    const maxQuantity = normalizeMaxQuantity(options.maxQuantity);
+
     setCartProducts((prev) => {
       const existing = prev.find((p) => p.id === productId);
+
+      if (maxQuantity === 0) {
+        return prev;
+      }
+
       if (existing) {
+        const nextQuantity = Math.min(existing.qty + 1, maxQuantity);
+        if (nextQuantity === existing.qty) {
+          return prev;
+        }
+
         return prev.map((p) =>
-          p.id === productId ? { ...p, qty: p.qty + 1 } : p
+          p.id === productId ? { ...p, qty: nextQuantity } : p
         );
       }
       return [...prev, { id: productId, qty: 1 }];
     });
   }
 
-  function updateProductQuantity(productId, quantity) {
+  function updateProductQuantity(productId, quantity, options = {}) {
+    const maxQuantity = normalizeMaxQuantity(options.maxQuantity);
+
     setCartProducts((prev) =>
       prev
         .map((product) =>
           product.id === productId
-            ? { ...product, qty: Math.max(1, Number(quantity) || 1) }
+            ? {
+                ...product,
+                qty: Math.min(Math.max(0, Number(quantity) || 0), maxQuantity),
+              }
             : product
         )
         .filter((product) => product.qty > 0)

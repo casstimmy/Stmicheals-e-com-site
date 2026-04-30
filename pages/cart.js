@@ -13,7 +13,7 @@ import { SUPPORTED_SHIPPING_DESTINATIONS } from "@/lib/shipping";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
 
 export default function CartPage() {
-  const { cartProducts, setCartProducts } = useContext(CartContext);
+  const { cartProducts, removeProductFromCart, updateProductQuantity } = useContext(CartContext);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
@@ -82,20 +82,42 @@ export default function CartPage() {
   }, [cartProducts]);
 
   const displayedProducts = cartProducts.length > 0 ? products : [];
-  const subtotal = displayedProducts.reduce((sum, product) => {
-    const item = cartProducts.find((cartItem) => cartItem.id === product._id);
-    const qty = item?.qty || 1;
-    return sum + (product.salePriceIncTax || 0) * qty;
-  }, 0);
+  const cartLines = displayedProducts.map((product) => {
+    const cartItem = cartProducts.find((item) => item.id === product._id);
+    const quantity = cartItem?.qty || 1;
+    const availableQuantity = getAvailableInventoryQuantity(product);
 
-  const updateQuantity = (productId, change) => {
-    setCartProducts((prev) =>
-      prev.map((item) =>
-        item.id === productId
-          ? { ...item, qty: Math.max(1, item.qty + change) }
-          : item
-      )
-    );
+    return {
+      product,
+      quantity,
+      imageSrc: getPrimaryProductImage(product?.images),
+      availableQuantity,
+      isSoldOut: availableQuantity === 0,
+      exceedsStock: availableQuantity > 0 && quantity > availableQuantity,
+    };
+  });
+  const subtotal = cartLines.reduce(
+    (sum, line) => sum + (line.product.salePriceIncTax || 0) * line.quantity,
+    0
+  );
+  const totalItems = cartProducts.reduce((sum, item) => sum + item.qty, 0);
+  const hasInventoryIssues = cartLines.some((line) => line.isSoldOut || line.exceedsStock);
+  const inventoryAlertText = cartLines
+    .filter((line) => line.isSoldOut || line.exceedsStock)
+    .map((line) =>
+      line.isSoldOut
+        ? `${line.product.name} is currently unavailable.`
+        : `${line.product.name} exceeds available stock. Reduce to ${line.availableQuantity}.`
+    )
+    .join(" ");
+
+  const handleQuantityChange = (productId, nextQuantity, availableQuantity) => {
+    if (availableQuantity === 0) {
+      return;
+    }
+
+    const clampedQuantity = Math.max(1, Math.min(nextQuantity, availableQuantity));
+    updateProductQuantity(productId, clampedQuantity, { maxQuantity: availableQuantity });
   };
 
   const handleCheckout = async () => {
@@ -165,7 +187,7 @@ export default function CartPage() {
   return (
     <>
       <Head>
-        <title>Your Cart | MyStore</title>
+        <title>Your Cart | St Michael&apos;s Store</title>
       </Head>
 
       <Header />
@@ -177,6 +199,28 @@ export default function CartPage() {
               <h1 className="mb-6 border-b border-[rgba(20,109,126,0.12)] pb-4 text-2xl font-extrabold text-[var(--foreground-strong)] sm:text-3xl">
                 Shopping Cart
               </h1>
+
+              <div className="mb-8 grid gap-4 sm:grid-cols-3">
+                {[
+                  {
+                    label: "1. Review basket",
+                    detail: "Check stock-aware quantities before payment.",
+                  },
+                  {
+                    label: "2. Confirm delivery",
+                    detail: "Shipping costs update instantly by destination.",
+                  },
+                  {
+                    label: "3. Start payment",
+                    detail: "Order totals are revalidated on the server.",
+                  },
+                ].map((step) => (
+                  <div key={step.label} className="theme-card-light rounded-[1.5rem] px-4 py-4 shadow-sm">
+                    <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">{step.label}</p>
+                    <p className="mt-2 text-sm leading-7 theme-muted-page">{step.detail}</p>
+                  </div>
+                ))}
+              </div>
 
               {displayedProducts.length === 0 ? (
                 <div className="text-center py-16">
@@ -192,6 +236,12 @@ export default function CartPage() {
                 </div>
               ) : (
                 <>
+                  {hasInventoryIssues && (
+                    <div className="mb-6 rounded-[1.5rem] border border-amber-200/80 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+                      Resolve stock alerts before payment can begin. {inventoryAlertText}
+                    </div>
+                  )}
+
                   <div className="overflow-x-auto mb-8">
                     <table className="min-w-full text-left text-sm text-[var(--foreground)]">
                       <thead>
@@ -202,86 +252,101 @@ export default function CartPage() {
                           <th className="py-3 px-3 text-right rounded-tr-xl">Remove</th>
                         </tr>
                       </thead>
-                     <tbody className="rounded-b-xl divide-y divide-[rgba(20,109,126,0.1)]">
-  {displayedProducts.map((product, index) => {
-    const cartItem = cartProducts.find((item) => item.id === product._id);
-    const quantity = cartItem?.qty || 1;
-    const imageSrc = getPrimaryProductImage(product?.images);
-    const availableQuantity = getAvailableInventoryQuantity(product);
+                      <tbody className="divide-y divide-[rgba(20,109,126,0.1)] rounded-b-xl">
+                        {cartLines.map((line, index) => (
+                          <tr
+                            key={line.product._id}
+                            className={`transition duration-200 ${
+                              index % 2 === 0 ? "bg-white/55" : "bg-[rgba(20,148,182,0.04)]"
+                            } hover:bg-[rgba(20,148,182,0.08)]`}
+                          >
+                            <td className="px-2 py-3 sm:px-3">
+                              <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:items-start sm:gap-4 sm:text-left">
+                                <Image
+                                  src={line.imageSrc}
+                                  alt={line.product.name || "Product"}
+                                  width={50}
+                                  height={50}
+                                  className="rounded-md border border-[rgba(20,109,126,0.14)] object-cover"
+                                />
+                                <div>
+                                  <h2 className="text-sm font-medium text-[var(--foreground-strong)] sm:text-base">
+                                    {line.product.name}
+                                  </h2>
+                                  <p className="text-xs text-[rgba(18,52,60,0.72)] sm:text-sm">
+                                    ₦{(line.product.salePriceIncTax || 0).toLocaleString()}
+                                  </p>
+                                  <p
+                                    className={`text-xs sm:text-sm ${
+                                      line.isSoldOut
+                                        ? "text-rose-600"
+                                        : line.exceedsStock
+                                          ? "text-amber-700"
+                                          : "theme-muted-page"
+                                    }`}
+                                  >
+                                    {line.isSoldOut
+                                      ? "Currently unavailable. Remove before checkout."
+                                      : line.exceedsStock
+                                        ? `Reduce quantity to ${line.availableQuantity} to continue.`
+                                        : `${line.availableQuantity} available for this reservation window`}
+                                  </p>
+                                </div>
+                              </div>
+                            </td>
 
-    return (
-      <tr
-        key={product._id}
-        className={`transition duration-200 ${
-          index % 2 === 0 ? "bg-white/55" : "bg-[rgba(20,148,182,0.04)]"
-        } hover:bg-[rgba(20,148,182,0.08)]`}
-      >
-        <td className="py-3 px-2 sm:px-3">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-4 text-center sm:text-left">
-            <Image
-              src={imageSrc}
-              alt={product.name || "Product"}
-              width={50}
-              height={50}
-              className="rounded-md border border-[rgba(20,109,126,0.14)] object-cover"
-            />
-            <div>
-              <h2 className="text-sm font-medium text-[var(--foreground-strong)] sm:text-base">
-                {product.name}
-              </h2>
-              <p className="text-xs text-[rgba(18,52,60,0.72)] sm:text-sm">
-                ₦{(product.salePriceIncTax || 0).toLocaleString()}
-              </p>
-              <p className="text-xs sm:text-sm theme-muted-page">
-                {availableQuantity} available for this reservation window
-              </p>
-            </div>
-          </div>
-        </td>
+                            <td className="px-2 py-3 text-center sm:px-4">
+                              <div className="flex flex-col items-center justify-center gap-1 sm:flex-row sm:gap-2">
+                                <button
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      line.product._id,
+                                      line.quantity - 1,
+                                      line.availableQuantity
+                                    )
+                                  }
+                                  aria-label="Decrease quantity"
+                                  disabled={line.quantity <= 1 || line.isSoldOut}
+                                  className="theme-button-secondary h-8 w-8 rounded-md text-lg font-bold focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  −
+                                </button>
+                                <span className="min-w-[2rem] text-center text-sm font-semibold sm:text-base">
+                                  {line.quantity}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    handleQuantityChange(
+                                      line.product._id,
+                                      line.quantity + 1,
+                                      line.availableQuantity
+                                    )
+                                  }
+                                  aria-label="Increase quantity"
+                                  disabled={line.isSoldOut || line.quantity >= line.availableQuantity}
+                                  className="theme-button-secondary h-8 w-8 rounded-md text-lg font-bold focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+                                >
+                                  +
+                                </button>
+                              </div>
+                            </td>
 
-        <td className="py-3 px-2 sm:px-4 text-center">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
-            <button
-              onClick={() => updateQuantity(product._id, -1)}
-              aria-label="Decrease quantity"
-              className="theme-button-secondary w-8 h-8 text-lg font-bold rounded-md focus:outline-none"
-            >
-              −
-            </button>
-            <span className="text-sm sm:text-base font-semibold min-w-[2rem] text-center">
-              {quantity}
-            </span>
-            <button
-              onClick={() => updateQuantity(product._id, 1)}
-              aria-label="Increase quantity"
-              className="theme-button-secondary w-8 h-8 text-lg font-bold rounded-md focus:outline-none"
-            >
-              +
-            </button>
-          </div>
-        </td>
+                            <td className="px-2 py-3 text-center text-sm font-semibold text-[var(--foreground-strong)] sm:px-3 sm:text-base">
+                              ₦{((line.product.salePriceIncTax || 0) * line.quantity).toLocaleString()}
+                            </td>
 
-        <td className="py-3 px-2 text-center text-sm font-semibold text-[var(--foreground-strong)] sm:px-3 sm:text-base">
-          ₦{((product.salePriceIncTax || 0) * quantity).toLocaleString()}
-        </td>
-
-        <td className="py-3 px-2 sm:px-3 text-center sm:text-right">
-          <button
-            onClick={() =>
-              setCartProducts((prev) =>
-                prev.filter((item) => item.id !== product._id)
-              )
-            }
-            className="text-lg text-rose-600 transition hover:text-rose-700 sm:text-xl"
-            aria-label="Remove item"
-          >
-            <FontAwesomeIcon icon={faTrash} />
-          </button>
-        </td>
-      </tr>
-    );
-  })}
-</tbody>
+                            <td className="px-2 py-3 text-center sm:px-3 sm:text-right">
+                              <button
+                                onClick={() => removeProductFromCart(line.product._id)}
+                                className="text-lg text-rose-600 transition hover:text-rose-700 sm:text-xl"
+                                aria-label="Remove item"
+                              >
+                                <FontAwesomeIcon icon={faTrash} />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
 
                     </table>
                   </div>
@@ -313,7 +378,7 @@ export default function CartPage() {
               <div className="space-y-4 text-cyan-50/90 text-sm sm:text-base">
                 <div className="flex justify-between border-b border-cyan-200/10 pb-2">
                   <span>Items:</span>
-                  <span>{cartProducts.reduce((sum, i) => sum + i.qty, 0)}</span>
+                  <span>{totalItems}</span>
                 </div>
                 <div className="flex justify-between border-b border-cyan-200/10 pb-2">
                   <span>Subtotal:</span>
@@ -404,18 +469,23 @@ export default function CartPage() {
 
               <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50/85">
                 Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts.
+                Signed-in customers also get profile details prefilled automatically.
               </div>
 
               <button
                 onClick={handleCheckout}
-                disabled={isLoading || displayedProducts.length === 0}
+                disabled={isLoading || displayedProducts.length === 0 || hasInventoryIssues}
                 className={`w-full py-3 rounded-lg font-semibold text-white transition ${
-                  isLoading || displayedProducts.length === 0
+                  isLoading || displayedProducts.length === 0 || hasInventoryIssues
                     ? "bg-white/10 text-cyan-100/45 cursor-not-allowed"
                     : "theme-button-accent"
                 }`}
               >
-                {isLoading ? "Processing..." : "Proceed to Payment"}
+                {isLoading
+                  ? "Processing..."
+                  : hasInventoryIssues
+                    ? "Resolve stock alerts to continue"
+                    : "Proceed to Payment"}
               </button>
             </div>
           </div>

@@ -1,33 +1,85 @@
+import Link from "next/link";
 import ProductBox from "./ProductBox";
+import Center from "./Center";
+import { getCatalogInsights } from "@/lib/storefront";
 
-export default function NewProducts({ newProducts }) {
+export default function NewProducts({ newProducts, catalogInsights }) {
+  const insights = catalogInsights || getCatalogInsights(newProducts || []);
+
   return (
-    <div className="max-w-7xl mx-auto px-4 py-12">
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-        <div>
-          <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
-            Catalog highlight
-          </span>
-          <h1 className="mt-4 text-3xl font-bold text-white">New Arrivals</h1>
-          <p className="mt-2 max-w-2xl theme-muted">
-            Fresh additions with clearer pricing, category context, and stock-aware product cards.
-          </p>
-        </div>
-        <div className="theme-card-soft rounded-2xl px-4 py-3 text-sm text-cyan-50 shadow-sm">
-          {newProducts?.length || 0} products available now
-        </div>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-        {newProducts?.length > 0 ? (
-          newProducts.map((product) => (
-            <div key={product._id}>
-              <ProductBox {...product} />
+    <div className="px-4 pb-14 sm:px-8">
+      <Center>
+        <section className="theme-shell-light rounded-[2rem] px-6 py-8 md:px-8 md:py-10">
+          <div className="mb-8 flex flex-col gap-6 border-b border-[rgba(20,109,126,0.12)] pb-6">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
+                  Catalog highlight
+                </span>
+                <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">New Arrivals</h2>
+                <p className="mt-2 max-w-2xl theme-muted-page">
+                  Fresh additions with clearer pricing, category context, and stock-aware product cards.
+                </p>
+              </div>
+              <div className="theme-card-light rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
+                {newProducts?.length || 0} products available now
+              </div>
             </div>
-          ))
-        ) : (
-          <p className="text-center col-span-4 theme-muted">No products available.</p>
-        )}
-      </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="theme-card-light rounded-[1.25rem] px-4 py-4 shadow-sm">
+                <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">In stock</p>
+                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{insights.availableCount}</p>
+              </div>
+              <div className="theme-card-light rounded-[1.25rem] px-4 py-4 shadow-sm">
+                <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Category spread</p>
+                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{insights.categoryCount}</p>
+              </div>
+              <div className="theme-card-light rounded-[1.25rem] px-4 py-4 shadow-sm">
+                <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Price window</p>
+                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">
+                  ₦{insights.minPrice?.toLocaleString() || 0}
+                </p>
+                <p className="mt-1 text-sm theme-muted-page">
+                  Up to ₦{insights.maxPrice?.toLocaleString() || 0}
+                </p>
+              </div>
+            </div>
+
+            {insights.topCategories.length > 0 && (
+              <div className="flex flex-wrap gap-3">
+                {insights.topCategories.map((category) => (
+                  <Link
+                    key={category.name}
+                    href={{
+                      pathname: "/products",
+                      query: { category: category.name },
+                    }}
+                    className="theme-card-light inline-flex items-center gap-3 rounded-full px-4 py-2 text-sm font-medium text-[var(--foreground-strong)] shadow-sm"
+                  >
+                    <span>{category.name}</span>
+                    <span className="rounded-full bg-[rgba(22,125,143,0.1)] px-2 py-1 text-xs text-[var(--brand-strong)]">
+                      {category.count}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
+            {newProducts?.length > 0 ? (
+              newProducts.map((product) => (
+                <div key={product._id}>
+                  <ProductBox {...product} />
+                </div>
+              ))
+            ) : (
+              <p className="col-span-4 text-center theme-muted-page">No products available.</p>
+            )}
+          </div>
+        </section>
+      </Center>
     </div>
   );
 }

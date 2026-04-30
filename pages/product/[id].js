@@ -1,8 +1,7 @@
 import Center from "@/components/Center";
 import Header from "@/components/Header";
 import Image from "next/image";
-import { mongooseConnect } from "@/lib/mongoose";
-import { Product } from "@/models/Product";
+import Link from "next/link";
 import { useContext, useState, useRef } from "react";
 import Head from "next/head";
 import { motion, AnimatePresence } from "framer-motion";
@@ -13,24 +12,33 @@ import {
   normalizeProductImages,
   PRODUCT_IMAGE_PLACEHOLDER,
 } from "@/lib/productImages";
-import { attachCategoryNames } from "@/lib/productCategories";
 import { getReviewSummary } from "@/lib/reviews";
 import ProductBox from "@/components/ProductBox";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
+import {
+  getStorefrontProductById,
+  getStorefrontProducts,
+} from "@/lib/storefrontCatalog";
 
 export default function ProductPage({ product, relatedProducts }) {
   const galleryImages = normalizeProductImages(product.images);
   const defaultImage = getPrimaryProductImage(product.images);
   const [activeImage, setActiveImage] = useState(defaultImage);
-  const { addProductToCart } = useContext(CartContext);
+  const { addProductToCart, cartProducts } = useContext(CartContext);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [reviews, setReviews] = useState(product.reviews || []);
   const mainImageRef = useRef(null);
   const reviewSummary = getReviewSummary(reviews);
   const availableQuantity = getAvailableInventoryQuantity(product);
   const isInStock = availableQuantity > 0;
+  const cartQuantity = cartProducts.find((item) => item.id === product._id)?.qty || 0;
+  const hasReachedCartLimit = isInStock && cartQuantity >= availableQuantity;
 
   const handleAddToCart = () => {
+    if (!isInStock || hasReachedCartLimit) {
+      return;
+    }
+
     const productImage = mainImageRef.current;
     const cartIcon = document.getElementById("cart-icon");
 
@@ -63,7 +71,7 @@ export default function ProductPage({ product, relatedProducts }) {
       });
     }
 
-    addProductToCart(product._id);
+    addProductToCart(product._id, { maxQuantity: availableQuantity });
   };
 
   const handleReviewSubmitted = (review) => {
@@ -155,6 +163,10 @@ export default function ProductPage({ product, relatedProducts }) {
                   <p className="font-semibold text-[var(--foreground-strong)]">SKU</p>
                   <p>{product.sku || "Not provided"}</p>
                 </div>
+                <div>
+                  <p className="font-semibold text-[var(--foreground-strong)]">In your cart</p>
+                  <p>{cartQuantity}</p>
+                </div>
               </div>
 
               <div className="mb-6">
@@ -174,17 +186,47 @@ export default function ProductPage({ product, relatedProducts }) {
                 </p>
               </div>
 
-              <button
-                onClick={handleAddToCart}
-                disabled={!isInStock}
-                className={`mt-8 w-full text-lg font-medium py-3 rounded-xl transition duration-200 ${
-                  isInStock
-                    ? "theme-button-accent"
-                    : "bg-[rgba(18,52,60,0.08)] cursor-not-allowed text-[rgba(18,52,60,0.4)]"
-                }`}
+              <div className="theme-card-light mt-6 rounded-[1.5rem] p-4 text-sm shadow-sm">
+                <p className="font-semibold text-[var(--foreground-strong)]">Reservation readiness</p>
+                <p className="mt-2 theme-muted-page">
+                  {availableQuantity === 0
+                    ? "This item is temporarily unavailable. Check related products for alternatives."
+                    : `You currently have ${cartQuantity} of ${availableQuantity} available unit${availableQuantity === 1 ? "" : "s"} reserved in your cart.`}
+                </p>
+              </div>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                <button
+                  onClick={handleAddToCart}
+                  disabled={!isInStock || hasReachedCartLimit}
+                  className={`w-full rounded-xl py-3 text-lg font-medium transition duration-200 ${
+                    isInStock && !hasReachedCartLimit
+                      ? "theme-button-accent"
+                      : "bg-[rgba(18,52,60,0.08)] cursor-not-allowed text-[rgba(18,52,60,0.4)]"
+                  }`}
+                >
+                  {!isInStock
+                    ? "Unavailable"
+                    : hasReachedCartLimit
+                      ? "Max reserved in cart"
+                      : "Add to Cart"}
+                </button>
+                <Link
+                  href="/cart"
+                  className="theme-card-light inline-flex items-center justify-center rounded-xl px-4 py-3 text-lg font-medium text-[var(--foreground-strong)] shadow-sm"
+                >
+                  Review Cart
+                </Link>
+              </div>
+              <Link
+                href={{
+                  pathname: "/products",
+                  query: { category: product.categoryName || product.category || "" },
+                }}
+                className="mt-3 inline-flex text-sm font-medium text-[var(--brand-strong)]"
               >
-                {isInStock ? "Add to Cart" : "Unavailable"}
-              </button>
+                Explore more in this category
+              </Link>
             </div>
           </div>
           <div className="theme-shell-light max-w-7xl mx-auto mt-12 rounded-[2rem] p-10">
@@ -208,14 +250,12 @@ export default function ProductPage({ product, relatedProducts }) {
   </div>
 
   <div className="flex flex-col md:flex-row gap-8">
-    {/* Review Form - 50% width on md+ */}
-    <div className="md:w-1/2 theme-card-soft p-8 rounded-lg shadow-inner">
+    <div className="theme-card-light rounded-[1.5rem] p-8 shadow-sm md:w-1/2">
       <ReviewForm productId={product._id} onSubmitted={handleReviewSubmitted} />
     </div>
 
-    {/* Reviews List - 50% width on md+ */}
-    <div className="md:w-1/2 space-y-8 theme-card-soft p-8 rounded-lg shadow-inner">
-  <h3 className="text-2xl font-bold text-white border-b border-cyan-200/10 pb-4 mb-6">
+    <div className="theme-card-light space-y-8 rounded-[1.5rem] p-8 shadow-sm md:w-1/2">
+  <h3 className="mb-6 border-b border-[rgba(20,109,126,0.12)] pb-4 text-2xl font-bold text-[var(--foreground-strong)]">
     All Reviews
   </h3>
 
@@ -223,10 +263,10 @@ export default function ProductPage({ product, relatedProducts }) {
     reviews.map((review, index) => (
       <div
         key={index}
-        className="rounded-2xl border border-cyan-200/10 bg-white/6 p-6 shadow-sm hover:shadow-lg transition-shadow duration-300"
+        className="rounded-2xl border border-[rgba(20,109,126,0.12)] bg-white/80 p-6 shadow-sm transition-shadow duration-300 hover:shadow-lg"
       >
         <div className="flex justify-between items-center mb-3">
-          <p className="font-semibold text-white text-lg tracking-wide">
+          <p className="text-lg font-semibold tracking-wide text-[var(--foreground-strong)]">
             {review.customerName || "Anonymous"}
           </p>
           <div className="flex items-center space-x-1">
@@ -246,13 +286,13 @@ export default function ProductPage({ product, relatedProducts }) {
           </div>
         </div>
 
-        <h4 className="font-semibold text-xl text-white mb-2 tracking-tight">
+        <h4 className="mb-2 text-xl font-semibold tracking-tight text-[var(--foreground-strong)]">
           {review.title}
         </h4>
 
-        <p className="theme-muted leading-relaxed mb-4">{review.text}</p>
+        <p className="mb-4 leading-relaxed theme-muted-page">{review.text}</p>
 
-        <p className="text-xs text-cyan-100/45 tracking-wide font-mono">
+        <p className="font-mono text-xs tracking-wide text-[rgba(18,52,60,0.48)]">
           {new Date(review.createdAt).toLocaleDateString(undefined, {
             year: "numeric",
             month: "short",
@@ -262,7 +302,7 @@ export default function ProductPage({ product, relatedProducts }) {
       </div>
     ))
   ) : (
-    <p className="theme-muted italic text-center mt-12 text-lg">
+    <p className="mt-12 text-center text-lg italic theme-muted-page">
       No reviews yet. Be the first to review this product!
     </p>
   )}
@@ -320,9 +360,8 @@ export default function ProductPage({ product, relatedProducts }) {
 
 export async function getServerSideProps(context) {
   try {
-    await mongooseConnect();
     const { id } = context.query;
-    const product = await Product.findById(id).lean();
+    const product = await getStorefrontProductById(id);
 
     if (!product) {
       return {
@@ -330,23 +369,20 @@ export async function getServerSideProps(context) {
       };
     }
 
-    const relatedProductsQuery = product.category
-      ? { _id: { $ne: product._id }, category: product.category }
-      : { _id: { $ne: product._id } };
-
-    const relatedProducts = await Product.find(relatedProductsQuery, null, {
-      sort: { _id: -1 },
-      limit: 4,
-    }).lean();
-
-    const [resolvedProduct, resolvedRelatedProducts] = await Promise.all([
-      attachCategoryNames(product),
-      attachCategoryNames(relatedProducts),
-    ]);
+    const catalogProducts = await getStorefrontProducts();
+    const relatedProducts = catalogProducts.filter(
+      (candidate) => String(candidate._id) !== String(product._id)
+    );
+    const sameCategoryProducts = relatedProducts.filter(
+      (candidate) => candidate.category === product.category
+    );
+    const resolvedRelatedProducts = (
+      sameCategoryProducts.length ? sameCategoryProducts : relatedProducts
+    ).slice(0, 4);
 
     return {
       props: {
-        product: JSON.parse(JSON.stringify(resolvedProduct)),
+        product: JSON.parse(JSON.stringify(product)),
         relatedProducts: JSON.parse(JSON.stringify(resolvedRelatedProducts)),
       },
     };

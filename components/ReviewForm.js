@@ -74,9 +74,9 @@ export default function ReviewForm({ productId, onSubmitted }) {
 
   return (
     <form onSubmit={handleReviewSubmit} className="space-y-4">
-     <h3 className="text-2xl font-bold text-white border-b border-cyan-200/10 pb-4 mb-6">
-    Add a Review
-  </h3>
+      <h3 className="mb-6 border-b border-[rgba(20,109,126,0.12)] pb-4 text-2xl font-bold text-[var(--foreground-strong)]">
+        Add a Review
+      </h3>
       <StarInput
         rating={reviewData.rating}
         onChange={(rating) => setReviewData((currentValue) => ({ ...currentValue, rating }))}
@@ -88,7 +88,7 @@ export default function ReviewForm({ productId, onSubmitted }) {
         onChange={(e) =>
           setReviewData({ ...reviewData, customerName: e.target.value })
         }
-        className="theme-input w-full p-2 rounded"
+        className="theme-input-light w-full rounded-2xl p-3"
         required
       />
       <input
@@ -96,14 +96,14 @@ export default function ReviewForm({ productId, onSubmitted }) {
         placeholder="Review Title"
         value={reviewData.title}
         onChange={(e) => setReviewData({ ...reviewData, title: e.target.value })}
-        className="theme-input w-full p-2 rounded"
+        className="theme-input-light w-full rounded-2xl p-3"
         required
       />
       <textarea
         placeholder="Write your review here..."
         value={reviewData.text}
         onChange={(e) => setReviewData({ ...reviewData, text: e.target.value })}
-        className="theme-input w-full p-2 rounded min-h-32"
+        className="theme-input-light min-h-32 w-full rounded-2xl p-3"
         required
       />
 
@@ -120,7 +120,7 @@ export default function ReviewForm({ productId, onSubmitted }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`mt-4 py-2 px-4 rounded-full ${
+        className={`mt-4 rounded-full px-4 py-2 ${
           isSubmitting
             ? "bg-white/10 text-cyan-100/45 cursor-not-allowed"
             : "theme-button-accent"

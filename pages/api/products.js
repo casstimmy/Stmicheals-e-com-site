@@ -1,17 +1,19 @@
-import { mongooseConnect } from "@/lib/mongoose";
-import { Product } from "@/models/Product";
-import { ObjectId } from "mongodb";
-import { attachCategoryNames } from "@/lib/productCategories";
+import {
+  getStorefrontProductById,
+  getStorefrontProducts,
+  getStorefrontProductsByIds,
+} from "@/lib/storefrontCatalog";
 
 export default async function handle(req, res) {
   const { method } = req;
-  await mongooseConnect();
 
   if (method === "GET") {
     if (req.query?.id) {
       try {
-        const product = await Product.findOne({ _id: req.query.id }).lean();
-        const resolvedProduct = await attachCategoryNames(product);
+        const resolvedProduct = await getStorefrontProductById(req.query.id);
+        if (!resolvedProduct) {
+          return res.status(404).json({ success: false, message: "Product not found" });
+        }
         return res.json(resolvedProduct);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -19,8 +21,7 @@ export default async function handle(req, res) {
       }
     } else {
       try {
-        const products = await Product.find().lean();
-        const resolvedProducts = await attachCategoryNames(products);
+        const resolvedProducts = await getStorefrontProducts();
         return res.json(resolvedProducts);
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -35,13 +36,10 @@ export default async function handle(req, res) {
       if (!Array.isArray(ids)) {
         return res.status(400).json({ success: false, message: "Invalid 'ids' array" });
       }
-      // Convert to ObjectId array safely
-      const objectIds = ids.filter((id) => ObjectId.isValid(id)).map((id) => new ObjectId(id));
-      if (!objectIds.length) {
+      if (!ids.length) {
         return res.json({ products: [] });
       }
-      const products = await Product.find({ _id: { $in: objectIds } }).lean();
-      const resolvedProducts = await attachCategoryNames(products);
+      const resolvedProducts = await getStorefrontProductsByIds(ids);
       return res.json({ products: resolvedProducts });
     } catch (error) {
       console.error("Error fetching multiple products:", error);

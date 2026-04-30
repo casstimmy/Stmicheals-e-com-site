@@ -1,6 +1,7 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
+import Head from "next/head";
 import { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
@@ -75,6 +76,9 @@ export default function OrderConfirmationPage() {
   if (loading) {
     return (
       <>
+        <Head>
+          <title>Confirming Order | St Michael&apos;s Store</title>
+        </Head>
         <Header />
         <Center>
           <div className="theme-shell-light mx-auto my-16 max-w-xl rounded-[2rem] px-6 py-10 text-center">
@@ -89,6 +93,9 @@ export default function OrderConfirmationPage() {
   if (verificationError && !order) {
     return (
       <>
+        <Head>
+          <title>Payment Pending | St Michael&apos;s Store</title>
+        </Head>
         <Header />
         <Center>
           <div className="max-w-xl mx-auto my-16 rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center shadow-sm">
@@ -106,6 +113,9 @@ export default function OrderConfirmationPage() {
   if (!order) {
     return (
       <>
+        <Head>
+          <title>Order Not Found | St Michael&apos;s Store</title>
+        </Head>
         <Header />
         <Center>
           <div className="theme-shell-light mx-auto my-16 max-w-xl rounded-[2rem] px-6 py-10 text-center">
@@ -128,9 +138,14 @@ export default function OrderConfirmationPage() {
   });
 
   const orderDate = new Date(order.createdAt).toLocaleString();
+  const itemCount = order.items?.length || 0;
+  const paymentStatusLabel = order.paid ? "Confirmed" : order.paymentStatus || "Pending";
 
   return (
     <>
+      <Head>
+        <title>Order Confirmation | St Michael&apos;s Store</title>
+      </Head>
       <Header />
       <Center>
         <div className="theme-shell-light mx-auto my-16 max-w-3xl rounded-2xl px-6 py-10">
@@ -147,7 +162,7 @@ export default function OrderConfirmationPage() {
               alt="St Micheal's Logo"
               width={80}
               height={80}
-              className="h-20 w-auto"
+              className="size-20"
             />
           </div>
 
@@ -161,32 +176,47 @@ export default function OrderConfirmationPage() {
 
           <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
             <span className={`rounded-full px-4 py-2 text-sm font-semibold ${
-              order.paid ? "bg-emerald-200/15 text-emerald-100" : "bg-amber-200/15 text-amber-100"
+              order.paid ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"
             }`}>
-              Payment: {order.paid ? "Confirmed" : order.paymentStatus || "Pending"}
+              Payment: {paymentStatusLabel}
             </span>
             <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
               Fulfillment: {order.status}
             </span>
           </div>
 
-          {/* Order Summary */}
-          <section className="panel-surface space-y-4 rounded-[1.5rem] p-6">
-            <h2 className="text-xl font-semibold border-b border-cyan-200/10 pb-2 text-white">
+          <div className="mb-8 grid gap-4 md:grid-cols-3">
+            <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Payment status</p>
+              <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{paymentStatusLabel}</p>
+            </div>
+            <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Fulfillment</p>
+              <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{order.status}</p>
+            </div>
+            <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
+              <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Items in order</p>
+              <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{itemCount}</p>
+            </div>
+          </div>
+
+          <section className="theme-card-light space-y-4 rounded-[1.5rem] p-6 shadow-sm">
+            <h2 className="border-b border-[rgba(20,109,126,0.12)] pb-2 text-xl font-semibold text-[var(--foreground-strong)]">
               Customer Details
             </h2>
-            <p><span className="font-medium">Name:</span> {order.customerSnapshot?.name || order.customer?.name}</p>
-            <p><span className="font-medium">Email:</span> {order.customerSnapshot?.email || order.customer?.email}</p>
-            <p><span className="font-medium">Phone:</span> {order.customerSnapshot?.phone || order.customer?.phone}</p>
-            <p>
-              <span className="font-medium">Address:</span>{" "}
-              {order.customerSnapshot?.address || order.customer?.address}
-              {(order.customerSnapshot?.city || order.customer?.city) ? `, ${order.customerSnapshot?.city || order.customer?.city}` : ""}
-            </p>
+            <div className="grid gap-3 text-sm theme-muted-page">
+              <p><span className="font-medium text-[var(--foreground-strong)]">Name:</span> {order.customerSnapshot?.name || order.customer?.name}</p>
+              <p><span className="font-medium text-[var(--foreground-strong)]">Email:</span> {order.customerSnapshot?.email || order.customer?.email}</p>
+              <p><span className="font-medium text-[var(--foreground-strong)]">Phone:</span> {order.customerSnapshot?.phone || order.customer?.phone}</p>
+              <p>
+                <span className="font-medium text-[var(--foreground-strong)]">Address:</span>{" "}
+                {order.customerSnapshot?.address || order.customer?.address}
+                {(order.customerSnapshot?.city || order.customer?.city) ? `, ${order.customerSnapshot?.city || order.customer?.city}` : ""}
+              </p>
+            </div>
 
-            {/* Items */}
             <div className="pt-6">
-              <h3 className="text-lg font-semibold border-b border-cyan-200/10 pb-2 mb-4 text-white">
+              <h3 className="mb-4 border-b border-[rgba(20,109,126,0.12)] pb-2 text-lg font-semibold text-[var(--foreground-strong)]">
                 Items in Your Order
               </h3>
 
@@ -201,7 +231,7 @@ export default function OrderConfirmationPage() {
                     return (
                       <li
                         key={_id}
-                        className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-cyan-200/10 pb-4"
+                        className="flex flex-col justify-between gap-4 rounded-[1.25rem] border border-[rgba(20,109,126,0.12)] bg-white/75 p-4 md:flex-row md:items-center"
                       >
                         <div className="flex gap-4">
                           <Image
@@ -209,16 +239,16 @@ export default function OrderConfirmationPage() {
                             alt={name}
                             width={64}
                             height={64}
-                            className="w-16 h-16 object-cover rounded border"
+                            className="h-16 w-16 rounded border border-[rgba(20,109,126,0.12)] object-cover"
                           />
                           <div>
-                            <p className="font-medium text-lg text-white">{name}</p>
-                            <p className="text-sm theme-muted">
+                            <p className="text-lg font-medium text-[var(--foreground-strong)]">{name}</p>
+                            <p className="text-sm theme-muted-page">
                               {quantity} × ₦{unitPrice.toLocaleString()}
                             </p>
                           </div>
                         </div>
-                        <div className="text-right font-bold text-white">
+                        <div className="text-right font-bold text-[var(--foreground-strong)]">
                           ₦{totalPrice.toLocaleString()}
                         </div>
                       </li>
@@ -226,29 +256,33 @@ export default function OrderConfirmationPage() {
                   })}
                 </ul>
               ) : (
-                <p className="text-sm theme-muted">No items found in this order.</p>
+                <p className="text-sm theme-muted-page">No items found in this order.</p>
               )}
             </div>
 
-            {/* Totals */}
-            <div className="border-t border-cyan-200/10 pt-4 space-y-2">
-              <p className="text-lg font-medium">
+            <div className="space-y-2 border-t border-[rgba(20,109,126,0.12)] pt-4">
+              <p className="text-lg font-medium text-[var(--foreground-strong)]">
                 Shipping Cost: <span className="text-[var(--accent)]">{shippingCost}</span>
               </p>
-              <p className="text-xl font-bold text-white">
+              <p className="text-xl font-bold text-[var(--foreground-strong)]">
                 Total Paid: <span className="text-[var(--accent)]">{totalAmount}</span>
               </p>
             </div>
           </section>
 
-          {/* Continue Shopping */}
-          <div className="mt-8 text-center">
-              <Link
-                href="/"
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/"
               className="theme-button-primary inline-block rounded-md px-6 py-3 text-lg font-semibold transition-all duration-200"
             >
               Continue Shopping
-              </Link>
+            </Link>
+            <Link
+              href="/account"
+              className="theme-card-light inline-block rounded-md px-6 py-3 text-lg font-semibold text-[var(--foreground-strong)] shadow-sm"
+            >
+              View My Orders
+            </Link>
           </div>
         </div>
       </Center>

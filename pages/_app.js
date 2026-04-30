@@ -1,4 +1,5 @@
 import CartProvider from "@/components/CartContext";
+import Footer from "@/components/Footer";
 import "@/styles/globals.css";
 import Head from "next/head";
 import { Sora, Rajdhani } from "next/font/google";
@@ -38,11 +39,12 @@ export default function App({ Component, pageProps }) {
           <a href="#main-content" className="skip-link">
             Skip to content
           </a>
-          <main id="main-content">
+          <main id="main-content" className="site-main">
             <Component {...pageProps} />
           </main>
+          <Footer />
         </div>
-        </CartProvider>
+      </CartProvider>
     </>
   );
 }

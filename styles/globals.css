@@ -1,23 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8f4ec;
-  --foreground: #12343c;
-  --foreground-strong: #0a252c;
-  --foreground-muted: #5d7981;
+  --background: #f6f1e7;
+  --foreground: #16363c;
+  --foreground-strong: #0f272c;
+  --foreground-muted: #60777e;
   --panel-foreground: #eff9fb;
   --panel-foreground-strong: #ffffff;
   --panel-foreground-muted: #c4e4ea;
-  --surface: rgba(7, 67, 83, 0.82);
-  --surface-strong: rgba(5, 49, 62, 0.96);
+  --surface: rgba(9, 65, 77, 0.84);
+  --surface-strong: rgba(6, 47, 56, 0.96);
   --surface-soft: rgba(255, 255, 255, 0.1);
-  --border-subtle: rgba(70, 152, 170, 0.16);
-  --brand: #1494b6;
-  --brand-strong: #0b6f89;
-  --brand-soft: rgba(20, 148, 182, 0.14);
-  --accent: #f7c32e;
-  --accent-deep: #d59f00;
-  --shadow-soft: 0 28px 72px rgba(15, 39, 46, 0.14);
+  --border-subtle: rgba(64, 132, 146, 0.16);
+  --brand: #167d8f;
+  --brand-strong: #0d5e6d;
+  --brand-soft: rgba(22, 125, 143, 0.14);
+  --accent: #d8ac4f;
+  --accent-deep: #ba8418;
+  --shadow-soft: 0 28px 72px rgba(15, 39, 46, 0.12);
+}
+
+* {
+  box-sizing: border-box;
 }
 
 html {
@@ -25,15 +29,20 @@ html {
 }
 
 body {
+  margin: 0;
   min-height: 100vh;
   background-color: var(--background);
   background:
-    radial-gradient(circle at top left, rgba(247, 195, 46, 0.18), transparent 24%),
-    radial-gradient(circle at top right, rgba(20, 148, 182, 0.12), transparent 26%),
-    linear-gradient(180deg, #fffdf9 0%, #f8f1e4 38%, #eef5f6 100%);
+    radial-gradient(circle at top left, rgba(216, 172, 79, 0.2), transparent 24%),
+    radial-gradient(circle at top right, rgba(22, 125, 143, 0.12), transparent 28%),
+    linear-gradient(180deg, #fffdf8 0%, #f7f0e3 40%, #eef4f3 100%);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
   text-rendering: optimizeLegibility;
+}
+
+#__next {
+  min-height: 100vh;
 }
 
 a,
@@ -68,6 +77,41 @@ h4 {
 
 .app-shell {
   min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.app-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto -10rem;
+  height: 30rem;
+  width: 30rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(216, 172, 79, 0.16), transparent 66%);
+  filter: blur(18px);
+  z-index: 0;
+}
+
+.app-shell::after {
+  content: "";
+  position: absolute;
+  inset: 12rem -10rem auto auto;
+  height: 32rem;
+  width: 32rem;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(22, 125, 143, 0.14), transparent 68%);
+  filter: blur(24px);
+  z-index: 0;
+}
+
+.site-main {
+  position: relative;
+  z-index: 1;
+  flex: 1;
 }
 
 .skip-link {
@@ -189,6 +233,42 @@ h4 {
 
 .theme-muted {
   color: var(--panel-foreground-muted);
+}
+
+.site-footer {
+  position: relative;
+  z-index: 1;
+  padding: 0 1.5rem 2.5rem;
+}
+
+.site-footer-panel {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 252, 246, 0.94),
+    rgba(244, 248, 247, 0.96) 52%,
+    rgba(231, 241, 241, 0.94) 100%
+  );
+  border: 1px solid rgba(22, 125, 143, 0.14);
+  box-shadow: 0 30px 70px rgba(18, 52, 60, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.theme-footer-link {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(22, 125, 143, 0.12);
+  background: rgba(255, 255, 255, 0.68);
+  box-shadow: 0 12px 24px rgba(18, 52, 60, 0.05);
+}
+
+.theme-footer-link:hover {
+  background: rgba(22, 125, 143, 0.08);
+  color: var(--brand-strong);
+  transform: translateY(-1px);
+}
+
+.theme-divider {
+  border-color: rgba(22, 125, 143, 0.14);
 }
 
 

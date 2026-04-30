@@ -18,14 +18,20 @@ export default function ProductBox({
     category,
     reviews,
 }) {
-    const { addProductToCart } = useContext(CartContext);
+    const { addProductToCart, cartProducts } = useContext(CartContext);
     const url = '/product/' + _id;
     const productImage = getPrimaryProductImage(images);
     const reviewSummary = getReviewSummary(reviews);
     const availableQuantity = getAvailableInventoryQuantity({ quantity, reservedQuantity });
     const isInStock = availableQuantity > 0;
+    const cartQuantity = cartProducts.find((item) => item.id === _id)?.qty || 0;
+    const hasReachedCartLimit = isInStock && cartQuantity >= availableQuantity;
 
     const handleAddToCart = (e) => {
+        if (!isInStock || hasReachedCartLimit) {
+            return;
+        }
+
         const productImage = e.currentTarget.closest(".product-box").querySelector("img");
         const cartIcon = document.getElementById("cart-icon");
 
@@ -58,7 +64,7 @@ export default function ProductBox({
             });
         }
 
-        addProductToCart(_id);
+        addProductToCart(_id, { maxQuantity: availableQuantity });
     };
 
     return (
@@ -80,7 +86,7 @@ export default function ProductBox({
                         alt={name}
                         width={160}
                         height={160}
-                        className="h-full object-contain drop-shadow-[0_14px_28px_rgba(18,52,60,0.14)]"
+                        className="h-full w-full object-contain drop-shadow-[0_14px_28px_rgba(18,52,60,0.14)]"
                     />
                 </Link>
             </div>
@@ -97,16 +103,28 @@ export default function ProductBox({
                             : "No reviews yet"}
                     </span>
                 </div>
+                <div className="mt-2 flex items-center justify-between gap-3 text-xs theme-muted-page">
+                    <span>
+                        {isInStock ? `${availableQuantity} available` : "Restock pending"}
+                    </span>
+                    <span>
+                        {cartQuantity > 0 ? `${cartQuantity} in cart` : "Not in cart yet"}
+                    </span>
+                </div>
                 <button
                     onClick={handleAddToCart}
-                    disabled={!isInStock}
+                    disabled={!isInStock || hasReachedCartLimit}
                     className={`w-full mt-4 text-sm py-2.5 rounded-full transition cursor-pointer ${
-                        isInStock
+                        isInStock && !hasReachedCartLimit
                             ? "theme-button-accent"
                             : "bg-[rgba(18,52,60,0.08)] text-[rgba(18,52,60,0.4)] cursor-not-allowed"
                     }`}
                 >
-                    {isInStock ? "Add to Cart" : "Notify Me Later"}
+                    {!isInStock
+                        ? "Sold out"
+                        : hasReachedCartLimit
+                            ? "Max reserved in cart"
+                            : "Add to Cart"}
                 </button>
             </div>
         </div>

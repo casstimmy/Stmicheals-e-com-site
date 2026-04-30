@@ -57,7 +57,7 @@ export default function Header() {
                 alt="St. Michael's Logo"
                 width={40}
                 height={40}
-                className="h-10 w-auto object-contain"
+                className="size-10 object-contain"
               />
             </div>
             <div className="hidden sm:block">
