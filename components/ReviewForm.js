@@ -110,8 +110,8 @@ export default function ReviewForm({ productId, onSubmitted }) {
       {feedback.message && (
         <div className={`rounded-lg px-4 py-3 text-sm ${
           feedback.type === "success"
-            ? "border border-emerald-200/30 bg-emerald-200/10 text-emerald-100"
-            : "border border-red-200/30 bg-red-200/10 text-red-100"
+            ? "border border-emerald-200/80 bg-emerald-50 text-emerald-700"
+            : "border border-red-200/80 bg-red-50 text-red-700"
         }`}>
           {feedback.message}
         </div>
@@ -120,9 +120,9 @@ export default function ReviewForm({ productId, onSubmitted }) {
       <button
         type="submit"
         disabled={isSubmitting}
-        className={`mt-4 rounded-full px-4 py-2 ${
+        className={`mt-4 min-h-[3.25rem] rounded-[1rem] px-5 py-2.5 font-semibold ${
           isSubmitting
-            ? "bg-white/10 text-cyan-100/45 cursor-not-allowed"
+            ? "bg-[rgba(18,52,60,0.08)] text-[rgba(18,52,60,0.4)] cursor-not-allowed"
             : "theme-button-accent"
         }`}
       >

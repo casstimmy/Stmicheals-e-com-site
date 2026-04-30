@@ -1,8 +1,9 @@
-import { mongooseConnect } from "@/lib/mongoose";
+import { isMongoConnectionError, mongooseConnect } from "@/lib/mongoose";
 import Customer from "@/models/Customer";
 import {
   createLoginOtp,
   deliverLoginOtp,
+  maskEmailAddress,
   normalizeCustomerEmail,
 } from "@/lib/customerAuth";
 
@@ -11,9 +12,9 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  await mongooseConnect();
-
   try {
+    await mongooseConnect();
+
     const email = normalizeCustomerEmail(req.body.email);
     const name = typeof req.body.name === "string" ? req.body.name.trim() : "";
 
@@ -47,11 +48,19 @@ export default async function handler(req, res) {
       message: "A sign-in code has been sent if the email is available.",
       expiresInMinutes: otpPayload.expiresInMinutes,
       delivery: delivery.method,
+      deliveryTarget: delivery.target || email,
+      maskedDeliveryTarget: maskEmailAddress(delivery.target || email),
       ...(process.env.NODE_ENV !== "production"
         ? { debugOtp: otpPayload.code }
         : {}),
     });
   } catch (error) {
+    if (isMongoConnectionError(error)) {
+      return res.status(503).json({
+        message: "Account sign-in is temporarily unavailable. Please try again shortly.",
+      });
+    }
+
     const statusCode = error.statusCode || 500;
     return res.status(statusCode).json({
       message:

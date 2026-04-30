@@ -114,20 +114,20 @@ export default function Featured({ product, catalogInsights }) {
               <div className="flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
                 <Link
                   href={`/product/${product._id}`}
-                  className="theme-button-secondary inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold shadow transition duration-300 ease-in-out"
+                  className="theme-button-secondary inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.15rem] px-6 py-3 font-semibold shadow transition duration-300 ease-in-out sm:min-w-[12rem]"
                 >
                   View Product Details
                 </Link>
                 <Link
                   href="/categories"
-                  className="theme-card-light inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold text-[var(--foreground-strong)] shadow-sm"
+                  className="theme-card-light inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.15rem] border border-[rgba(20,109,126,0.12)] px-6 py-3 font-semibold text-[var(--foreground-strong)] shadow-sm sm:min-w-[12rem]"
                 >
                   Browse Categories
                 </Link>
                 <button
                   onClick={addFeatureProductToCart}
                   disabled={!canAddFeaturedProduct}
-                  className={`flex items-center justify-center gap-2 rounded-full px-6 py-3 font-semibold shadow transition duration-300 ease-in-out ${
+                  className={`flex min-h-[3.6rem] items-center justify-center gap-2 rounded-[1.15rem] px-6 py-3 font-semibold shadow transition duration-300 ease-in-out sm:min-w-[12rem] ${
                     canAddFeaturedProduct
                       ? "theme-button-accent cursor-pointer"
                       : "bg-[rgba(18,52,60,0.08)] text-[rgba(18,52,60,0.4)] cursor-not-allowed"
@@ -155,10 +155,12 @@ export default function Featured({ product, catalogInsights }) {
                   alt={product.name || "Featured Product"}
                   width={600}
                   height={400}
+                  priority
+                  sizes="(max-width: 768px) 90vw, 48vw"
                   className="h-auto w-full rounded-[1.75rem] border border-white/80 bg-white/60 object-cover shadow-[0_30px_60px_rgba(18,52,60,0.14)]"
                 />
                 <div className="theme-card-light absolute bottom-4 left-4 right-4 rounded-[1.25rem] p-4 shadow-lg backdrop-blur-xl md:left-auto md:max-w-xs">
-                  <p className="text-xs uppercase tracking-[0.24em] text-[rgba(18,52,60,0.52)]">Operational note</p>
+                  <p className="text-xs uppercase tracking-[0.24em] text-[rgba(18,52,60,0.66)]">Operational note</p>
                   <p className="mt-2 text-sm leading-7 text-[rgba(18,52,60,0.82)]">
                     Inventory, shipping totals, and payment confirmation stay aligned from cart to order receipt.
                   </p>

@@ -17,6 +17,11 @@ export default function OrderConfirmationPage() {
   const [verificationError, setVerificationError] = useState("");
   const verificationStartedRef = useRef(false);
   const { clearCart } = useContext(CartContext);
+  const clearCartRef = useRef(clearCart);
+
+  useEffect(() => {
+    clearCartRef.current = clearCart;
+  }, [clearCart]);
 
   useEffect(() => {
     if (!router.isReady || !id) {
@@ -40,23 +45,22 @@ export default function OrderConfirmationPage() {
         if (paymentReference && !verificationStartedRef.current) {
           verificationStartedRef.current = true;
           await axios.post("/api/paystack/verify", { reference: paymentReference });
-          clearCart();
+          clearCartRef.current();
         }
 
-        const response = await axios.get(`/api/orders/${id}`);
+        const response = await axios.get("/api/orders", {
+          params: { id },
+        });
         if (!cancelled) {
           setOrder(response.data);
           if (response.data?.paid) {
-            clearCart();
+            clearCartRef.current();
           }
         }
       } catch (error) {
-        console.error("Order finalization error:", error);
         if (!cancelled) {
           setVerificationError(
-            error.response?.data?.error ||
-              error.response?.data?.message ||
-              "We could not confirm this payment yet."
+            error.response?.data?.message || "We could not confirm this payment yet."
           );
         }
       } finally {
@@ -71,7 +75,7 @@ export default function OrderConfirmationPage() {
     return () => {
       cancelled = true;
     };
-  }, [clearCart, id, reference, router.isReady, trxref]);
+  }, [id, reference, router.isReady, trxref]);
 
   if (loading) {
     return (
@@ -81,9 +85,17 @@ export default function OrderConfirmationPage() {
         </Head>
         <Header />
         <Center>
-          <div className="theme-shell-light mx-auto my-16 max-w-xl rounded-[2rem] px-6 py-10 text-center">
+          <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
+            <div className="theme-shell-light mx-auto max-w-xl rounded-[2rem] px-6 py-10 text-center shadow-[0_30px_70px_rgba(18,52,60,0.08)]">
             <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Confirming your order</h1>
             <p className="mt-3 theme-muted-page">We are validating payment and loading your final order details.</p>
+            <Link
+              href="/"
+              className="theme-card-light mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm"
+            >
+              Return to home
+            </Link>
+            </div>
           </div>
         </Center>
       </>
@@ -98,12 +110,20 @@ export default function OrderConfirmationPage() {
         </Head>
         <Header />
         <Center>
-          <div className="max-w-xl mx-auto my-16 rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center shadow-sm">
+          <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
+            <div className="max-w-xl rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center shadow-sm">
             <h1 className="text-2xl font-bold text-red-800">Payment confirmation pending</h1>
             <p className="mt-3 text-red-700">{verificationError}</p>
             <p className="mt-3 text-sm text-red-600">
               If payment was completed, your order will remain available once verification succeeds.
             </p>
+            <Link
+              href="/"
+              className="mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-700 shadow-sm"
+            >
+              Go to home
+            </Link>
+            </div>
           </div>
         </Center>
       </>
@@ -118,9 +138,17 @@ export default function OrderConfirmationPage() {
         </Head>
         <Header />
         <Center>
-          <div className="theme-shell-light mx-auto my-16 max-w-xl rounded-[2rem] px-6 py-10 text-center">
+          <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
+            <div className="theme-shell-light mx-auto max-w-xl rounded-[2rem] px-6 py-10 text-center">
             <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Order not found</h1>
             <p className="mt-3 theme-muted-page">We could not locate that order record. Return to the storefront and try again from your recent orders.</p>
+            <Link
+              href="/"
+              className="theme-button-primary mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold"
+            >
+              Go to home
+            </Link>
+            </div>
           </div>
         </Center>
       </>
@@ -289,3 +317,5 @@ export default function OrderConfirmationPage() {
     </>
   );
 }
+
+OrderConfirmationPage.hideFooter = true;

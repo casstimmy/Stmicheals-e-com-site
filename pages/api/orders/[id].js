@@ -1,4 +1,4 @@
-import { mongooseConnect } from "@/lib/mongoose";
+import { isMongoConnectionError, mongooseConnect } from "@/lib/mongoose";
 import { releaseExpiredReservations } from "@/lib/orderLifecycle";
 import Order from "@/models/Order";
 
@@ -26,9 +26,15 @@ export default async function handler(req, res) {
     return res.status(200).json(order);
   } catch (error) {
     console.error("Error fetching order:", error);
+
+    if (isMongoConnectionError(error)) {
+      return res.status(503).json({
+        message: "Order confirmation is temporarily unavailable. Please try again shortly.",
+      });
+    }
+
     return res.status(500).json({
-      message: "Server Error",
-      error: error.message,
+      message: "We could not load this order right now.",
     });
   }
 }

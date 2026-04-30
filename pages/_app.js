@@ -16,6 +16,8 @@ const rajdhani = Rajdhani({
 });
 
 export default function App({ Component, pageProps }) {
+  const hideFooter = Component.hideFooter === true;
+
   return (
     <>
       <Head>
@@ -42,7 +44,7 @@ export default function App({ Component, pageProps }) {
           <main id="main-content" className="site-main">
             <Component {...pageProps} />
           </main>
-          <Footer />
+          {!hideFooter && <Footer />}
         </div>
       </CartProvider>
     </>

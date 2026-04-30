@@ -1,20 +1,41 @@
 import Customer from "@/models/Customer";
-import { mongooseConnect } from "@/lib/mongoose";
+import { isMongoConnectionError, mongooseConnect } from "@/lib/mongoose";
 import { buildOrderDraft } from "@/lib/checkout";
 import {
   createReservedOrder,
   releaseExpiredReservations,
   RESERVATION_WINDOW_MINUTES,
 } from "@/lib/orderLifecycle";
+import Order from "@/models/Order";
 
 export default async function handler(req, res) {
-  await mongooseConnect();
-
-  if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method Not Allowed" });
-  }
-
   try {
+    await mongooseConnect();
+
+    if (req.method === "GET") {
+      const { id } = req.query;
+
+      if (!id || Array.isArray(id)) {
+        return res.status(400).json({ message: "Order id is required." });
+      }
+
+      await releaseExpiredReservations();
+
+      const order = await Order.findById(id)
+        .populate("customer")
+        .populate("items.productId");
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      return res.status(200).json(order);
+    }
+
+    if (req.method !== "POST") {
+      return res.status(405).json({ message: "Method Not Allowed" });
+    }
+
     await releaseExpiredReservations();
 
     const { customer, cartProducts } = req.body;
@@ -59,6 +80,19 @@ export default async function handler(req, res) {
       message: "Order successfully created",
     });
   } catch (error) {
+    if (req.method === "GET") {
+      if (isMongoConnectionError(error)) {
+        return res.status(503).json({
+          message: "Order confirmation is temporarily unavailable. Please try again shortly.",
+        });
+      }
+
+      console.error("Error fetching order:", error);
+      return res.status(500).json({
+        message: "We could not load this order right now.",
+      });
+    }
+
     console.error("Error creating order:", error);
     return res.status(error.statusCode || 500).json({
       message: "Error creating order",

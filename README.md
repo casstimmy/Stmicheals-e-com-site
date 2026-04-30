@@ -1,40 +1,69 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+## St Michael's Store
 
-## Getting Started
+This repository contains the storefront for St Michael's Store, built with Next.js pages router, MongoDB/Mongoose, Paystack checkout, and OTP-based customer account access.
 
-First, run the development server:
+## Local Setup
+
+1. Install dependencies.
+
+```bash
+npm install
+```
+
+2. Create a local environment file from [.env.example](.env.example).
+
+3. Fill in the required values for MongoDB, Paystack, and mail delivery.
+
+4. Start the development server.
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open `http://localhost:3000`.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Environment Variables
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+The app reads its runtime configuration from `.env`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+Required for core storefront flows:
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `MONGODB_URI`: primary MongoDB connection string. In production this should remain the cloud Atlas URI.
+- `CUSTOMER_SESSION_SECRET`: secret used to sign the customer session cookie.
+- `PAYSTACK_SECRET_KEY`: Paystack secret key for payment initialization, verification, and webhook validation.
+- `NEXT_PUBLIC_SITE_URL`: public base URL used when building payment callback URLs.
+- `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY`: Paystack public key used on the client.
 
-## Learn More
+Optional but recommended for local development:
 
-To learn more about Next.js, take a look at the following resources:
+- `MONGODB_DIRECT_URI`: direct Atlas replica-set connection string. Use this if your local network can reach Atlas hosts directly but fails SRV lookups for `mongodb+srv` URIs.
+- `MONGODB_LOCAL_URI` or `LOCAL_MONGODB_URI`: local MongoDB fallback if you want to run the app against a local database.
+- `FEATURED_PRODUCT_ID`: forces a specific product into the homepage featured slot.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+Mail delivery options:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Preferred SMTP settings: `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`.
+- Legacy Gmail fallback: `EMAIL_USER`, `EMAIL_PASS`, `EMAIL_FROM`.
 
-## Deploy on Vercel
+## MongoDB Fallback Note
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The storefront is cloud-first. In production, the app uses `MONGODB_URI` as the primary source of truth.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+For local development, [lib/mongoose.js](lib/mongoose.js) now prefers `MONGODB_DIRECT_URI` when it is present. This is intentional: some local networks can open direct Atlas hostnames but fail DNS SRV resolution for `mongodb+srv` records. When that happens, a direct Atlas URI keeps the app connected to the same live cluster without switching to seeded-only preview mode.
+
+If your machine can resolve SRV records normally, `MONGODB_DIRECT_URI` is optional.
+
+## Useful Commands
+
+```bash
+npm run dev
+npm run lint
+npm run build
+npm run test:integration
+```
+
+## Notes
+
+- The storefront includes seeded catalog fallback behavior for preview resilience when MongoDB is unavailable.
+- Customer account sign-in uses email OTP. In development, if mail delivery is not configured, the API can return a console-delivered debug OTP instead of pretending email was sent.
+- Order confirmation reads through the stable `/api/orders?id=<orderId>` lookup path.
