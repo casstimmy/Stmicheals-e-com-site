@@ -1,14 +1,35 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import Center from "./Center";
 import { COMPANY_LINKS, POLICY_LINKS, PRIMARY_FOOTER_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
-
-const serviceHighlights = [
-  "Secure OTP-based account access",
-  "Server-validated payment flow",
-  "Stock-aware ordering and delivery pricing",
-];
+import {
+  getPublicScopedHref,
+  getPublicSiteConfig,
+  inferPublicSiteFromPath,
+  normalizePublicSite,
+} from "@/lib/publicSite";
 
 export default function Footer() {
+  const router = useRouter();
+  const activeSiteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
+  const site = getPublicSiteConfig(activeSiteKey);
+  const serviceHighlights = [
+    `${site.shortLabel} OTP-based account access`,
+    "Server-validated payment flow",
+    `${site.shortLabel} stock-aware ordering and delivery pricing`,
+  ];
+  const companyLinks = COMPANY_LINKS.map((link) => ({
+    ...link,
+    href: getPublicScopedHref(activeSiteKey, link.href),
+  }));
+  const policyLinks = POLICY_LINKS.map((link) => ({
+    ...link,
+    href: getPublicScopedHref(activeSiteKey, link.href),
+  }));
+  const primaryLinks = PRIMARY_FOOTER_LINKS.map((link) => ({
+    ...link,
+    href: link.href === "/" ? "/" : getPublicScopedHref(activeSiteKey, link.href),
+  }));
   const currentYear = new Date().getFullYear();
 
   return (
@@ -21,10 +42,10 @@ export default function Footer() {
                 Business profile
               </span>
               <h2 className="mt-5 max-w-xl text-3xl font-bold text-[var(--foreground-strong)] md:text-4xl">
-                {STORE_DETAILS.businessName}
+                {site.displayName}
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-8 theme-muted-page">
-                Industrial-standard storefront foundations: clear navigation, policy access, secure checkout,
+                Industrial-standard public foundations for the {site.shortLabel.toLowerCase()} side: clear navigation, policy access, secure checkout,
                 and direct business contact details in one footer.
               </p>
 
@@ -37,7 +58,7 @@ export default function Footer() {
               </div>
 
               <div className="mt-5 grid gap-3 min-[420px]:grid-cols-2 xl:max-w-md">
-                {COMPANY_LINKS.map((link) => (
+                {companyLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -51,10 +72,10 @@ export default function Footer() {
 
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.52)]">
-                Shop
+                {site.shortLabel} navigation
               </p>
               <div className="mt-5 grid gap-3 min-[420px]:grid-cols-2 xl:grid-cols-1">
-                {PRIMARY_FOOTER_LINKS.map((link) => (
+                {primaryLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
@@ -71,7 +92,7 @@ export default function Footer() {
                 Policies
               </p>
               <div className="mt-5 grid gap-3 min-[420px]:grid-cols-2 xl:grid-cols-1">
-                {POLICY_LINKS.map((policy) => (
+                {policyLinks.map((policy) => (
                   <Link
                     key={policy.href}
                     href={policy.href}
@@ -100,7 +121,7 @@ export default function Footer() {
                   <p className="text-sm font-semibold text-[var(--foreground-strong)]">Reach the store</p>
                   <div className="mt-3 space-y-2 text-sm leading-7">
                     <Link
-                      href="/contact"
+                      href={getPublicScopedHref(activeSiteKey, "/contact")}
                       className="theme-footer-link mb-3 w-full justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)]"
                     >
                       Open contact page
@@ -124,7 +145,7 @@ export default function Footer() {
           </div>
 
           <div className="theme-divider mt-8 flex flex-col gap-4 border-t pt-5 text-sm text-[rgba(18,52,60,0.58)] md:flex-row md:items-center md:justify-between">
-            <p className="max-w-xl">© {currentYear} {STORE_DETAILS.businessName}. All rights reserved.</p>
+            <p className="max-w-xl">© {currentYear} {STORE_DETAILS.businessName}. {site.shortLabel} side.</p>
             <div className="flex flex-col gap-1 md:items-end md:text-right">
               <p>Phone: {STORE_DETAILS.phoneNumbers.join(" · ")}</p>
               <a className="break-all text-[var(--brand-strong)]" href={`mailto:${STORE_DETAILS.email}`}>

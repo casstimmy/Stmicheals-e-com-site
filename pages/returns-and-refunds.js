@@ -1,4 +1,6 @@
 import PolicyPageLayout from "@/components/PolicyPageLayout";
+import { useRouter } from "next/router";
+import { getPublicSiteConfig, inferPublicSiteFromPath, normalizePublicSite } from "@/lib/publicSite";
 
 const sections = [
   {
@@ -32,10 +34,12 @@ const sections = [
 ];
 
 export default function ReturnsAndRefundsPage() {
+  const router = useRouter();
+  const site = getPublicSiteConfig(normalizePublicSite(inferPublicSiteFromPath(router.pathname)));
   return (
     <PolicyPageLayout
       title="Returns & Refunds"
-      intro="This policy explains how St Michael's Food & Drinks Warehouse reviews issues with delivered goods and how return or refund requests are handled where appropriate."
+      intro={`This policy explains how ${site.displayName} reviews issues with delivered goods and how return or refund requests are handled where appropriate.`}
       sections={sections}
     />
   );

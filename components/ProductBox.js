@@ -5,6 +5,7 @@ import { CartContext } from "./CartContext";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { getReviewSummary } from "@/lib/reviews";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
+import { getPublicProductPath, normalizePublicSite } from "@/lib/publicSite";
 
 export default function ProductBox({
     _id,
@@ -16,9 +17,11 @@ export default function ProductBox({
     categoryName,
     category,
     reviews,
+    siteKey,
 }) {
     const { addProductToCart, cartProducts } = useContext(CartContext);
-    const url = '/product/' + _id;
+    const resolvedSiteKey = normalizePublicSite(siteKey);
+    const url = getPublicProductPath(resolvedSiteKey, _id);
     const productImage = getPrimaryProductImage(images);
     const reviewSummary = getReviewSummary(reviews);
     const availableQuantity = getAvailableInventoryQuantity({ quantity, reservedQuantity });

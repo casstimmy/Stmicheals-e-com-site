@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useContext, useState, useRef } from "react";
 import Head from "next/head";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRouter } from "next/router";
 import { CartContext } from "@/components/CartContext";
 import ReviewForm from "@/components/ReviewForm";
 import {
@@ -19,8 +20,17 @@ import {
   getStorefrontProductById,
   getStorefrontProducts,
 } from "@/lib/storefrontCatalog";
+import {
+  getPublicScopedHref,
+  getPublicSiteConfig,
+  inferPublicSiteFromPath,
+  normalizePublicSite,
+} from "@/lib/publicSite";
 
 export default function ProductPage({ product, relatedProducts }) {
+  const router = useRouter();
+  const siteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
+  const site = getPublicSiteConfig(siteKey);
   const galleryImages = normalizeProductImages(product.images);
   const defaultImage = getPrimaryProductImage(product.images);
   const [activeImage, setActiveImage] = useState(defaultImage);
@@ -85,9 +95,9 @@ export default function ProductPage({ product, relatedProducts }) {
   return (
     <>
       <Head>
-        <title>{`${product.name} | St Michael's Food & Drinks Warehouse`}</title>
+        <title>{`${product.name} | ${site.displayName}`}</title>
       </Head>
-      <Header />
+      <Header siteKey={siteKey} />
       <Center>
         <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
           <div className="mx-auto grid max-w-7xl items-start gap-6 sm:gap-8 md:grid-cols-[3fr_2fr] lg:gap-12">
@@ -216,7 +226,7 @@ export default function ProductPage({ product, relatedProducts }) {
                       : "Add to Cart"}
                 </button>
                 <Link
-                  href="/cart"
+                  href={getPublicScopedHref(siteKey, "/cart")}
                   className="theme-card-light inline-flex items-center justify-center rounded-xl px-4 py-3 text-lg font-medium text-[var(--foreground-strong)] shadow-sm"
                 >
                   Review Cart
@@ -224,7 +234,7 @@ export default function ProductPage({ product, relatedProducts }) {
               </div>
               <Link
                 href={{
-                  pathname: "/products",
+                  pathname: getPublicScopedHref(siteKey, "/products"),
                   query: { category: product.categoryName || product.category || "" },
                 }}
                 className="mt-4 inline-flex text-sm font-medium text-[var(--brand-strong)]"
@@ -333,7 +343,7 @@ export default function ProductPage({ product, relatedProducts }) {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-6">
               {relatedProducts.map((relatedProduct) => (
                 <div key={relatedProduct._id}>
-                  <ProductBox {...relatedProduct} />
+                  <ProductBox {...relatedProduct} siteKey={siteKey} />
                 </div>
               ))}
             </div>
@@ -365,7 +375,8 @@ export default function ProductPage({ product, relatedProducts }) {
 export async function getServerSideProps(context) {
   try {
     const { id } = context.query;
-    const product = await getStorefrontProductById(id);
+    const siteKey = normalizePublicSite(inferPublicSiteFromPath(context.resolvedUrl || ""));
+    const product = await getStorefrontProductById(id, { site: siteKey });
 
     if (!product) {
       return {
@@ -373,7 +384,7 @@ export async function getServerSideProps(context) {
       };
     }
 
-    const catalogProducts = await getStorefrontProducts();
+    const catalogProducts = await getStorefrontProducts({ site: siteKey });
     const relatedProducts = catalogProducts.filter(
       (candidate) => String(candidate._id) !== String(product._id)
     );

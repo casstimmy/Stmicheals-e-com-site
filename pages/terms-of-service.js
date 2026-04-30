@@ -1,4 +1,6 @@
 import PolicyPageLayout from "@/components/PolicyPageLayout";
+import { useRouter } from "next/router";
+import { getPublicSiteConfig, inferPublicSiteFromPath, normalizePublicSite } from "@/lib/publicSite";
 
 const sections = [
   {
@@ -32,10 +34,12 @@ const sections = [
 ];
 
 export default function TermsOfServicePage() {
+  const router = useRouter();
+  const site = getPublicSiteConfig(normalizePublicSite(inferPublicSiteFromPath(router.pathname)));
   return (
     <PolicyPageLayout
       title="Terms of Service"
-      intro="These terms describe the basic rules governing use of the storefront, customer accounts, ordering, and payment initiation through St Michael's Food & Drinks Warehouse."
+      intro={`These terms describe the basic rules governing use of the ${site.shortLabel.toLowerCase()} public site, customer accounts, ordering, and payment initiation through ${site.displayName}.`}
       sections={sections}
     />
   );

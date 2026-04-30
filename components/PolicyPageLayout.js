@@ -1,8 +1,15 @@
 import Head from "next/head";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import Header from "@/components/Header";
 import Center from "@/components/Center";
 import { RESOURCE_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
+import {
+  getPublicScopedHref,
+  getPublicSiteConfig,
+  inferPublicSiteFromPath,
+  normalizePublicSite,
+} from "@/lib/publicSite";
 
 export default function PolicyPageLayout({
   title,
@@ -16,12 +23,19 @@ export default function PolicyPageLayout({
   relatedTitle = "Useful pages",
   relatedLinks = RESOURCE_LINKS,
 }) {
+  const router = useRouter();
+  const activeSiteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
+  const site = getPublicSiteConfig(activeSiteKey);
+  const resolvedRelatedLinks = relatedLinks.map((link) => ({
+    ...link,
+    href: getPublicScopedHref(activeSiteKey, link.href),
+  }));
   return (
     <>
       <Head>
-        <title>{`${title} | ${STORE_DETAILS.displayName}`}</title>
+        <title>{`${title} | ${site.displayName}`}</title>
       </Head>
-      <Header />
+      <Header siteKey={activeSiteKey} />
       <Center>
         <div className="min-h-screen px-4 py-6 sm:px-6 sm:py-8">
           <div className="theme-shell-light mx-auto max-w-4xl rounded-[1.75rem] p-4 sm:rounded-[2rem] sm:p-6 lg:p-8">
@@ -41,23 +55,23 @@ export default function PolicyPageLayout({
               <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 {supportHref ? (
                   <Link
-                    href={supportHref}
+                    href={getPublicScopedHref(activeSiteKey, supportHref)}
                     className="theme-footer-link inline-flex w-full items-center justify-center rounded-full px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)] sm:w-auto"
                   >
                     {supportLabel}
                   </Link>
                 ) : null}
                 <Link
-                  href={backHref}
+                  href={getPublicScopedHref(activeSiteKey, backHref)}
                   className="theme-card-light inline-flex w-full items-center justify-center rounded-full px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm sm:w-auto"
                 >
                   {backLabel}
                 </Link>
               </div>
 
-              {relatedLinks.length > 0 ? (
+              {resolvedRelatedLinks.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
-                  {relatedLinks.slice(0, 4).map((link) => (
+                  {resolvedRelatedLinks.slice(0, 4).map((link) => (
                     <Link
                       key={link.href}
                       href={link.href}
@@ -91,7 +105,8 @@ export default function PolicyPageLayout({
                   Business details
                 </p>
                 <div className="mt-4 space-y-3 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                  <p><span className="font-semibold text-[var(--foreground-strong)]">Store:</span> {STORE_DETAILS.businessName}</p>
+                  <p><span className="font-semibold text-[var(--foreground-strong)]">Business:</span> {STORE_DETAILS.businessName}</p>
+                  <p><span className="font-semibold text-[var(--foreground-strong)]">Side:</span> {site.displayName}</p>
                   <p><span className="font-semibold text-[var(--foreground-strong)]">Phone:</span> {STORE_DETAILS.phoneNumbers.join(", ")}</p>
                   <p><span className="font-semibold text-[var(--foreground-strong)]">Email:</span> {STORE_DETAILS.email}</p>
                   <p><span className="font-semibold text-[var(--foreground-strong)]">Country:</span> {STORE_DETAILS.country}</p>
@@ -121,7 +136,7 @@ export default function PolicyPageLayout({
                   {relatedTitle}
                 </p>
                 <div className="mt-4 grid gap-3 min-[420px]:grid-cols-2 lg:grid-cols-1">
-                  {relatedLinks.map((policy) => (
+                  {resolvedRelatedLinks.map((policy) => (
                     <Link
                       key={policy.href}
                       href={policy.href}

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { PUBLIC_SITE_KEYS } from "@/lib/publicSite";
 
 const CustomerSnapshotSchema = new mongoose.Schema(
   {
@@ -15,6 +16,11 @@ const CustomerSnapshotSchema = new mongoose.Schema(
 const OrderSchema = new mongoose.Schema(
   {
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
+    siteKey: {
+      type: String,
+      enum: [PUBLIC_SITE_KEYS.STORE, PUBLIC_SITE_KEYS.HOTEL],
+      default: PUBLIC_SITE_KEYS.STORE,
+    },
     customerSnapshot: CustomerSnapshotSchema,
     items: [
   {

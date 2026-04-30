@@ -5,7 +5,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
-  const { ids } = req.body;
+  const { ids, siteKey } = req.body;
 
   if (!ids || !Array.isArray(ids)) {
     return res.status(400).json({ error: "Invalid or missing 'ids' array" });
@@ -16,7 +16,7 @@ export default async function handler(req, res) {
       return res.status(200).json({ products: [] });
     }
 
-    const products = await getStorefrontProductsByIds(ids);
+    const products = await getStorefrontProductsByIds(ids, { site: siteKey });
     res.status(200).json({ products });
   } catch (error) {
     console.error("Error fetching products:", error);

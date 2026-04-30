@@ -11,8 +11,18 @@ import axios from "axios";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { SUPPORTED_SHIPPING_DESTINATIONS } from "@/lib/shipping";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
+import { useRouter } from "next/router";
+import {
+  getPublicSiteConfig,
+  getPublicScopedHref,
+  inferPublicSiteFromPath,
+  normalizePublicSite,
+} from "@/lib/publicSite";
 
 export default function CartPage() {
+  const router = useRouter();
+  const siteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
+  const site = getPublicSiteConfig(siteKey);
   const { cartProducts, removeProductFromCart, updateProductQuantity } = useContext(CartContext);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -69,7 +79,7 @@ export default function CartPage() {
     if (ids.length > 0) {
       let cancelled = false;
 
-      axios.post("/api/cart", { ids }).then((res) => {
+      axios.post("/api/cart", { ids, siteKey }).then((res) => {
         if (!cancelled) {
           setProducts(res.data.products);
         }
@@ -79,7 +89,7 @@ export default function CartPage() {
         cancelled = true;
       };
     }
-  }, [cartProducts]);
+  }, [cartProducts, siteKey]);
 
   const displayedProducts = cartProducts.length > 0 ? products : [];
   const cartLines = displayedProducts.map((product) => {
@@ -154,6 +164,7 @@ export default function CartPage() {
       const orderRes = await axios.post("/api/orders", {
         customer,
         cartProducts: fullCartProducts,
+        siteKey,
       });
 
       const { orderId } = orderRes.data;
@@ -187,10 +198,10 @@ export default function CartPage() {
   return (
     <>
       <Head>
-        <title>Your Cart | St Michael&apos;s Store</title>
+        <title>{`Your Cart | ${site.displayName}`}</title>
       </Head>
 
-      <Header />
+      <Header siteKey={siteKey} />
       <Center>
         <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
           <div className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 md:grid-cols-3 md:gap-8">
@@ -228,7 +239,7 @@ export default function CartPage() {
                     Your cart is currently empty.
                   </p>
                   <Link
-                    href="/"
+                    href={getPublicScopedHref(siteKey, "/")}
                     className="theme-button-accent inline-block px-6 py-3 rounded-lg transition"
                   >
                     Continue Shopping
@@ -455,7 +466,7 @@ export default function CartPage() {
                       </span>
                     </div>
                     <Link
-                      href="/"
+                      href={getPublicScopedHref(siteKey, "/")}
                       className="theme-button-secondary inline-block w-full rounded-lg px-6 py-3 text-center transition sm:w-auto"
                     >
                       Continue Shopping

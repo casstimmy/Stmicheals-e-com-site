@@ -1,4 +1,6 @@
 import PolicyPageLayout from "@/components/PolicyPageLayout";
+import { useRouter } from "next/router";
+import { getPublicSiteConfig, inferPublicSiteFromPath, normalizePublicSite } from "@/lib/publicSite";
 
 const sections = [
   {
@@ -32,10 +34,12 @@ const sections = [
 ];
 
 export default function ShippingPolicyPage() {
+  const router = useRouter();
+  const site = getPublicSiteConfig(normalizePublicSite(inferPublicSiteFromPath(router.pathname)));
   return (
     <PolicyPageLayout
       title="Shipping Policy"
-      intro="This policy outlines how delivery coverage, shipping charges, and fulfillment coordination work for orders placed through the storefront."
+      intro={`This policy outlines how delivery coverage, shipping charges, and fulfillment coordination work for orders placed through the ${site.shortLabel.toLowerCase()} side of the public site.`}
       sections={sections}
     />
   );

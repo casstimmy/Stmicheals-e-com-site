@@ -2,8 +2,9 @@ import Link from "next/link";
 import ProductBox from "./ProductBox";
 import Center from "./Center";
 import { getCatalogInsights } from "@/lib/storefront";
+import { getPublicSitePath } from "@/lib/publicSite";
 
-export default function NewProducts({ newProducts, catalogInsights }) {
+export default function NewProducts({ newProducts, catalogInsights, site }) {
   const insights = catalogInsights || getCatalogInsights(newProducts || []);
 
   return (
@@ -16,9 +17,9 @@ export default function NewProducts({ newProducts, catalogInsights }) {
                 <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
                   Catalog highlight
                 </span>
-                <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">New Arrivals</h2>
+                <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">New {site.shortLabel} Arrivals</h2>
                 <p className="mt-2 max-w-2xl theme-muted-page">
-                  Fresh additions with clearer pricing, category context, and stock-aware product cards.
+                  Fresh {site.shortLabel.toLowerCase()} additions with clearer pricing, category context, and stock-aware product cards.
                 </p>
               </div>
               <div className="theme-card-light rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
@@ -32,7 +33,7 @@ export default function NewProducts({ newProducts, catalogInsights }) {
                   <Link
                     key={category.name}
                     href={{
-                      pathname: "/products",
+                      pathname: getPublicSitePath(site.key, "/products"),
                       query: { category: category.name },
                     }}
                     className="theme-card-light inline-flex items-center gap-3 rounded-full px-4 py-2 text-sm font-medium text-[var(--foreground-strong)] shadow-sm"
@@ -51,11 +52,11 @@ export default function NewProducts({ newProducts, catalogInsights }) {
             {newProducts?.length > 0 ? (
               newProducts.map((product) => (
                 <div key={product._id}>
-                  <ProductBox {...product} />
+                  <ProductBox {...product} siteKey={site.key} />
                 </div>
               ))
             ) : (
-              <p className="col-span-full text-center theme-muted-page">No products available.</p>
+              <p className="col-span-full text-center theme-muted-page">{site.emptyCatalogMessage}</p>
             )}
           </div>
         </section>

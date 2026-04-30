@@ -38,8 +38,8 @@ export default async function handler(req, res) {
 
     await releaseExpiredReservations();
 
-    const { customer, cartProducts } = req.body;
-    const orderDraft = await buildOrderDraft({ customer, cartProducts });
+    const { customer, cartProducts, siteKey } = req.body;
+    const orderDraft = await buildOrderDraft({ customer, cartProducts, siteKey });
 
     if (orderDraft.errors?.length) {
       return res.status(400).json({

@@ -28,6 +28,7 @@ const ProductSchema = new Schema({
     },
   ],
   properties: [{ type: Object }, []],
+  locations: [{ type: String }],
   reviews: [ReviewSchema], // ✅ Add this
 }, { timestamps: true });
 

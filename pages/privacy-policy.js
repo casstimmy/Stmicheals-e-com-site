@@ -1,4 +1,6 @@
 import PolicyPageLayout from "@/components/PolicyPageLayout";
+import { useRouter } from "next/router";
+import { getPublicSiteConfig, inferPublicSiteFromPath, normalizePublicSite } from "@/lib/publicSite";
 
 const sections = [
   {
@@ -32,10 +34,12 @@ const sections = [
 ];
 
 export default function PrivacyPolicyPage() {
+  const router = useRouter();
+  const site = getPublicSiteConfig(normalizePublicSite(inferPublicSiteFromPath(router.pathname)));
   return (
     <PolicyPageLayout
       title="Privacy Policy"
-      intro="This policy explains how St Michael's Food & Drinks Warehouse handles customer information used for orders, account access, delivery coordination, and payment-related communication."
+      intro={`This policy explains how ${site.displayName} handles customer information used for orders, account access, delivery coordination, and payment-related communication.`}
       sections={sections}
     />
   );

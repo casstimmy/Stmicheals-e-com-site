@@ -4,6 +4,13 @@ import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import {
+  getPublicOrderConfirmationPath,
+  getPublicSiteConfig,
+  inferPublicSiteFromPath,
+  normalizePublicSite,
+} from "@/lib/publicSite";
 
 function applySessionPayload(payload, { applyAuthenticatedSession, clearSessionState }) {
   if (payload?.authenticated) {
@@ -15,6 +22,9 @@ function applySessionPayload(payload, { applyAuthenticatedSession, clearSessionS
 }
 
 export default function AccountPage() {
+  const router = useRouter();
+  const siteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
+  const site = getPublicSiteConfig(siteKey);
   const [sessionLoading, setSessionLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loginForm, setLoginForm] = useState({ email: "", name: "" });
@@ -216,9 +226,9 @@ export default function AccountPage() {
   return (
     <>
       <Head>
-        <title>My Account | St Michael&apos;s Store</title>
+        <title>{`My Account | ${site.displayName}`}</title>
       </Head>
-      <Header />
+      <Header siteKey={siteKey} />
       <Center>
         <div className="min-h-screen py-8 px-4 sm:px-8">
           <div className="theme-shell-light mx-auto max-w-4xl rounded-[2rem] p-8">
@@ -515,7 +525,7 @@ export default function AccountPage() {
                                 </p>
                               </div>
                               <Link
-                                href={`/checkout/order-confirmation/${order._id}`}
+                                href={getPublicOrderConfirmationPath(order.siteKey || siteKey, order._id)}
                                 className="theme-button-accent inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-4 py-2 text-sm font-medium transition"
                               >
                                 View order

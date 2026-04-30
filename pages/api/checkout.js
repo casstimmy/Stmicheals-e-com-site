@@ -18,6 +18,7 @@ export default async function handler(req, res) {
     const orderDraft = await buildOrderDraft({
       customer: req.body.customer,
       cartProducts: req.body.items || req.body.cartProducts,
+      siteKey: req.body.siteKey,
     });
 
     if (orderDraft.errors?.length) {

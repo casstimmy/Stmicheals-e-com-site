@@ -12,8 +12,9 @@ import Link from "next/link";
 import { CartContext } from "./CartContext";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
+import { getPublicProductPath, getPublicSitePath } from "@/lib/publicSite";
 
-export default function Featured({ product, catalogInsights }) {
+export default function Featured({ product, catalogInsights, site }) {
   const { addProductToCart, cartProducts } = useContext(CartContext);
   const availableQuantity = getAvailableInventoryQuantity(product);
   const cartQuantity = cartProducts.find((item) => item.id === product._id)?.qty || 0;
@@ -48,22 +49,21 @@ export default function Featured({ product, catalogInsights }) {
           <div className="relative mx-auto flex max-w-7xl flex-col-reverse items-center justify-between gap-16 md:flex-row">
             <div className="text-center md:w-1/2 md:text-left">
               <span className="inline-flex rounded-full border border-[rgba(216,172,79,0.3)] bg-[rgba(216,172,79,0.15)] px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-[rgba(109,76,0,0.9)] shadow-sm">
-                Curated weekly feature
+                {site.heroEyebrow}
               </span>
               <h1 className="mb-4 mt-5 text-4xl font-extrabold leading-[1.02] text-[var(--foreground-strong)] lg:text-6xl">
-                Fresh essentials, refined service, fewer checkout frictions.
+                {site.heroTitle}
               </h1>
               <p className="mb-6 max-w-xl text-base leading-8 text-[rgba(18,52,60,0.76)] lg:text-lg">
                 {productDescription}
                 {productDescription ? " " : ""}
-                Shop premium groceries and household staples with clearer discovery, safer payment handling,
-                and reliable stock visibility.
+                {site.heroDescription}
               </p>
 
               <div className="mb-8 flex flex-wrap justify-center gap-3 md:justify-start">
                 {[
-                  { icon: faShieldHeart, label: "Server-verified checkout" },
-                  { icon: faLeaf, label: "Fresh curated inventory" },
+                  { icon: faShieldHeart, label: site.heroHighlights[0] },
+                  { icon: faLeaf, label: site.heroHighlights[1] },
                   { icon: faBolt, label: topCategoryLabel },
                 ].map((feature) => (
                   <span
@@ -78,7 +78,7 @@ export default function Featured({ product, catalogInsights }) {
 
               <div className="mb-8 flex flex-wrap items-end justify-center gap-8 md:justify-start">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Featured product</p>
+                  <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">{site.featuredProductLabel}</p>
                   <p className="text-2xl font-bold text-[var(--foreground-strong)]">{product.name}</p>
                 </div>
                 <div>
@@ -89,16 +89,16 @@ export default function Featured({ product, catalogInsights }) {
 
               <div className="flex flex-col justify-center gap-4 sm:flex-row md:justify-start">
                 <Link
-                  href={`/product/${product._id}`}
+                  href={getPublicProductPath(site.key, product._id)}
                   className="theme-button-secondary inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.15rem] px-6 py-3 font-semibold shadow transition duration-300 ease-in-out sm:min-w-[12rem]"
                 >
                   View Product Details
                 </Link>
                 <Link
-                  href="/categories"
+                  href={getPublicSitePath(site.key, "/categories")}
                   className="theme-card-light inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.15rem] border border-[rgba(20,109,126,0.12)] px-6 py-3 font-semibold text-[var(--foreground-strong)] shadow-sm sm:min-w-[12rem]"
                 >
-                  Browse Categories
+                  {site.secondaryCtaLabel}
                 </Link>
                 <button
                   onClick={addFeatureProductToCart}

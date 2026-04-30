@@ -14,19 +14,31 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { COMPANY_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
+import {
+  getPublicScopedHref,
+  getPublicSiteConfig,
+  inferPublicSiteFromPath,
+  normalizePublicSite,
+} from "@/lib/publicSite";
 
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "All Products" },
-  { href: "/categories", label: "Categories" },
-  { href: "/account", label: "Account" },
-];
-
-export default function Header() {
+export default function Header({ siteKey }) {
   const { cartCount } = useContext(CartContext);
   const [navOpen, setNavOpen] = useState(false);
   const router = useRouter();
-  const cartIsActive = router.pathname.startsWith("/cart");
+  const activeSiteKey = normalizePublicSite(siteKey || inferPublicSiteFromPath(router.pathname));
+  const site = getPublicSiteConfig(activeSiteKey);
+  const navLinks = [
+    { href: getPublicScopedHref(activeSiteKey, "/"), label: "Home" },
+    { href: getPublicScopedHref(activeSiteKey, "/products"), label: "All Products" },
+    { href: getPublicScopedHref(activeSiteKey, "/categories"), label: "Categories" },
+    { href: getPublicScopedHref(activeSiteKey, "/account"), label: "Account" },
+  ];
+  const companyLinks = COMPANY_LINKS.map((link) => ({
+    ...link,
+    href: getPublicScopedHref(activeSiteKey, link.href),
+  }));
+  const cartHref = getPublicScopedHref(activeSiteKey, "/cart");
+  const cartIsActive = router.asPath === cartHref || router.asPath.startsWith(`${cartHref}?`);
 
   useEffect(() => {
     const closeMobileNav = () => {
@@ -78,23 +90,25 @@ export default function Header() {
   }, []);
 
   const isActiveRoute = (href) => {
-    if (href === "/") {
-      return router.pathname === href;
+    const currentPath = router.asPath.split("?")[0];
+
+    if (href === getPublicScopedHref(activeSiteKey, "/")) {
+      return currentPath === href;
     }
 
-    return router.pathname.startsWith(href);
+    return currentPath.startsWith(href);
   };
 
   const mobileSupportLinks = [
     {
       href: `mailto:${STORE_DETAILS.email}`,
-      label: "Email the store",
+      label: `Email the ${site.shortLabel.toLowerCase()} desk`,
       value: STORE_DETAILS.email,
       icon: faEnvelope,
     },
     {
       href: `tel:${STORE_DETAILS.phoneNumbers[0]}`,
-      label: "Call the store",
+      label: `Call the ${site.shortLabel.toLowerCase()} desk`,
       value: STORE_DETAILS.phoneNumbers[0],
       icon: faPhone,
     },
@@ -106,12 +120,12 @@ export default function Header() {
         <Center>
           <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
             <span className="text-[0.62rem] tracking-[0.18em] sm:text-[0.72rem] sm:tracking-[0.24em]">
-              <span className="sm:hidden">Trusted delivery across major Nigerian cities</span>
-              <span className="hidden sm:inline">Trusted grocery delivery across major Nigerian cities</span>
+              <span className="sm:hidden">{site.topBarCopy}</span>
+              <span className="hidden sm:inline">{site.topBarCopy}</span>
             </span>
-            <Link href="/products" className="inline-flex items-center gap-2 font-semibold text-white/90 transition hover:text-[var(--accent)]">
-              <span className="sm:hidden">Explore catalog</span>
-              <span className="hidden sm:inline">Explore the catalog</span>
+            <Link href={getPublicScopedHref(activeSiteKey, "/products")} className="inline-flex items-center gap-2 font-semibold text-white/90 transition hover:text-[var(--accent)]">
+              <span className="sm:hidden">{site.topBarCta}</span>
+              <span className="hidden sm:inline">{site.topBarCta}</span>
               <FontAwesomeIcon icon={faArrowRight} className="text-xs" />
             </Link>
           </div>
@@ -121,7 +135,7 @@ export default function Header() {
       <Center>
         <div className="relative px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-center justify-between gap-3 sm:gap-4">
-            <Link href="/" className="flex min-w-0 flex-1 items-center gap-3">
+            <Link href={getPublicScopedHref(activeSiteKey, "/")} className="flex min-w-0 flex-1 items-center gap-3">
               <div className="rounded-2xl border border-[rgba(20,109,126,0.12)] bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(239,247,248,0.96))] p-2 shadow-[0_12px_28px_rgba(18,52,60,0.08)]">
                 <Image
                   src="/images/st-micheals-logo.png"
@@ -133,17 +147,17 @@ export default function Header() {
               </div>
               <div className="min-w-0">
                 <span className="block truncate text-[0.98rem] font-bold text-[var(--foreground-strong)] sm:text-xl">
-                  St. Michael&apos;s Food & Drinks Warehouse
+                  {site.displayName}
                 </span>
                 <span className="block truncate text-[0.62rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.56)] sm:text-xs sm:tracking-[0.26em]">
-                  Essentials marketplace
+                  {site.tagLine}
                 </span>
               </div>
             </Link>
 
             <div className="flex shrink-0 items-center gap-2 md:hidden">
               <Link
-                href="/cart"
+                href={cartHref}
                 data-cart-icon
                 className={`inline-flex h-11 min-w-[3rem] items-center justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm transition ${
                   cartIsActive
@@ -192,7 +206,7 @@ export default function Header() {
                 </Link>
               ))}
               <Link
-                href="/cart"
+                href={cartHref}
                 data-cart-icon
                 className="theme-button-primary inline-flex items-center gap-2 rounded-full px-4 py-2 transition shadow-lg"
               >
@@ -216,10 +230,10 @@ export default function Header() {
                     <div className="flex items-start justify-between gap-3">
                       <div>
                         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.52)]">
-                          Browse the store
+                          Browse the {site.shortLabel.toLowerCase()}
                         </p>
                         <p className="mt-2 text-sm leading-7 theme-muted-page">
-                          Jump to the main storefront pages with larger touch targets and clearer grouping.
+                          Jump to the main {site.shortLabel.toLowerCase()} pages with larger touch targets and clearer grouping.
                         </p>
                       </div>
                       <span className="rounded-full bg-[rgba(20,148,182,0.12)] px-3 py-1 text-xs font-semibold text-[var(--brand-strong)]">
@@ -228,7 +242,7 @@ export default function Header() {
                     </div>
 
                     <Link
-                      href="/cart"
+                      href={cartHref}
                       onClick={() => setNavOpen(false)}
                       className={`mt-4 flex items-center justify-between rounded-[1.2rem] px-4 py-3 text-sm font-semibold transition ${
                         cartIsActive ? "theme-button-accent" : "theme-button-primary"
@@ -270,10 +284,10 @@ export default function Header() {
                         {COMPANY_LINKS.map((link) => (
                           <Link
                             key={link.href}
-                            href={link.href}
+                            href={getPublicScopedHref(activeSiteKey, link.href)}
                             onClick={() => setNavOpen(false)}
                             className={`rounded-[1.15rem] px-4 py-3 text-sm font-semibold transition ${
-                              isActiveRoute(link.href)
+                              isActiveRoute(getPublicScopedHref(activeSiteKey, link.href))
                                 ? "theme-button-accent"
                                 : "theme-footer-link text-[var(--foreground-strong)]"
                             }`}

@@ -4,6 +4,7 @@ import axios from 'axios';
 import { mongooseConnect } from "@/lib/mongoose";
 import Order from "@/models/Order";
 import { releaseExpiredReservations } from "@/lib/orderLifecycle";
+import { getPublicOrderConfirmationPath } from "@/lib/publicSite";
 
 function getSiteUrl(req) {
   const configuredUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -63,9 +64,10 @@ export default async function handler(req, res) {
       {
         email: order.customer.email,
         amount,
-        callback_url: `${siteUrl}/checkout/order-confirmation/${orderId}`,
+        callback_url: `${siteUrl}${getPublicOrderConfirmationPath(order.siteKey, orderId)}`,
         metadata: {
           orderId: String(order._id),
+          siteKey: order.siteKey,
           reservationExpiresAt: order.reservationExpiresAt,
           customer: {
             name: order.customer.name,
