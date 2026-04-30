@@ -26,26 +26,6 @@ export default function NewProducts({ newProducts, catalogInsights }) {
               </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-3">
-              <div className="theme-card-light rounded-[1.25rem] px-4 py-4 shadow-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">In stock</p>
-                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{insights.availableCount}</p>
-              </div>
-              <div className="theme-card-light rounded-[1.25rem] px-4 py-4 shadow-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Category spread</p>
-                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{insights.categoryCount}</p>
-              </div>
-              <div className="theme-card-light rounded-[1.25rem] px-4 py-4 shadow-sm">
-                <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Price window</p>
-                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">
-                  ₦{insights.minPrice?.toLocaleString() || 0}
-                </p>
-                <p className="mt-1 text-sm theme-muted-page">
-                  Up to ₦{insights.maxPrice?.toLocaleString() || 0}
-                </p>
-              </div>
-            </div>
-
             {insights.topCategories.length > 0 && (
               <div className="flex flex-wrap gap-3">
                 {insights.topCategories.map((category) => (

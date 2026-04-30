@@ -90,7 +90,7 @@ export default function ProductBox({
                             alt={name}
                             fill
                             sizes="(max-width: 640px) 74vw, (max-width: 1024px) 30vw, 16vw"
-                            className="object-contain drop-shadow-[0_14px_28px_rgba(18,52,60,0.14)]"
+                            className="object-contain"
                         />
                     </div>
                 </Link>
