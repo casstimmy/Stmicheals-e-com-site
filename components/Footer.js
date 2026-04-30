@@ -1,18 +1,11 @@
 import Link from "next/link";
 import Center from "./Center";
-
-const primaryLinks = [
-  { href: "/", label: "Home" },
-  { href: "/products", label: "All Products" },
-  { href: "/categories", label: "Categories" },
-  { href: "/cart", label: "Cart" },
-  { href: "/account", label: "Account" },
-];
+import { COMPANY_LINKS, POLICY_LINKS, PRIMARY_FOOTER_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
 
 const serviceHighlights = [
-  "Live stock-aware product cards",
-  "Server-validated delivery totals",
-  "OTP-based customer account access",
+  "Secure OTP-based account access",
+  "Server-validated payment flow",
+  "Stock-aware ordering and delivery pricing",
 ];
 
 export default function Footer() {
@@ -21,18 +14,18 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <Center>
-        <div className="site-footer-panel overflow-hidden rounded-[2rem] px-6 py-10 md:px-10 md:py-12">
-          <div className="grid gap-8 lg:grid-cols-[1.15fr_0.85fr_0.85fr]">
+        <div className="site-footer-panel overflow-hidden rounded-[1.75rem] px-4 py-8 sm:rounded-[2rem] sm:px-6 sm:py-10 md:px-10 md:py-12">
+          <div className="grid gap-6 xl:grid-cols-[1.15fr_0.8fr_0.8fr_1fr]">
             <div>
               <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
-                Refined storefront system
+                Business profile
               </span>
               <h2 className="mt-5 max-w-xl text-3xl font-bold text-[var(--foreground-strong)] md:text-4xl">
-                Balanced discovery, cleaner checkout, and stronger customer trust.
+                {STORE_DETAILS.businessName}
               </h2>
               <p className="mt-4 max-w-2xl text-base leading-8 theme-muted-page">
-                St Michael&apos;s Store now presents catalog discovery, order management, and payment
-                confirmation as one cohesive customer journey instead of isolated pages.
+                Industrial-standard storefront foundations: clear navigation, policy access, secure checkout,
+                and direct business contact details in one footer.
               </p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -42,18 +35,13 @@ export default function Footer() {
                   </div>
                 ))}
               </div>
-            </div>
 
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.52)]">
-                Navigate
-              </p>
-              <div className="mt-5 grid gap-3">
-                {primaryLinks.map((link) => (
+              <div className="mt-5 grid gap-3 min-[420px]:grid-cols-2 xl:max-w-md">
+                {COMPANY_LINKS.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="theme-footer-link rounded-2xl px-4 py-3 text-sm font-medium text-[var(--foreground-strong)]"
+                    className="theme-footer-link w-full justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)]"
                   >
                     {link.label}
                   </Link>
@@ -63,29 +51,86 @@ export default function Footer() {
 
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.52)]">
-                Customer confidence
+                Shop
               </p>
-              <div className="mt-5 space-y-4">
+              <div className="mt-5 grid gap-3 min-[420px]:grid-cols-2 xl:grid-cols-1">
+                {PRIMARY_FOOTER_LINKS.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="theme-footer-link w-full justify-between rounded-2xl px-4 py-3 text-sm font-medium text-[var(--foreground-strong)]"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.52)]">
+                Policies
+              </p>
+              <div className="mt-5 grid gap-3 min-[420px]:grid-cols-2 xl:grid-cols-1">
+                {POLICY_LINKS.map((policy) => (
+                  <Link
+                    key={policy.href}
+                    href={policy.href}
+                    className="theme-footer-link w-full justify-between rounded-2xl px-4 py-3 text-sm font-medium text-[var(--foreground-strong)]"
+                  >
+                    {policy.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.52)]">
+                Contact & compliance
+              </p>
+              <div className="mt-5 grid gap-4 min-[460px]:grid-cols-2 xl:grid-cols-1">
                 <div className="theme-card-light rounded-[1.25rem] px-5 py-4 shadow-sm">
-                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">Checkout integrity</p>
-                  <p className="mt-2 text-sm leading-7 theme-muted-page">
-                    Payment starts only after the order, pricing, shipping, and inventory state are
-                    revalidated on the server.
-                  </p>
+                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">Store details</p>
+                  <div className="mt-3 space-y-2 text-sm leading-7 theme-muted-page">
+                    <p>{STORE_DETAILS.displayName}</p>
+                    <p>{STORE_DETAILS.country}</p>
+                    <p>Location Code: {STORE_DETAILS.locationCode}</p>
+                  </div>
                 </div>
                 <div className="theme-card-light rounded-[1.25rem] px-5 py-4 shadow-sm">
-                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">Account continuity</p>
-                  <p className="mt-2 text-sm leading-7 theme-muted-page">
-                    Customers can retrieve order history and update delivery details with email-based OTP access.
-                  </p>
+                  <p className="text-sm font-semibold text-[var(--foreground-strong)]">Reach the store</p>
+                  <div className="mt-3 space-y-2 text-sm leading-7">
+                    <Link
+                      href="/contact"
+                      className="theme-footer-link mb-3 w-full justify-center rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)]"
+                    >
+                      Open contact page
+                    </Link>
+                    <a className="block break-all text-[var(--brand-strong)]" href={`mailto:${STORE_DETAILS.email}`}>
+                      {STORE_DETAILS.email}
+                    </a>
+                    {STORE_DETAILS.phoneNumbers.map((phoneNumber) => (
+                      <a
+                        key={phoneNumber}
+                        className="block text-[var(--brand-strong)]"
+                        href={`tel:${phoneNumber}`}
+                      >
+                        {phoneNumber}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="theme-divider mt-8 flex flex-col gap-3 border-t pt-5 text-sm text-[rgba(18,52,60,0.58)] md:flex-row md:items-center md:justify-between">
-            <p>© {currentYear} St Michael&apos;s Store. Premium groceries and essentials, delivered with clearer digital service.</p>
-            <p>Built for responsive browsing, accessible navigation, and verified payment flow continuity.</p>
+          <div className="theme-divider mt-8 flex flex-col gap-4 border-t pt-5 text-sm text-[rgba(18,52,60,0.58)] md:flex-row md:items-center md:justify-between">
+            <p className="max-w-xl">© {currentYear} {STORE_DETAILS.businessName}. All rights reserved.</p>
+            <div className="flex flex-col gap-1 md:items-end md:text-right">
+              <p>Phone: {STORE_DETAILS.phoneNumbers.join(" · ")}</p>
+              <a className="break-all text-[var(--brand-strong)]" href={`mailto:${STORE_DETAILS.email}`}>
+                {STORE_DETAILS.email}
+              </a>
+            </div>
           </div>
         </div>
       </Center>

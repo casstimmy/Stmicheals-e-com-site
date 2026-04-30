@@ -275,4 +275,98 @@ h4 {
   border-color: rgba(22, 125, 143, 0.14);
 }
 
+.app-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background: rgba(246, 241, 231, 0.82);
+  backdrop-filter: blur(12px);
+}
+
+.app-loader-panel {
+  width: min(24rem, calc(100vw - 2rem));
+  border-radius: 1.75rem;
+  border: 1px solid rgba(20, 109, 126, 0.16);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 52px rgba(18, 52, 60, 0.12);
+  padding: 2rem 1.5rem;
+  text-align: center;
+}
+
+.app-loader-logo-shell {
+  margin: 0 auto;
+  display: grid;
+  height: 6rem;
+  width: 6rem;
+  place-items: center;
+  border-radius: 1.5rem;
+  border: 1px solid rgba(20, 109, 126, 0.12);
+  background: #ffffff;
+  box-shadow: 0 18px 36px rgba(18, 52, 60, 0.1);
+  animation: app-loader-float 1.6s ease-in-out infinite;
+}
+
+.app-loader-logo {
+  height: auto;
+  width: auto;
+  max-width: 4.4rem;
+  object-fit: contain;
+}
+
+.app-loader-title {
+  margin: 1rem 0 0;
+  color: var(--foreground-strong);
+  font-family: var(--font-display), sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.app-loader-copy {
+  margin: 0.5rem 0 0;
+  color: rgba(18, 52, 60, 0.66);
+  line-height: 1.7;
+}
+
+.app-loader-progress {
+  margin-top: 1.25rem;
+  height: 0.4rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(20, 109, 126, 0.12);
+}
+
+.app-loader-progress span {
+  display: block;
+  height: 100%;
+  width: 38%;
+  border-radius: inherit;
+  background: #167d8f;
+  animation: app-loader-sweep 1.15s ease-in-out infinite;
+}
+
+@keyframes app-loader-sweep {
+  0% {
+    transform: translateX(-110%);
+  }
+
+  100% {
+    transform: translateX(280%);
+  }
+}
+
+@keyframes app-loader-float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
 

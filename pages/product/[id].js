@@ -144,7 +144,7 @@ export default function ProductPage({ product, relatedProducts }) {
                     ? "border-emerald-200/80 bg-emerald-50 text-emerald-700"
                     : "border-rose-200/80 bg-rose-50 text-rose-700"
                 }`}>
-                  {isInStock ? `${availableQuantity} ready now` : "Currently unavailable"}
+                  {isInStock ? `${availableQuantity} in stock` : "Currently unavailable"}
                 </span>
               </div>
               <h1 className="mb-4 text-2xl font-bold text-[var(--foreground-strong)] sm:text-3xl">
@@ -249,7 +249,7 @@ export default function ProductPage({ product, relatedProducts }) {
     </div>
     <div>
       <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Fulfillment</p>
-      <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{isInStock ? "Ready" : "Paused"}</p>
+      <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{isInStock ? "In stock" : "Paused"}</p>
     </div>
   </div>
 

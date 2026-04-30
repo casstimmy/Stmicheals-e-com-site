@@ -71,8 +71,8 @@ export default function ProductBox({
     };
 
     return (
-        <div className="product-box theme-card-light flex h-full flex-col overflow-hidden rounded-[1.35rem] transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(18,52,60,0.14)] sm:rounded-[1.5rem]">
-            <div className="relative flex h-40 w-full items-center justify-center overflow-hidden bg-[#f4f1ea] px-3 pb-3 pt-12 sm:h-48 sm:px-4 sm:pb-4 sm:pt-14">
+        <div className="product-box theme-card-light flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-[rgba(18,52,60,0.18)] ring-1 ring-white/70 transition hover:-translate-y-1 hover:shadow-[0_22px_40px_rgba(18,52,60,0.14)] sm:rounded-[1.5rem]">
+            <div className="relative flex h-40 w-full items-center justify-center overflow-hidden bg-white px-3 pb-3 pt-12 sm:h-48 sm:px-4 sm:pb-4 sm:pt-14">
                 <div className="theme-card-light absolute left-3 top-3 max-w-[58%] rounded-full px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.2em] text-[rgba(18,52,60,0.76)] shadow-sm sm:max-w-[55%] sm:text-[0.68rem]">
                     {categoryName || category || "Featured"}
                 </div>
@@ -81,7 +81,7 @@ export default function ProductBox({
                         ? "border-emerald-200/80 bg-emerald-50 text-emerald-700"
                         : "border-rose-200/80 bg-rose-50 text-rose-700"
                 }`}>
-                    {isInStock ? `${availableQuantity} ready` : "Sold out"}
+                    {isInStock ? `${availableQuantity} in stock` : "Sold out"}
                 </div>
                 <Link href={url} className="flex h-full w-full items-center justify-center">
                     <div className="relative h-full w-full max-w-[8.5rem] sm:max-w-[10rem]">

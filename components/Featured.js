@@ -72,7 +72,7 @@ export default function Featured({ product, catalogInsights }) {
                 {productDescription}
                 {productDescription ? " " : ""}
                 Shop premium groceries and household staples with clearer discovery, safer payment handling,
-                and delivery-ready stock visibility.
+                and reliable stock visibility.
               </p>
 
               <div className="mb-8 flex flex-wrap justify-center gap-3 md:justify-start">
@@ -141,11 +141,11 @@ export default function Featured({ product, catalogInsights }) {
                       : "Add to Cart"}
                 </button>
               </div>
-              <p className="mt-4 text-sm theme-muted-page">
-                {availableQuantity === 0
-                  ? "This feature is temporarily unavailable while inventory is refreshed."
-                  : `Cart reserve: ${cartQuantity} of ${availableQuantity} available units currently selected.`}
-              </p>
+              {availableQuantity === 0 && (
+                <p className="mt-4 text-sm theme-muted-page">
+                  This feature is temporarily unavailable while inventory is refreshed.
+                </p>
+              )}
             </div>
 
             <div className="w-full md:w-1/2">
@@ -159,12 +159,6 @@ export default function Featured({ product, catalogInsights }) {
                   sizes="(max-width: 768px) 90vw, 48vw"
                   className="h-auto w-full rounded-[1.75rem] border border-white/80 bg-white/60 object-cover shadow-[0_30px_60px_rgba(18,52,60,0.14)]"
                 />
-                <div className="theme-card-light absolute bottom-4 left-4 right-4 rounded-[1.25rem] p-4 shadow-lg backdrop-blur-xl md:left-auto md:max-w-xs">
-                  <p className="text-xs uppercase tracking-[0.24em] text-[rgba(18,52,60,0.66)]">Operational note</p>
-                  <p className="mt-2 text-sm leading-7 text-[rgba(18,52,60,0.82)]">
-                    Inventory, shipping totals, and payment confirmation stay aligned from cart to order receipt.
-                  </p>
-                </div>
               </div>
             </div>
           </div>

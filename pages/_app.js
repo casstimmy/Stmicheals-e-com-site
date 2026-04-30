@@ -1,7 +1,10 @@
 import CartProvider from "@/components/CartContext";
+import AppLoaderOverlay from "@/components/AppLoaderOverlay";
 import Footer from "@/components/Footer";
 import "@/styles/globals.css";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { Sora, Rajdhani } from "next/font/google";
 
 const sora = Sora({
@@ -16,7 +19,49 @@ const rajdhani = Rajdhani({
 });
 
 export default function App({ Component, pageProps }) {
+  const router = useRouter();
   const hideFooter = Component.hideFooter === true;
+  const [isBootLoading, setIsBootLoading] = useState(true);
+  const [isRouteLoading, setIsRouteLoading] = useState(false);
+
+  useEffect(() => {
+    const bootTimer = window.setTimeout(() => {
+      setIsBootLoading(false);
+    }, 450);
+
+    return () => {
+      window.clearTimeout(bootTimer);
+    };
+  }, []);
+
+  useEffect(() => {
+    let routeTimer;
+
+    const handleStart = () => {
+      window.clearTimeout(routeTimer);
+      routeTimer = window.setTimeout(() => {
+        setIsRouteLoading(true);
+      }, 120);
+    };
+
+    const handleStop = () => {
+      window.clearTimeout(routeTimer);
+      setIsRouteLoading(false);
+    };
+
+    router.events.on("routeChangeStart", handleStart);
+    router.events.on("routeChangeComplete", handleStop);
+    router.events.on("routeChangeError", handleStop);
+
+    return () => {
+      window.clearTimeout(routeTimer);
+      router.events.off("routeChangeStart", handleStart);
+      router.events.off("routeChangeComplete", handleStop);
+      router.events.off("routeChangeError", handleStop);
+    };
+  }, [router.events]);
+
+  const showLoader = isBootLoading || isRouteLoading;
 
   return (
     <>
@@ -38,6 +83,7 @@ export default function App({ Component, pageProps }) {
       </Head>
       <CartProvider>
         <div className={`${sora.variable} ${rajdhani.variable} app-shell`}>
+          {showLoader && <AppLoaderOverlay />}
           <a href="#main-content" className="skip-link">
             Skip to content
           </a>
