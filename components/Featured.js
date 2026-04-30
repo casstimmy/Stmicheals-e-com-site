@@ -12,7 +12,6 @@ import Link from "next/link";
 import { CartContext } from "./CartContext";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
-import { SUPPORTED_SHIPPING_DESTINATIONS } from "@/lib/shipping";
 
 export default function Featured({ product, catalogInsights }) {
   const { addProductToCart, cartProducts } = useContext(CartContext);
@@ -37,20 +36,6 @@ export default function Featured({ product, catalogInsights }) {
   const topCategoryLabel =
     catalogInsights?.topCategories?.map((category) => category.name).join(" · ") ||
     "Everyday essentials";
-  const spotlightStats = [
-    {
-      label: "Recent arrivals",
-      value: `${catalogInsights?.productCount || 0}`,
-    },
-    {
-      label: "Active categories",
-      value: `${catalogInsights?.categoryCount || 0}`,
-    },
-    {
-      label: "Delivery cities",
-      value: `${SUPPORTED_SHIPPING_DESTINATIONS.length}`,
-    },
-  ];
   const productDescription = product.description?.trim() || "";
 
   return (
@@ -88,15 +73,6 @@ export default function Featured({ product, catalogInsights }) {
                     <FontAwesomeIcon icon={feature.icon} className="text-[var(--brand)]" />
                     {feature.label}
                   </span>
-                ))}
-              </div>
-
-              <div className="mb-8 grid gap-4 sm:grid-cols-3">
-                {spotlightStats.map((stat) => (
-                  <div key={stat.label} className="theme-card-light rounded-[1.25rem] px-4 py-4 text-left shadow-sm">
-                    <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">{stat.label}</p>
-                    <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{stat.value}</p>
-                  </div>
                 ))}
               </div>
 
