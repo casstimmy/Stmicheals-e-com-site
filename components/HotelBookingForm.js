@@ -72,18 +72,18 @@ export default function HotelBookingForm({
   }
 
   return (
-    <section className={`theme-shell-light rounded-[1.75rem] ${compact ? "p-5 sm:p-6" : "p-6 sm:p-8"}`}>
-      <div className="border-b border-[rgba(20,109,126,0.12)] pb-5">
-        <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
+    <section className={`hotel-section rounded-[1.75rem] ${compact ? "p-5 sm:p-6" : "p-6 sm:p-8"}`}>
+      <div className="hotel-divider border-b pb-5">
+        <span className="hotel-kicker inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
           Reservations
         </span>
         <h2 className="mt-4 text-2xl font-bold text-[var(--foreground-strong)] sm:text-3xl">{title}</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 theme-muted-page sm:text-base sm:leading-8">{intro}</p>
+        <p className="hotel-muted-page mt-2 max-w-2xl text-sm leading-7 sm:text-base sm:leading-8">{intro}</p>
       </div>
 
       <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
         {selectedRoom ? (
-          <div className="rounded-[1.35rem] bg-[rgba(20,148,182,0.08)] px-5 py-4 text-sm text-[var(--foreground-strong)]">
+          <div className="hotel-card-soft rounded-[1.35rem] px-5 py-4 text-sm text-[var(--foreground-strong)]">
             <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.46)]">Selected room</p>
             <p className="mt-1 text-base font-semibold">{selectedRoom.name}</p>
           </div>
@@ -93,7 +93,7 @@ export default function HotelBookingForm({
             <select
               value={formValues.roomId}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, roomId: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             >
               <option value="">Any available room</option>
               {(rooms || []).map((room) => (
@@ -112,7 +112,7 @@ export default function HotelBookingForm({
               type="text"
               value={formValues.guestName}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, guestName: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -122,7 +122,7 @@ export default function HotelBookingForm({
               type="email"
               value={formValues.email}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, email: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -135,7 +135,7 @@ export default function HotelBookingForm({
               type="tel"
               value={formValues.phone}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, phone: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -146,7 +146,7 @@ export default function HotelBookingForm({
               value={formValues.preferredArrivalTime}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, preferredArrivalTime: event.target.value }))}
               placeholder="Example: 6:00 PM"
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             />
           </label>
         </div>
@@ -159,7 +159,7 @@ export default function HotelBookingForm({
               value={formValues.checkInDate}
               min={defaultCheckIn}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, checkInDate: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -170,7 +170,7 @@ export default function HotelBookingForm({
               value={formValues.checkOutDate}
               min={formValues.checkInDate || defaultCheckOut}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, checkOutDate: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -182,7 +182,7 @@ export default function HotelBookingForm({
             <select
               value={formValues.adults}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, adults: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             >
               {[1, 2, 3, 4].map((value) => (
                 <option key={value} value={String(value)}>
@@ -196,7 +196,7 @@ export default function HotelBookingForm({
             <select
               value={formValues.children}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, children: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             >
               {[0, 1, 2, 3].map((value) => (
                 <option key={value} value={String(value)}>
@@ -214,7 +214,7 @@ export default function HotelBookingForm({
             value={formValues.specialRequests}
             onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, specialRequests: event.target.value }))}
             placeholder="Airport pickup, early check-in request, extra bedding, or any other notes."
-            className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+            className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
           />
         </label>
 
@@ -227,7 +227,7 @@ export default function HotelBookingForm({
         <button
           type="submit"
           disabled={submitting}
-          className={`theme-button-accent inline-flex min-h-[3.2rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
+          className={`hotel-button-primary inline-flex min-h-[3.2rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
         >
           {submitting ? "Sending request..." : submitLabel}
         </button>

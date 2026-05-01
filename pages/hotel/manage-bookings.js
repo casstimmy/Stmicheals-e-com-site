@@ -79,14 +79,14 @@ export default function HotelManageBookingsPage({ site }) {
       </Head>
       <Header siteKey={site.key} />
       <Center>
-        <div className="min-h-screen px-4 py-8 sm:px-8 sm:py-10">
+        <div className="hotel-page min-h-screen px-4 py-8 sm:px-8 sm:py-10">
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <section className="theme-shell-light rounded-[2rem] p-6 md:p-8">
-              <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
+            <section className="hotel-shell rounded-[2rem] p-6 md:p-8">
+              <span className="hotel-shell-kicker inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
                 Reservation lookup
               </span>
-              <h1 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)] sm:text-4xl">Manage your stay or table request</h1>
-              <p className="mt-3 text-base leading-8 theme-muted-page">
+              <h1 className="mt-4 text-3xl font-bold text-[#fff1dc] sm:text-4xl">Manage your stay or table request</h1>
+              <p className="hotel-shell-muted mt-3 text-base leading-8">
                 Enter the request ID and the same email used when you submitted the reservation. You can review the details and cancel requests that are still open.
               </p>
 
@@ -97,7 +97,7 @@ export default function HotelManageBookingsPage({ site }) {
                     type="text"
                     value={formValues.reference}
                     onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, reference: event.target.value }))}
-                    className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+                    className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
                     required
                   />
                 </label>
@@ -107,14 +107,14 @@ export default function HotelManageBookingsPage({ site }) {
                     type="email"
                     value={formValues.email}
                     onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, email: event.target.value }))}
-                    className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+                    className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
                     required
                   />
                 </label>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className={`theme-button-accent inline-flex min-h-[3.2rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
+                  className={`hotel-button-primary inline-flex min-h-[3.2rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
                 >
                   {submitting ? "Checking request..." : "Find reservation"}
                 </button>
@@ -127,16 +127,16 @@ export default function HotelManageBookingsPage({ site }) {
                   "Use the same email used at submission time",
                   "Contact the hotel if you need same-day changes",
                 ].map((item) => (
-                  <div key={item} className="theme-card-light rounded-[1.3rem] px-4 py-4 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
+                  <div key={item} className="hotel-shell-card rounded-[1.3rem] px-4 py-4 text-sm font-semibold text-[#fff1dc]">
                     {item}
                   </div>
                 ))}
               </div>
             </section>
 
-            <section className="theme-shell-light rounded-[2rem] p-6 md:p-8">
+            <section className="hotel-section rounded-[2rem] p-6 md:p-8">
               <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Reservation details</h2>
-              <p className="mt-2 theme-muted-page">Lookup results will appear here.</p>
+              <p className="hotel-muted-page mt-2">Lookup results will appear here.</p>
 
               {errorMessage ? (
                 <div className="mt-5 rounded-[1.2rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -153,48 +153,48 @@ export default function HotelManageBookingsPage({ site }) {
               {reservation ? (
                 <div className="mt-6 space-y-4">
                   <div className="grid gap-4 sm:grid-cols-2">
-                    <div className="theme-card-light rounded-[1.35rem] px-5 py-4 shadow-sm">
+                    <div className="hotel-card rounded-[1.35rem] px-5 py-4 shadow-sm">
                       <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Reservation type</p>
                       <p className="mt-2 text-lg font-bold text-[var(--foreground-strong)]">{reservation.kind === "stay" ? "Room stay" : "Table reservation"}</p>
                     </div>
-                    <div className="theme-card-light rounded-[1.35rem] px-5 py-4 shadow-sm">
+                    <div className="hotel-card rounded-[1.35rem] px-5 py-4 shadow-sm">
                       <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Status</p>
                       <p className="mt-2 text-lg font-bold text-[var(--foreground-strong)]">{reservation.status}</p>
                     </div>
-                    <div className="theme-card-light rounded-[1.35rem] px-5 py-4 shadow-sm sm:col-span-2">
+                    <div className="hotel-card rounded-[1.35rem] px-5 py-4 shadow-sm sm:col-span-2">
                       <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Reference ID</p>
                       <p className="mt-2 break-all text-lg font-bold text-[var(--foreground-strong)]">{reservation.reference}</p>
                     </div>
                   </div>
 
-                  <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
+                  <div className="hotel-card rounded-[1.5rem] px-5 py-5 shadow-sm">
                     <div className="grid gap-4 sm:grid-cols-2">
                       <div>
                         <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Guest</p>
                         <p className="mt-2 text-base font-semibold text-[var(--foreground-strong)]">{reservation.guestName}</p>
-                        <p className="mt-1 text-sm theme-muted-page">{reservation.email}</p>
-                        <p className="mt-1 text-sm theme-muted-page">{reservation.phone}</p>
+                        <p className="hotel-muted-page mt-1 text-sm">{reservation.email}</p>
+                        <p className="hotel-muted-page mt-1 text-sm">{reservation.phone}</p>
                       </div>
 
                       {reservation.kind === "stay" ? (
                         <div>
                           <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Stay details</p>
                           <p className="mt-2 text-base font-semibold text-[var(--foreground-strong)]">{reservation.roomName}</p>
-                          <p className="mt-1 text-sm theme-muted-page">{formatDate(reservation.checkInDate)} to {formatDate(reservation.checkOutDate)}</p>
-                          <p className="mt-1 text-sm theme-muted-page">{reservation.nights} night{reservation.nights === 1 ? "" : "s"} · {reservation.adults} adult{reservation.adults === 1 ? "" : "s"}{reservation.children ? `, ${reservation.children} child${reservation.children === 1 ? "" : "ren"}` : ""}</p>
+                          <p className="hotel-muted-page mt-1 text-sm">{formatDate(reservation.checkInDate)} to {formatDate(reservation.checkOutDate)}</p>
+                          <p className="hotel-muted-page mt-1 text-sm">{reservation.nights} night{reservation.nights === 1 ? "" : "s"} · {reservation.adults} adult{reservation.adults === 1 ? "" : "s"}{reservation.children ? `, ${reservation.children} child${reservation.children === 1 ? "" : "ren"}` : ""}</p>
                         </div>
                       ) : (
                         <div>
                           <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Table details</p>
                           <p className="mt-2 text-base font-semibold text-[var(--foreground-strong)]">{formatDate(reservation.reservationDate)} at {reservation.reservationTime}</p>
-                          <p className="mt-1 text-sm theme-muted-page">Party of {reservation.partySize}</p>
-                          <p className="mt-1 text-sm theme-muted-page">{reservation.areaPreference || reservation.occasion || "General lounge reservation"}</p>
+                          <p className="hotel-muted-page mt-1 text-sm">Party of {reservation.partySize}</p>
+                          <p className="hotel-muted-page mt-1 text-sm">{reservation.areaPreference || reservation.occasion || "General lounge reservation"}</p>
                         </div>
                       )}
                     </div>
 
                     {reservation.specialRequests || reservation.preferredArrivalTime || reservation.occasion || reservation.areaPreference ? (
-                      <div className="mt-4 rounded-[1.2rem] bg-white/70 px-4 py-4 text-sm theme-muted-page">
+                      <div className="hotel-card-soft hotel-muted-page mt-4 rounded-[1.2rem] px-4 py-4 text-sm">
                         {reservation.preferredArrivalTime ? <p><span className="font-semibold text-[var(--foreground-strong)]">Arrival:</span> {reservation.preferredArrivalTime}</p> : null}
                         {reservation.areaPreference ? <p><span className="font-semibold text-[var(--foreground-strong)]">Area:</span> {reservation.areaPreference}</p> : null}
                         {reservation.occasion ? <p><span className="font-semibold text-[var(--foreground-strong)]">Occasion:</span> {reservation.occasion}</p> : null}
@@ -207,7 +207,7 @@ export default function HotelManageBookingsPage({ site }) {
                         type="button"
                         onClick={handleCancelReservation}
                         disabled={submitting}
-                        className={`theme-button-secondary mt-5 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
+                        className={`hotel-button-secondary mt-5 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
                       >
                         {submitting ? "Updating..." : "Cancel reservation"}
                       </button>
@@ -215,8 +215,8 @@ export default function HotelManageBookingsPage({ site }) {
                   </div>
                 </div>
               ) : (
-                <div className="mt-6 rounded-[1.5rem] border border-dashed border-[rgba(20,109,126,0.18)] px-6 py-12 text-center">
-                  <p className="theme-muted-page">No reservation loaded yet.</p>
+                <div className="mt-6 rounded-[1.5rem] border border-dashed border-[rgba(188,133,34,0.22)] px-6 py-12 text-center">
+                  <p className="hotel-muted-page">No reservation loaded yet.</p>
                 </div>
               )}
             </section>

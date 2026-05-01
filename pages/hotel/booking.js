@@ -14,14 +14,14 @@ export default function HotelBookingPage({ site, rooms }) {
       </Head>
       <Header siteKey={site.key} />
       <Center>
-        <div className="min-h-screen px-4 py-8 sm:px-8 sm:py-10">
+        <div className="hotel-page min-h-screen px-4 py-8 sm:px-8 sm:py-10">
           <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-            <section className="theme-shell-light rounded-[2rem] p-6 md:p-8">
-              <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
+            <section className="hotel-shell rounded-[2rem] p-6 md:p-8">
+              <span className="hotel-shell-kicker inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
                 Direct reservations
               </span>
-              <h1 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)] sm:text-4xl">Request your room directly</h1>
-              <p className="mt-3 text-base leading-8 theme-muted-page">
+              <h1 className="mt-4 text-3xl font-bold text-[#fff1dc] sm:text-4xl">Request your room directly</h1>
+              <p className="hotel-shell-muted mt-3 text-base leading-8">
                 The hotel side now runs as a direct booking experience. Choose a room type, select your dates, and send the request to the reservations desk without using a cart or stock-managed checkout.
               </p>
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -31,7 +31,7 @@ export default function HotelBookingPage({ site, rooms }) {
                   "Email confirmation to guest and hotel",
                   "Lounge and contact follow-up handled directly",
                 ].map((item) => (
-                  <div key={item} className="theme-card-light rounded-[1.3rem] px-4 py-4 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
+                  <div key={item} className="hotel-shell-card rounded-[1.3rem] px-4 py-4 text-sm font-semibold text-[#fff1dc]">
                     {item}
                   </div>
                 ))}

@@ -7,7 +7,7 @@ export default function SiteHomePage({ site, featuredProduct, newProducts, catal
   return (
     <div>
       <Head>
-        <title>{`${site.displayName} | St Michael's Business Group`}</title>
+        <title>{`${site.displayName} | St Michael's`}</title>
         <meta name="description" content={site.heroDescription} />
       </Head>
       <Header siteKey={site.key} />

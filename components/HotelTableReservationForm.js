@@ -58,13 +58,13 @@ export default function HotelTableReservationForm({
   }
 
   return (
-    <section className="theme-shell-light rounded-[1.75rem] p-6 sm:p-8">
-      <div className="border-b border-[rgba(20,109,126,0.12)] pb-5">
-        <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
+    <section className="hotel-section rounded-[1.75rem] p-6 sm:p-8">
+      <div className="hotel-divider border-b pb-5">
+        <span className="hotel-kicker inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
           Lounge reservations
         </span>
         <h2 className="mt-4 text-2xl font-bold text-[var(--foreground-strong)] sm:text-3xl">{title}</h2>
-        <p className="mt-2 max-w-2xl text-sm leading-7 theme-muted-page sm:text-base sm:leading-8">{intro}</p>
+        <p className="hotel-muted-page mt-2 max-w-2xl text-sm leading-7 sm:text-base sm:leading-8">{intro}</p>
       </div>
 
       <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
@@ -75,7 +75,7 @@ export default function HotelTableReservationForm({
               type="text"
               value={formValues.guestName}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, guestName: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -85,7 +85,7 @@ export default function HotelTableReservationForm({
               type="email"
               value={formValues.email}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, email: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -98,7 +98,7 @@ export default function HotelTableReservationForm({
               type="tel"
               value={formValues.phone}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, phone: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -107,7 +107,7 @@ export default function HotelTableReservationForm({
             <select
               value={formValues.partySize}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, partySize: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             >
               {[2, 3, 4, 5, 6, 8, 10].map((value) => (
                 <option key={value} value={String(value)}>
@@ -126,7 +126,7 @@ export default function HotelTableReservationForm({
               value={formValues.reservationDate}
               min={defaultReservationDate}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, reservationDate: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
           </label>
@@ -135,7 +135,7 @@ export default function HotelTableReservationForm({
             <select
               value={formValues.reservationTime}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, reservationTime: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             >
               {["1:00 PM", "3:00 PM", "5:00 PM", "7:00 PM", "9:00 PM"].map((time) => (
                 <option key={time} value={time}>
@@ -152,7 +152,7 @@ export default function HotelTableReservationForm({
             <select
               value={formValues.areaPreference}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, areaPreference: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             >
               <option value="">No preference</option>
               <option value="Indoor lounge">Indoor lounge</option>
@@ -168,7 +168,7 @@ export default function HotelTableReservationForm({
               value={formValues.occasion}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, occasion: event.target.value }))}
               placeholder="Birthday dinner, business meeting, date night"
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
             />
           </label>
         </div>
@@ -180,7 +180,7 @@ export default function HotelTableReservationForm({
             value={formValues.specialRequests}
             onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, specialRequests: event.target.value }))}
             placeholder="Dietary notes, celebration setup, accessibility needs, or service preferences."
-            className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+            className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
           />
         </label>
 
@@ -193,7 +193,7 @@ export default function HotelTableReservationForm({
         <button
           type="submit"
           disabled={submitting}
-          className={`theme-button-accent inline-flex min-h-[3.2rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
+          className={`hotel-button-primary inline-flex min-h-[3.2rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold ${submitting ? "opacity-70" : ""}`}
         >
           {submitting ? "Sending request..." : submitLabel}
         </button>

@@ -16,7 +16,7 @@ export default function AppLoaderOverlay() {
           />
         </div>
         <p className="app-loader-title">{STORE_DETAILS.displayName}</p>
-        <p className="app-loader-copy">Preparing your storefront experience...</p>
+        <p className="app-loader-copy">Preparing your experience...</p>
         <div className="app-loader-progress" aria-hidden="true">
           <span />
         </div>

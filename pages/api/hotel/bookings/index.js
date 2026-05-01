@@ -9,6 +9,7 @@ import {
   buildHotelReservationConfirmationUrl,
   createHotelReservationAccessToken,
 } from "@/lib/hotelReservationAccess";
+import { createHotelEmailHtml, HOTEL_BRAND_NAME } from "@/lib/hotelEmailTemplates";
 import { STORE_DETAILS } from "@/lib/storeDetails";
 
 const MS_PER_NIGHT = 24 * 60 * 60 * 1000;
@@ -107,6 +108,7 @@ async function sendBookingEmails({ booking, accessToken, req }) {
       return;
     }
 
+    const hotelMailLabel = HOTEL_BRAND_NAME;
     const stayWindow = `${booking.checkInDate.toISOString().slice(0, 10)} to ${booking.checkOutDate.toISOString().slice(0, 10)}`;
     const roomLabel = booking.roomName || "General stay request";
     const confirmationUrl = buildHotelReservationConfirmationUrl({
@@ -130,19 +132,61 @@ async function sendBookingEmails({ booking, accessToken, req }) {
     ]
       .filter(Boolean)
       .join("\n");
+    const guestSummary = [
+      `Reference ID: ${booking._id}`,
+      `Requested room: ${roomLabel}`,
+      `Stay dates: ${stayWindow}`,
+      `Guests: ${booking.adults} adult${booking.adults === 1 ? "" : "s"}${booking.children ? `, ${booking.children} child${booking.children === 1 ? "" : "ren"}` : ""}`,
+      booking.preferredArrivalTime ? `Preferred arrival: ${booking.preferredArrivalTime}` : null,
+      confirmationUrl ? `View confirmation: ${confirmationUrl}` : null,
+      manageUrl ? `Manage booking: ${manageUrl}` : null,
+    ]
+      .filter(Boolean)
+      .join("\n");
+    const commonRows = [
+      { label: "Reference ID", value: String(booking._id) },
+      { label: "Requested room", value: roomLabel },
+      { label: "Stay dates", value: stayWindow },
+      {
+        label: "Guests",
+        value: `${booking.adults} adult${booking.adults === 1 ? "" : "s"}${booking.children ? `, ${booking.children} child${booking.children === 1 ? "" : "ren"}` : ""}`,
+      },
+      booking.phone ? { label: "Phone", value: booking.phone } : null,
+      booking.preferredArrivalTime ? { label: "Preferred arrival", value: booking.preferredArrivalTime } : null,
+      booking.specialRequests ? { label: "Notes", value: booking.specialRequests } : null,
+    ].filter(Boolean);
 
     await Promise.all([
       transporter.sendMail({
-        from: getMailFromAddress("St Michael's Hotel"),
+        from: getMailFromAddress(hotelMailLabel),
         to: STORE_DETAILS.email,
-        subject: `New hotel booking request: ${roomLabel}`,
-        text: `A new hotel booking request has been submitted.\n\n${requestSummary}`,
+        subject: `New reservation request for ${hotelMailLabel}: ${roomLabel}`,
+        text: `A new reservation request has been submitted for ${hotelMailLabel}.\n\n${requestSummary}`,
+        html: createHotelEmailHtml({
+          eyebrow: "New hotel reservation request",
+          title: `New request for ${roomLabel}`,
+          intro: `A new room request has been submitted for ${hotelMailLabel}. Review the guest details below and continue from the reservation tools.`,
+          rows: commonRows,
+          primaryAction: confirmationUrl ? { label: "Open confirmation", href: confirmationUrl } : null,
+          secondaryAction: manageUrl ? { label: "Manage bookings", href: manageUrl } : null,
+          closing: "Use the reservation tools to review the request and coordinate any follow-up with the guest.",
+        }),
       }),
       transporter.sendMail({
-        from: getMailFromAddress("St Michael's Hotel"),
+        from: getMailFromAddress(hotelMailLabel),
         to: booking.email,
-        subject: "Your hotel booking request has been received",
-        text: `Hi ${booking.guestName},\n\nWe have received your booking request for ${roomLabel}.\n\n${requestSummary}\n\nOur reservations desk will contact you shortly to confirm availability and finalize your stay.`,
+        subject: `${hotelMailLabel} booking request received`,
+        text: `Hi ${booking.guestName},\n\nThank you for choosing ${hotelMailLabel}. We have received your booking request for ${roomLabel}.\n\n${guestSummary}\n\nOur reservations desk will contact you shortly to confirm availability and finalize your stay.`,
+        html: createHotelEmailHtml({
+          eyebrow: "Booking request received",
+          title: "Your stay request is in review",
+          greeting: `Hi ${booking.guestName},`,
+          intro: `Thank you for choosing ${hotelMailLabel}. We have received your booking request for ${roomLabel} and will review availability shortly.`,
+          rows: commonRows,
+          primaryAction: confirmationUrl ? { label: "View confirmation", href: confirmationUrl } : null,
+          secondaryAction: manageUrl ? { label: "Manage booking", href: manageUrl } : null,
+          closing: "Our reservations desk will contact you shortly to confirm availability and finalize your stay.",
+        }),
       }),
     ]);
   } catch (error) {

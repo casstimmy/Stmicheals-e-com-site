@@ -4,6 +4,7 @@ import HotelBooking from "@/models/HotelBooking";
 import HotelTableReservation from "@/models/HotelTableReservation";
 import { createMailTransport, getMailFromAddress } from "@/lib/mail";
 import { buildHotelManageBookingsUrl } from "@/lib/hotelReservationAccess";
+import { createHotelEmailHtml, HOTEL_BRAND_NAME } from "@/lib/hotelEmailTemplates";
 import { STORE_DETAILS } from "@/lib/storeDetails";
 import { normalizeCustomerEmail } from "@/lib/customerAuth";
 
@@ -88,25 +89,59 @@ async function sendCancellationEmails({ kind, reservation, req }) {
     const summary = [...summaryLines, manageUrl ? `Manage reservations: ${manageUrl}` : null]
       .filter(Boolean)
       .join("\n");
+    const rows = [
+      { label: kind === "stay" ? "Booking ID" : "Reservation ID", value: String(reservation._id) },
+      { label: "Guest", value: reservation.guestName },
+      kind === "stay"
+        ? { label: "Stay", value: `${reservation.checkInDate.toISOString().slice(0, 10)} to ${reservation.checkOutDate.toISOString().slice(0, 10)}` }
+        : { label: "Date", value: reservation.reservationDate.toISOString().slice(0, 10) },
+      kind === "stay"
+        ? { label: "Room", value: reservation.roomName || "Any available room" }
+        : { label: "Time", value: reservation.reservationTime },
+      kind === "stay"
+        ? {
+            label: "Guests",
+            value: `${reservation.adults} adult${reservation.adults === 1 ? "" : "s"}${reservation.children ? `, ${reservation.children} child${reservation.children === 1 ? "" : "ren"}` : ""}`,
+          }
+        : { label: "Party size", value: String(reservation.partySize) },
+      { label: "Phone", value: reservation.phone },
+    ].filter(Boolean);
 
     await Promise.all([
       transporter.sendMail({
-        from: getMailFromAddress("St Michael's Hotel"),
+        from: getMailFromAddress(HOTEL_BRAND_NAME),
         to: STORE_DETAILS.email,
         subject:
           kind === "stay"
             ? `Hotel booking cancelled by guest: ${reservation.roomName || "Stay request"}`
             : `Lounge reservation cancelled by guest: ${reservation.guestName}`,
         text: `A guest cancelled a ${kind === "stay" ? "room booking" : "table reservation"} request.\n\n${summary}`,
+        html: createHotelEmailHtml({
+          eyebrow: kind === "stay" ? "Room booking cancelled" : "Lounge reservation cancelled",
+          title: kind === "stay" ? "A guest cancelled a stay request" : "A guest cancelled a table request",
+          intro: `A guest has cancelled a ${kind === "stay" ? "room booking" : "table reservation"} request for ${HOTEL_BRAND_NAME}.`,
+          rows,
+          primaryAction: manageUrl ? { label: "Manage reservations", href: manageUrl } : null,
+          closing: "Review the reservation dashboard if any further staff action is required.",
+        }),
       }),
       transporter.sendMail({
-        from: getMailFromAddress("St Michael's Hotel"),
+        from: getMailFromAddress(HOTEL_BRAND_NAME),
         to: reservation.email,
         subject:
           kind === "stay"
             ? "Your hotel booking request has been cancelled"
             : "Your lounge reservation has been cancelled",
         text: `Hi ${reservation.guestName},\n\nYour ${kind === "stay" ? "hotel booking request" : "lounge reservation"} has been cancelled successfully.\n\n${summary}\n\nIf you need a new reservation, you can submit another request at any time.`,
+        html: createHotelEmailHtml({
+          eyebrow: kind === "stay" ? "Stay request cancelled" : "Lounge request cancelled",
+          title: kind === "stay" ? "Your booking request has been cancelled" : "Your table request has been cancelled",
+          greeting: `Hi ${reservation.guestName},`,
+          intro: `Your ${kind === "stay" ? "hotel booking request" : "lounge reservation"} has been cancelled successfully.`,
+          rows,
+          primaryAction: manageUrl ? { label: "Manage reservations", href: manageUrl } : null,
+          closing: "If you need a new reservation, you can submit another request at any time.",
+        }),
       }),
     ]);
   } catch (error) {

@@ -20,10 +20,10 @@ export default function LandingGateway() {
   return (
     <>
       <Head>
-        <title>St Michael&apos;s Business Group</title>
+        <title>St Michael&apos;s</title>
         <meta
           name="description"
-          content="Choose between the store and hotel side of St Michael&apos;s business services."
+          content="Choose between the store and hotel side of St Michael&apos;s."
         />
       </Head>
 
@@ -33,10 +33,10 @@ export default function LandingGateway() {
             <div className="grid gap-10 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
               <div>
                 <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
-                  Business site gateway
+                  St Michael&apos;s gateway
                 </span>
                 <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[1.04] text-[var(--foreground-strong)] sm:text-5xl">
-                  Choose the side of the business you want to enter.
+                  Choose the experience you want to enter.
                 </h1>
                 <p className="mt-5 max-w-2xl text-base leading-8 theme-muted-page sm:text-lg">
                   The public site now separates warehouse-store operations from hotel-facing operations.
@@ -80,7 +80,7 @@ export default function LandingGateway() {
                     />
                   </div>
                   <h2 className="mt-6 text-3xl font-bold text-[var(--foreground-strong)]">
-                    One business. Two public experiences.
+                    One name. Two public experiences.
                   </h2>
                   <p className="mt-4 text-sm leading-7 theme-muted-page sm:text-base">
                     Products are now filtered by their assigned locations so warehouse products appear on the
