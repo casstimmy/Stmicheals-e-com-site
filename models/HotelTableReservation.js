@@ -1,21 +1,12 @@
 import mongoose from "mongoose";
 import { PUBLIC_SITE_KEYS } from "@/lib/publicSite";
 
-const HotelBookingSchema = new mongoose.Schema(
+const HotelTableReservationSchema = new mongoose.Schema(
   {
     siteKey: {
       type: String,
       enum: [PUBLIC_SITE_KEYS.HOTEL],
       default: PUBLIC_SITE_KEYS.HOTEL,
-    },
-    roomProduct: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
-    },
-    roomName: {
-      type: String,
-      trim: true,
-      default: "",
     },
     guestName: {
       type: String,
@@ -33,30 +24,26 @@ const HotelBookingSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    checkInDate: {
+    reservationDate: {
       type: Date,
       required: true,
     },
-    checkOutDate: {
-      type: Date,
+    reservationTime: {
+      type: String,
       required: true,
+      trim: true,
     },
-    nights: {
+    partySize: {
       type: Number,
       required: true,
       min: 1,
     },
-    adults: {
-      type: Number,
-      default: 1,
-      min: 1,
+    areaPreference: {
+      type: String,
+      trim: true,
+      default: "",
     },
-    children: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
-    preferredArrivalTime: {
+    occasion: {
       type: String,
       trim: true,
       default: "",
@@ -79,4 +66,4 @@ const HotelBookingSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.models.HotelBooking || mongoose.model("HotelBooking", HotelBookingSchema);
+export default mongoose.models.HotelTableReservation || mongoose.model("HotelTableReservation", HotelTableReservationSchema);

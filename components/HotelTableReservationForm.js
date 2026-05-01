@@ -13,35 +13,27 @@ function formatDateInput(value) {
   return new Date(value.getTime() - value.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
 
-export default function HotelBookingForm({
-  rooms,
-  selectedRoomId = "",
-  title = "Book your stay",
-  intro = "Send a room request directly to the reservations desk and we will confirm availability shortly.",
-  submitLabel = "Send booking request",
-  compact = false,
+export default function HotelTableReservationForm({
+  title = "Reserve a table",
+  intro = "Send a lounge table request directly to the hotel and we will confirm your table shortly.",
+  submitLabel = "Send table request",
 }) {
   const router = useRouter();
   const today = useMemo(() => new Date(), []);
-  const defaultCheckIn = useMemo(() => formatDateInput(addDays(today, 1)), [today]);
-  const defaultCheckOut = useMemo(() => formatDateInput(addDays(today, 2)), [today]);
+  const defaultReservationDate = useMemo(() => formatDateInput(addDays(today, 1)), [today]);
   const [formValues, setFormValues] = useState({
-    roomId: selectedRoomId,
     guestName: "",
     email: "",
     phone: "",
-    checkInDate: defaultCheckIn,
-    checkOutDate: defaultCheckOut,
-    adults: "1",
-    children: "0",
-    preferredArrivalTime: "",
+    reservationDate: defaultReservationDate,
+    reservationTime: "7:00 PM",
+    partySize: "2",
+    areaPreference: "",
+    occasion: "",
     specialRequests: "",
   });
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const queryRoomId = typeof router.query.roomId === "string" ? router.query.roomId : "";
-  const effectiveRoomId = selectedRoomId || formValues.roomId || queryRoomId;
-  const selectedRoom = (rooms || []).find((room) => String(room._id) === String(effectiveRoomId));
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -49,22 +41,16 @@ export default function HotelBookingForm({
     setErrorMessage("");
 
     try {
-      const response = await axios.post("/api/hotel/bookings", {
-        ...formValues,
-        roomId: effectiveRoomId,
-        roomName: selectedRoom?.name || "",
-      });
-
+      const response = await axios.post("/api/hotel/table-reservations", formValues);
       const confirmationQuery = response.data.accessToken
         ? `?token=${encodeURIComponent(response.data.accessToken)}`
         : "";
-
       await router.push(
-        `${getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, `/booking/confirmation/${response.data.bookingId}`)}${confirmationQuery}`
+        `${getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, `/reserve-table/confirmation/${response.data.reservationId}`)}${confirmationQuery}`
       );
     } catch (error) {
       setErrorMessage(
-        error.response?.data?.message || "We could not send the booking request right now."
+        error.response?.data?.message || "We could not send the table reservation right now."
       );
     } finally {
       setSubmitting(false);
@@ -72,39 +58,16 @@ export default function HotelBookingForm({
   }
 
   return (
-    <section className={`theme-shell-light rounded-[1.75rem] ${compact ? "p-5 sm:p-6" : "p-6 sm:p-8"}`}>
+    <section className="theme-shell-light rounded-[1.75rem] p-6 sm:p-8">
       <div className="border-b border-[rgba(20,109,126,0.12)] pb-5">
         <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
-          Reservations
+          Lounge reservations
         </span>
         <h2 className="mt-4 text-2xl font-bold text-[var(--foreground-strong)] sm:text-3xl">{title}</h2>
         <p className="mt-2 max-w-2xl text-sm leading-7 theme-muted-page sm:text-base sm:leading-8">{intro}</p>
       </div>
 
       <form className="mt-6 grid gap-4" onSubmit={handleSubmit}>
-        {selectedRoom ? (
-          <div className="rounded-[1.35rem] bg-[rgba(20,148,182,0.08)] px-5 py-4 text-sm text-[var(--foreground-strong)]">
-            <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.46)]">Selected room</p>
-            <p className="mt-1 text-base font-semibold">{selectedRoom.name}</p>
-          </div>
-        ) : (
-          <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Room type</span>
-            <select
-              value={formValues.roomId}
-              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, roomId: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
-            >
-              <option value="">Any available room</option>
-              {(rooms || []).map((room) => (
-                <option key={room._id} value={room._id}>
-                  {room.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        )}
-
         <div className="grid gap-4 md:grid-cols-2">
           <label className="grid gap-2">
             <span className="text-sm font-semibold text-[var(--foreground-strong)]">Guest name</span>
@@ -140,70 +103,73 @@ export default function HotelBookingForm({
             />
           </label>
           <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Preferred arrival time</span>
+            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Party size</span>
+            <select
+              value={formValues.partySize}
+              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, partySize: event.target.value }))}
+              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+            >
+              {[2, 3, 4, 5, 6, 8, 10].map((value) => (
+                <option key={value} value={String(value)}>
+                  {value} guests
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="grid gap-2">
+            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Reservation date</span>
+            <input
+              type="date"
+              value={formValues.reservationDate}
+              min={defaultReservationDate}
+              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, reservationDate: event.target.value }))}
+              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              required
+            />
+          </label>
+          <label className="grid gap-2">
+            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Reservation time</span>
+            <select
+              value={formValues.reservationTime}
+              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, reservationTime: event.target.value }))}
+              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+            >
+              {["1:00 PM", "3:00 PM", "5:00 PM", "7:00 PM", "9:00 PM"].map((time) => (
+                <option key={time} value={time}>
+                  {time}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-2">
+          <label className="grid gap-2">
+            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Area preference</span>
+            <select
+              value={formValues.areaPreference}
+              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, areaPreference: event.target.value }))}
+              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+            >
+              <option value="">No preference</option>
+              <option value="Indoor lounge">Indoor lounge</option>
+              <option value="Window-side seating">Window-side seating</option>
+              <option value="Rooftop section">Rooftop section</option>
+              <option value="Quiet corner">Quiet corner</option>
+            </select>
+          </label>
+          <label className="grid gap-2">
+            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Occasion</span>
             <input
               type="text"
-              value={formValues.preferredArrivalTime}
-              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, preferredArrivalTime: event.target.value }))}
-              placeholder="Example: 6:00 PM"
+              value={formValues.occasion}
+              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, occasion: event.target.value }))}
+              placeholder="Birthday dinner, business meeting, date night"
               className="theme-input-light rounded-2xl px-4 py-3 outline-none"
             />
-          </label>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Check-in date</span>
-            <input
-              type="date"
-              value={formValues.checkInDate}
-              min={defaultCheckIn}
-              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, checkInDate: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
-              required
-            />
-          </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Check-out date</span>
-            <input
-              type="date"
-              value={formValues.checkOutDate}
-              min={formValues.checkInDate || defaultCheckOut}
-              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, checkOutDate: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
-              required
-            />
-          </label>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Adults</span>
-            <select
-              value={formValues.adults}
-              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, adults: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
-            >
-              {[1, 2, 3, 4].map((value) => (
-                <option key={value} value={String(value)}>
-                  {value}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-2">
-            <span className="text-sm font-semibold text-[var(--foreground-strong)]">Children</span>
-            <select
-              value={formValues.children}
-              onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, children: event.target.value }))}
-              className="theme-input-light rounded-2xl px-4 py-3 outline-none"
-            >
-              {[0, 1, 2, 3].map((value) => (
-                <option key={value} value={String(value)}>
-                  {value}
-                </option>
-              ))}
-            </select>
           </label>
         </div>
 
@@ -213,7 +179,7 @@ export default function HotelBookingForm({
             rows={4}
             value={formValues.specialRequests}
             onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, specialRequests: event.target.value }))}
-            placeholder="Airport pickup, early check-in request, extra bedding, or any other notes."
+            placeholder="Dietary notes, celebration setup, accessibility needs, or service preferences."
             className="theme-input-light rounded-2xl px-4 py-3 outline-none"
           />
         </label>

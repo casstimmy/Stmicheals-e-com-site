@@ -39,10 +39,10 @@ export default function HotelDiningCard({ item }) {
         ) : null}
 
         <Link
-          href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/contact")}
+          href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/reserve-table")}
           className="theme-button-secondary mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-4 py-3 text-sm font-semibold sm:mt-auto"
         >
-          Plan lounge service
+          Reserve a table
         </Link>
       </div>
     </article>

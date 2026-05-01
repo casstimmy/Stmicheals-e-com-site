@@ -1,8 +1,10 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useDeferredValue, useMemo, useState } from "react";
 import Center from "@/components/Center";
 import Header from "@/components/Header";
 import HotelDiningCard from "@/components/HotelDiningCard";
+import { PUBLIC_SITE_KEYS, getPublicSitePath } from "@/lib/publicSite";
 
 export default function HotelLoungePage({ site, dining }) {
   const [query, setQuery] = useState("");
@@ -37,6 +39,14 @@ export default function HotelLoungePage({ site, dining }) {
               </span>
               <h1 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)] sm:text-4xl">Lounge & Dining</h1>
               <p className="mt-2 max-w-2xl theme-muted-page">{site.categoryDescription}</p>
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+                <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/reserve-table")} className="theme-button-accent inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold">
+                  Reserve a table
+                </Link>
+                <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/manage-bookings")} className="theme-card-light inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
+                  Manage reservations
+                </Link>
+              </div>
             </div>
 
             <div className="mt-6 grid gap-4 md:grid-cols-[1.4fr_0.6fr]">

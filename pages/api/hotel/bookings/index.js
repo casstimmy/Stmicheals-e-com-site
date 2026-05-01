@@ -4,6 +4,11 @@ import { Product } from "@/models/Product";
 import HotelBooking from "@/models/HotelBooking";
 import { PUBLIC_SITE_KEYS, productMatchesPublicSite } from "@/lib/publicSite";
 import { createMailTransport, getMailFromAddress } from "@/lib/mail";
+import {
+  buildHotelManageBookingsUrl,
+  buildHotelReservationConfirmationUrl,
+  createHotelReservationAccessToken,
+} from "@/lib/hotelReservationAccess";
 import { STORE_DETAILS } from "@/lib/storeDetails";
 
 const MS_PER_NIGHT = 24 * 60 * 60 * 1000;
@@ -95,7 +100,7 @@ function validatePayload(payload) {
   };
 }
 
-async function sendBookingEmails({ booking }) {
+async function sendBookingEmails({ booking, accessToken, req }) {
   try {
     const transporter = createMailTransport();
     if (!transporter) {
@@ -104,6 +109,13 @@ async function sendBookingEmails({ booking }) {
 
     const stayWindow = `${booking.checkInDate.toISOString().slice(0, 10)} to ${booking.checkOutDate.toISOString().slice(0, 10)}`;
     const roomLabel = booking.roomName || "General stay request";
+    const confirmationUrl = buildHotelReservationConfirmationUrl({
+      req,
+      reservationId: booking._id,
+      kind: "stay",
+      token: accessToken,
+    });
+    const manageUrl = buildHotelManageBookingsUrl(req);
     const requestSummary = [
       `Booking ID: ${booking._id}`,
       `Guest: ${booking.guestName}`,
@@ -113,6 +125,8 @@ async function sendBookingEmails({ booking }) {
       `Phone: ${booking.phone}`,
       booking.preferredArrivalTime ? `Arrival: ${booking.preferredArrivalTime}` : null,
       booking.specialRequests ? `Notes: ${booking.specialRequests}` : null,
+      confirmationUrl ? `Confirmation link: ${confirmationUrl}` : null,
+      manageUrl ? `Manage booking: ${manageUrl}` : null,
     ]
       .filter(Boolean)
       .join("\n");
@@ -176,11 +190,19 @@ export default async function handler(req, res) {
       specialRequests: payload.specialRequests,
     });
 
-    await sendBookingEmails({ booking });
+    const accessToken = createHotelReservationAccessToken({
+      reservationId: booking._id,
+      email: booking.email,
+      kind: "stay",
+      createdAt: booking.createdAt,
+    });
+
+    await sendBookingEmails({ booking, accessToken, req });
 
     return res.status(201).json({
       success: true,
       bookingId: booking._id,
+      accessToken,
       booking: {
         _id: booking._id,
         roomName: booking.roomName,

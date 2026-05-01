@@ -27,7 +27,7 @@ const nextConfig = {
       { source: "/hotel/categories", destination: "/hotel/lounge", permanent: false },
       { source: "/hotel/product/:id", destination: "/hotel/rooms/:id", permanent: false },
       { source: "/hotel/cart", destination: "/hotel/booking", permanent: false },
-      { source: "/hotel/account", destination: "/hotel/contact", permanent: false },
+      { source: "/hotel/account", destination: "/hotel/manage-bookings", permanent: false },
     ];
   },
 };

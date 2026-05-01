@@ -2,6 +2,10 @@ import Head from "next/head";
 import Link from "next/link";
 import Center from "@/components/Center";
 import Header from "@/components/Header";
+import {
+  readHotelReservationAccessToken,
+  verifyHotelReservationAccessToken,
+} from "@/lib/hotelReservationAccess";
 import { mongooseConnect } from "@/lib/mongoose";
 import HotelBooking from "@/models/HotelBooking";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig, getPublicSitePath } from "@/lib/publicSite";
@@ -31,6 +35,11 @@ export default function HotelBookingConfirmationPage({ site, booking }) {
                 <p className="mt-1 text-sm theme-muted-page">{booking.phone}</p>
               </div>
               <div className="theme-card-light rounded-[1.4rem] px-5 py-4 shadow-sm">
+                <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Reference ID</p>
+                <p className="mt-2 break-all text-lg font-bold text-[var(--foreground-strong)]">{booking.reference}</p>
+                <p className="mt-1 text-sm theme-muted-page">Keep this reference for changes or cancellation.</p>
+              </div>
+              <div className="theme-card-light rounded-[1.4rem] px-5 py-4 shadow-sm">
                 <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Requested room</p>
                 <p className="mt-2 text-lg font-bold text-[var(--foreground-strong)]">{booking.roomName || "Any available room"}</p>
                 <p className="mt-1 text-sm theme-muted-page">{booking.nights} night{booking.nights === 1 ? "" : "s"}</p>
@@ -49,6 +58,9 @@ export default function HotelBookingConfirmationPage({ site, booking }) {
               <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/rooms")} className="theme-card-light inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
                 Browse rooms again
               </Link>
+              <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/manage-bookings")} className="theme-card-light inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
+                Manage bookings
+              </Link>
               <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/contact")} className="theme-button-accent inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold">
                 Contact reservations
               </Link>
@@ -62,10 +74,26 @@ export default function HotelBookingConfirmationPage({ site, booking }) {
 
 export async function getServerSideProps(context) {
   try {
-    await mongooseConnect();
-    const booking = await HotelBooking.findById(context.query.id);
+    const reservationId = Array.isArray(context.query.id) ? context.query.id[0] : context.query.id;
+    const token = Array.isArray(context.query.token) ? context.query.token[0] : context.query.token;
+    const tokenPayload = readHotelReservationAccessToken(token);
 
-    if (!booking) {
+    if (!reservationId || !tokenPayload || tokenPayload.kind !== "stay" || tokenPayload.reservationId !== reservationId) {
+      return { notFound: true };
+    }
+
+    await mongooseConnect();
+    const booking = await HotelBooking.findById(reservationId);
+
+    if (
+      !booking ||
+      !verifyHotelReservationAccessToken(token, {
+        reservationId: booking._id,
+        email: booking.email,
+        kind: "stay",
+        createdAt: booking.createdAt,
+      })
+    ) {
       return { notFound: true };
     }
 
@@ -73,6 +101,7 @@ export async function getServerSideProps(context) {
       props: {
         site: getPublicSiteConfig(PUBLIC_SITE_KEYS.HOTEL),
         booking: {
+          reference: String(booking._id),
           guestName: booking.guestName,
           email: booking.email,
           phone: booking.phone,
