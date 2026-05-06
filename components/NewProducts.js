@@ -8,56 +8,117 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
   const insights = catalogInsights || getCatalogInsights(newProducts || []);
 
   return (
-    <div className="px-4 pb-14 sm:px-8">
+    <div className="px-4 pb-14 sm:px-8 lg:pb-16">
       <Center>
-        <section className="theme-shell-light rounded-[2rem] px-6 py-8 md:px-8 md:py-10">
-          <div className="mb-8 flex flex-col gap-6 border-b border-[rgba(20,109,126,0.12)] pb-6">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-              <div>
-                <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
-                  Catalog highlight
-                </span>
-                <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">New {site.shortLabel} Arrivals</h2>
-                <p className="mt-2 max-w-2xl theme-muted-page">
-                  Fresh {site.shortLabel.toLowerCase()} additions with clearer pricing, category context, and stock-aware product cards.
+        <section className="grid gap-6 xl:grid-cols-[0.74fr_1.26fr]">
+          <div className="store-shell rounded-[2rem] px-6 py-7 md:px-8 md:py-8">
+            <span className="store-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em]">
+              Fresh in the warehouse
+            </span>
+            <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">
+              New {site.shortLabel} arrivals with faster decision points.
+            </h2>
+            <p className="mt-3 text-base leading-8 store-shell-muted">
+              The newest published items are grouped with price signals, category paths, and stock-aware cards so customers can move faster without scanning noise.
+            </p>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+              <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                  Published now
+                </p>
+                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">
+                  {newProducts?.length || 0}
                 </p>
               </div>
-              <div className="theme-card-light rounded-2xl px-4 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm">
-                {newProducts?.length || 0} products available now
+              <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                  In stock
+                </p>
+                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">
+                  {insights.availableCount}
+                </p>
+              </div>
+              <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                  Price band
+                </p>
+                <p className="mt-2 text-xl font-bold text-[var(--foreground-strong)]">
+                  ₦{insights.minPrice.toLocaleString()} - ₦{insights.maxPrice.toLocaleString()}
+                </p>
               </div>
             </div>
 
-            {insights.topCategories.length > 0 && (
-              <div className="flex flex-wrap gap-3">
-                {insights.topCategories.map((category) => (
-                  <Link
-                    key={category.name}
-                    href={{
-                      pathname: getPublicSitePath(site.key, "/products"),
-                      query: { category: category.name },
-                    }}
-                    className="theme-card-light inline-flex items-center gap-3 rounded-full px-4 py-2 text-sm font-medium text-[var(--foreground-strong)] shadow-sm"
-                  >
-                    <span>{category.name}</span>
-                    <span className="rounded-full bg-[rgba(22,125,143,0.1)] px-2 py-1 text-xs text-[var(--brand-strong)]">
-                      {category.count}
-                    </span>
-                  </Link>
-                ))}
+            <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4">
+              <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3">
+                <p className="text-sm font-semibold text-[var(--foreground-strong)]">Popular category routes</p>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.48)]">
+                  Top {insights.topCategories.length}
+                </span>
               </div>
-            )}
+
+              <div className="mt-4 grid gap-3">
+                {insights.topCategories.length > 0 ? (
+                  insights.topCategories.map((category) => (
+                    <Link
+                      key={category.name}
+                      href={{
+                        pathname: getPublicSitePath(site.key, "/products"),
+                        query: { category: category.name },
+                      }}
+                      className="store-button-secondary flex items-center justify-between rounded-[1.1rem] px-4 py-3 text-sm font-medium"
+                    >
+                      <span>
+                        <span className="block font-semibold text-[var(--foreground-strong)]">{category.name}</span>
+                        <span className="mt-1 block text-xs text-[rgba(18,52,60,0.56)]">
+                          {category.availableCount} currently available
+                        </span>
+                      </span>
+                      <span className="rounded-full bg-[rgba(31,44,51,0.08)] px-2.5 py-1 text-xs font-semibold text-[rgba(18,52,60,0.72)]">
+                        {category.count}
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-sm store-shell-muted">Category routing will appear here when more items are published.</p>
+                )}
+              </div>
+            </div>
+
+            <Link
+              href={getPublicSitePath(site.key, "/products")}
+              className="store-button-primary mt-6 inline-flex min-h-[3.2rem] items-center justify-center rounded-[1.1rem] px-5 py-3 text-sm font-semibold"
+            >
+              Open full warehouse catalog
+            </Link>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {newProducts?.length > 0 ? (
-              newProducts.map((product) => (
-                <div key={product._id}>
-                  <ProductBox {...product} siteKey={site.key} />
-                </div>
-              ))
-            ) : (
-              <p className="col-span-full text-center theme-muted-page">{site.emptyCatalogMessage}</p>
-            )}
+          <div className="store-shell rounded-[2rem] px-5 py-6 sm:px-6 sm:py-7 md:px-7">
+            <div className="mb-6 flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-5 sm:flex-row sm:items-end sm:justify-between">
+              <div>
+                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                  Available now
+                </p>
+                <h3 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">
+                  Warehouse picks ready for checkout
+                </h3>
+              </div>
+              <p className="max-w-md text-sm leading-7 store-shell-muted">
+                Each card surfaces stock status, pricing, and reviews without overloading the browsing path.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {newProducts?.length > 0 ? (
+                newProducts.map((product) => (
+                  <div key={product._id}>
+                    <ProductBox {...product} siteKey={site.key} />
+                  </div>
+                ))
+              ) : (
+                <p className="col-span-full text-center theme-muted-page">{site.emptyCatalogMessage}</p>
+              )}
+            </div>
           </div>
         </section>
       </Center>

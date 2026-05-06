@@ -23,6 +23,7 @@ export default function CartPage() {
   const router = useRouter();
   const siteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
   const site = getPublicSiteConfig(siteKey);
+  const isHotelSite = siteKey === "hotel";
   const { cartProducts, removeProductFromCart, updateProductQuantity } = useContext(CartContext);
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -60,19 +61,27 @@ export default function CartPage() {
 
   // Fetch shipping cost when city changes
   useEffect(() => {
-    if (customer.city) {
-      axios
-        .post("/api/shipping-cost", { destination: customer.city })
-        .then((res) => {
-          setShippingCost(res.data.cost);
-          setShippingDetails(res.data);
-        })
-        .catch(() => {
-          setShippingCost(2000);
-          setShippingDetails(null);
-        });
+    if (!customer.city) {
+      return;
     }
-  }, [customer.city]);
+
+    if (cartProducts.length === 0) {
+      setShippingCost(0);
+      setShippingDetails(null);
+      return;
+    }
+
+    axios
+      .post("/api/shipping-cost", { destination: customer.city })
+      .then((res) => {
+        setShippingCost(res.data.cost);
+        setShippingDetails(res.data);
+      })
+      .catch(() => {
+        setShippingCost(2000);
+        setShippingDetails(null);
+      });
+  }, [cartProducts.length, customer.city]);
 
   useEffect(() => {
     const ids = cartProducts.map((p) => p.id);
@@ -120,6 +129,7 @@ export default function CartPage() {
         : `${line.product.name} exceeds available stock. Reduce to ${line.availableQuantity}.`
     )
     .join(" ");
+  const storeInputClassName = "mt-1 w-full rounded-[1rem] border border-[rgba(31,44,51,0.12)] bg-white/86 px-4 py-3 text-sm text-[var(--foreground-strong)] outline-none transition focus:border-[rgba(176,114,42,0.38)] focus:ring-4 focus:ring-[rgba(176,114,42,0.1)]";
 
   const handleQuantityChange = (productId, nextQuantity, availableQuantity) => {
     if (availableQuantity === 0) {
@@ -194,6 +204,433 @@ export default function CartPage() {
       setIsLoading(false);
     }
   };
+
+  if (!isHotelSite) {
+    return (
+      <>
+        <Head>
+          <title>{`Your Cart | ${site.displayName}`}</title>
+        </Head>
+
+        <Header siteKey={siteKey} />
+        <Center>
+          <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
+            <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 xl:grid-cols-[1.18fr_0.82fr] xl:gap-6">
+              <div className="store-shell rounded-[2rem] p-4 sm:p-6 lg:p-8">
+                <div className="flex flex-col gap-4 border-b border-[rgba(31,44,51,0.08)] pb-6 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <span className="store-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em]">
+                      Checkout readiness
+                    </span>
+                    <h1 className="mt-4 text-3xl font-extrabold text-[var(--foreground-strong)] sm:text-[2.4rem]">
+                      Cart and delivery review
+                    </h1>
+                    <p className="mt-3 max-w-2xl text-base leading-8 store-shell-muted">
+                      Review stock-aware quantities, confirm delivery details, and start payment only after the server rechecks the final order state.
+                    </p>
+                  </div>
+                  <div className="store-button-secondary inline-flex min-h-[3rem] items-center rounded-[1rem] px-4 py-3 text-sm font-semibold">
+                    {cartLines.length} line{cartLines.length === 1 ? "" : "s"} · {totalItems} item{totalItems === 1 ? "" : "s"}
+                  </div>
+                </div>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                  {[
+                    {
+                      label: "1. Review basket",
+                      detail: "Check live quantity limits before payment starts.",
+                    },
+                    {
+                      label: "2. Confirm delivery",
+                      detail: "Shipping totals update with the selected destination.",
+                    },
+                    {
+                      label: "3. Start payment",
+                      detail: "The server revalidates prices, stock, and totals.",
+                    },
+                  ].map((step) => (
+                    <div key={step.label} className="store-shell-card rounded-[1.35rem] px-4 py-4">
+                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                        {step.label}
+                      </p>
+                      <p className="mt-2 text-sm leading-7 store-shell-muted">{step.detail}</p>
+                    </div>
+                  ))}
+                </div>
+
+                {displayedProducts.length === 0 ? (
+                  <div className="mt-8 rounded-[1.6rem] border border-dashed border-[rgba(31,44,51,0.18)] bg-[rgba(255,255,255,0.62)] px-6 py-14 text-center">
+                    <p className="text-lg store-shell-muted">Your cart is currently empty.</p>
+                    <Link
+                      href={getPublicScopedHref(siteKey, "/")}
+                      className="store-button-accent mt-6 inline-flex min-h-[3.2rem] items-center justify-center rounded-[1rem] px-6 py-3 text-sm font-semibold"
+                    >
+                      Continue shopping
+                    </Link>
+                  </div>
+                ) : (
+                  <>
+                    {hasInventoryIssues && (
+                      <div className="mt-6 rounded-[1.4rem] border border-amber-200/80 bg-amber-50 px-5 py-4 text-sm text-amber-800">
+                        Resolve stock alerts before payment can begin. {inventoryAlertText}
+                      </div>
+                    )}
+
+                    <div className="mt-6 space-y-4 sm:hidden">
+                      {cartLines.map((line) => (
+                        <div key={line.product._id} className="store-shell-card rounded-[1.4rem] p-4">
+                          <div className="flex items-start gap-3">
+                            <Image
+                              src={line.imageSrc}
+                              alt={line.product.name || "Product"}
+                              width={72}
+                              height={72}
+                              className="h-[4.5rem] w-[4.5rem] rounded-[1rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] object-cover"
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                  <h2 className="line-clamp-2 text-sm font-semibold text-[var(--foreground-strong)]">
+                                    {line.product.name}
+                                  </h2>
+                                  <p className="mt-1 text-sm text-[rgba(18,52,60,0.72)]">
+                                    ₦{(line.product.salePriceIncTax || 0).toLocaleString()} each
+                                  </p>
+                                </div>
+                                <button
+                                  onClick={() => removeProductFromCart(line.product._id)}
+                                  className="text-lg text-rose-600 transition hover:text-rose-700"
+                                  aria-label="Remove item"
+                                >
+                                  <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                              </div>
+
+                              <p
+                                className={`mt-2 text-xs leading-6 ${
+                                  line.isSoldOut
+                                    ? "text-rose-600"
+                                    : line.exceedsStock
+                                      ? "text-amber-700"
+                                      : "store-shell-muted"
+                                }`}
+                              >
+                                {line.isSoldOut
+                                  ? "Currently unavailable. Remove before checkout."
+                                  : line.exceedsStock
+                                    ? `Reduce quantity to ${line.availableQuantity} to continue.`
+                                    : `${line.availableQuantity} available for this delivery window`}
+                              </p>
+
+                              <div className="mt-4 flex items-end justify-between gap-3">
+                                <div className="flex items-center gap-2">
+                                  <button
+                                    onClick={() =>
+                                      handleQuantityChange(
+                                        line.product._id,
+                                        line.quantity - 1,
+                                        line.availableQuantity
+                                      )
+                                    }
+                                    aria-label="Decrease quantity"
+                                    disabled={line.quantity <= 1 || line.isSoldOut}
+                                    className="store-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-xl text-lg font-bold disabled:cursor-not-allowed disabled:opacity-50"
+                                  >
+                                    −
+                                  </button>
+                                  <span className="min-w-[2rem] text-center text-sm font-semibold text-[var(--foreground-strong)]">
+                                    {line.quantity}
+                                  </span>
+                                  <button
+                                    onClick={() =>
+                                      handleQuantityChange(
+                                        line.product._id,
+                                        line.quantity + 1,
+                                        line.availableQuantity
+                                      )
+                                    }
+                                    aria-label="Increase quantity"
+                                    disabled={line.isSoldOut || line.quantity >= line.availableQuantity}
+                                    className="store-button-secondary inline-flex h-9 w-9 items-center justify-center rounded-xl text-lg font-bold disabled:cursor-not-allowed disabled:opacity-50"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+
+                                <div className="text-right">
+                                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.46)]">
+                                    Line total
+                                  </p>
+                                  <p className="mt-1 text-sm font-semibold text-[var(--foreground-strong)]">
+                                    ₦{((line.product.salePriceIncTax || 0) * line.quantity).toLocaleString()}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-6 hidden overflow-x-auto sm:block">
+                      <div className="overflow-hidden rounded-[1.6rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.78)]">
+                        <table className="min-w-full text-left text-sm text-[var(--foreground)]">
+                          <thead>
+                            <tr className="bg-[rgba(247,243,236,0.96)] text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.56)]">
+                              <th className="px-4 py-4">Product</th>
+                              <th className="px-4 py-4 text-center">Quantity</th>
+                              <th className="px-4 py-4 text-center">Line total</th>
+                              <th className="px-4 py-4 text-right">Remove</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-[rgba(31,44,51,0.08)]">
+                            {cartLines.map((line, index) => (
+                              <tr
+                                key={line.product._id}
+                                className={index % 2 === 0 ? "bg-white/84" : "bg-[rgba(249,246,240,0.82)]"}
+                              >
+                                <td className="px-4 py-4">
+                                  <div className="flex items-start gap-4">
+                                    <Image
+                                      src={line.imageSrc}
+                                      alt={line.product.name || "Product"}
+                                      width={56}
+                                      height={56}
+                                      className="rounded-[0.95rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] object-cover"
+                                    />
+                                    <div>
+                                      <h2 className="text-sm font-semibold text-[var(--foreground-strong)] sm:text-base">
+                                        {line.product.name}
+                                      </h2>
+                                      <p className="mt-1 text-sm text-[rgba(18,52,60,0.72)]">
+                                        ₦{(line.product.salePriceIncTax || 0).toLocaleString()} each
+                                      </p>
+                                      <p
+                                        className={`mt-2 text-xs leading-6 ${
+                                          line.isSoldOut
+                                            ? "text-rose-600"
+                                            : line.exceedsStock
+                                              ? "text-amber-700"
+                                              : "store-shell-muted"
+                                        }`}
+                                      >
+                                        {line.isSoldOut
+                                          ? "Currently unavailable. Remove before checkout."
+                                          : line.exceedsStock
+                                            ? `Reduce quantity to ${line.availableQuantity} to continue.`
+                                            : `${line.availableQuantity} available for this delivery window`}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </td>
+
+                                <td className="px-4 py-4 text-center">
+                                  <div className="flex items-center justify-center gap-2">
+                                    <button
+                                      onClick={() =>
+                                        handleQuantityChange(
+                                          line.product._id,
+                                          line.quantity - 1,
+                                          line.availableQuantity
+                                        )
+                                      }
+                                      aria-label="Decrease quantity"
+                                      disabled={line.quantity <= 1 || line.isSoldOut}
+                                      className="store-button-secondary h-9 w-9 rounded-xl text-lg font-bold disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                      −
+                                    </button>
+                                    <span className="min-w-[2rem] text-center text-sm font-semibold sm:text-base">
+                                      {line.quantity}
+                                    </span>
+                                    <button
+                                      onClick={() =>
+                                        handleQuantityChange(
+                                          line.product._id,
+                                          line.quantity + 1,
+                                          line.availableQuantity
+                                        )
+                                      }
+                                      aria-label="Increase quantity"
+                                      disabled={line.isSoldOut || line.quantity >= line.availableQuantity}
+                                      className="store-button-secondary h-9 w-9 rounded-xl text-lg font-bold disabled:cursor-not-allowed disabled:opacity-50"
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </td>
+
+                                <td className="px-4 py-4 text-center text-sm font-semibold text-[var(--foreground-strong)] sm:text-base">
+                                  ₦{((line.product.salePriceIncTax || 0) * line.quantity).toLocaleString()}
+                                </td>
+
+                                <td className="px-4 py-4 text-right">
+                                  <button
+                                    onClick={() => removeProductFromCart(line.product._id)}
+                                    className="text-lg text-rose-600 transition hover:text-rose-700 sm:text-xl"
+                                    aria-label="Remove item"
+                                  >
+                                    <FontAwesomeIcon icon={faTrash} />
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div className="mt-6 flex flex-col gap-4 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.7)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Subtotal</p>
+                        <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">₦{subtotal.toLocaleString()}</p>
+                      </div>
+                      <Link
+                        href={getPublicScopedHref(siteKey, "/")}
+                        className="store-button-secondary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold"
+                      >
+                        Continue shopping
+                      </Link>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              <aside className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
+                <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Order summary</h2>
+                <p className="mt-2 text-sm leading-7 store-shell-muted">
+                  Delivery totals update when the destination changes. Payment only begins after the server confirms the final order state.
+                </p>
+
+                <div className="mt-5 space-y-3">
+                  {[
+                    { label: "Items", value: totalItems },
+                    { label: "Subtotal", value: `₦${subtotal.toLocaleString()}` },
+                    { label: "Shipping", value: `₦${shippingCost.toLocaleString()}` },
+                  ].map((item) => (
+                    <div key={item.label} className="store-shell-card flex items-center justify-between rounded-[1.2rem] px-4 py-4 text-sm">
+                      <span className="store-shell-muted">{item.label}</span>
+                      <span className="font-semibold text-[var(--foreground-strong)]">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 rounded-[1.4rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(31,44,51,0.04)] px-4 py-4">
+                  <div className="flex items-center justify-between gap-3 text-[var(--foreground-strong)]">
+                    <span className="text-sm font-semibold uppercase tracking-[0.18em]">Total</span>
+                    <span className="text-2xl font-bold">₦{(subtotal + shippingCost).toLocaleString()}</span>
+                  </div>
+                </div>
+
+                {shippingDetails && (
+                  <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
+                    Delivery quote for {shippingDetails.destination}: ₦{shippingCost.toLocaleString()}
+                    {shippingDetails.isFallback ? " (standard rate applied)" : ""}
+                  </div>
+                )}
+
+                <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.6)] p-4 sm:p-5">
+                  <h3 className="text-lg font-semibold text-[var(--foreground-strong)]">Customer information</h3>
+                  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                    <label className="text-sm font-medium text-[rgba(18,52,60,0.72)] sm:col-span-2">
+                      Full name
+                      <input
+                        type="text"
+                        placeholder="Full Name"
+                        className={storeInputClassName}
+                        value={customer.name}
+                        onChange={(e) =>
+                          setCustomer({ ...customer, name: e.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="text-sm font-medium text-[rgba(18,52,60,0.72)]">
+                      Email address
+                      <input
+                        type="email"
+                        placeholder="Email Address"
+                        className={storeInputClassName}
+                        value={customer.email}
+                        onChange={(e) =>
+                          setCustomer({ ...customer, email: e.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="text-sm font-medium text-[rgba(18,52,60,0.72)]">
+                      Phone number
+                      <input
+                        type="tel"
+                        placeholder="Phone Number"
+                        className={storeInputClassName}
+                        value={customer.phone}
+                        onChange={(e) =>
+                          setCustomer({ ...customer, phone: e.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="text-sm font-medium text-[rgba(18,52,60,0.72)] sm:col-span-2">
+                      Street address
+                      <input
+                        type="text"
+                        placeholder="Street Address"
+                        className={storeInputClassName}
+                        value={customer.address}
+                        onChange={(e) =>
+                          setCustomer({ ...customer, address: e.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="text-sm font-medium text-[rgba(18,52,60,0.72)] sm:col-span-2">
+                      Delivery city
+                      <select
+                        className={storeInputClassName}
+                        value={customer.city}
+                        onChange={(e) =>
+                          setCustomer({ ...customer, city: e.target.value })
+                        }
+                      >
+                        {SUPPORTED_SHIPPING_DESTINATIONS.map((city) => (
+                          <option key={city} value={city}>
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </div>
+
+                {checkoutError && (
+                  <div className="mt-4 rounded-[1.25rem] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                    {checkoutError}
+                  </div>
+                )}
+
+                <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
+                  Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts. Signed-in customers also get profile details prefilled automatically.
+                </div>
+
+                <button
+                  onClick={handleCheckout}
+                  disabled={isLoading || displayedProducts.length === 0 || hasInventoryIssues}
+                  className={`mt-5 w-full min-h-[3.4rem] rounded-[1rem] py-3 text-sm font-semibold transition ${
+                    isLoading || displayedProducts.length === 0 || hasInventoryIssues
+                      ? "bg-[rgba(18,52,60,0.08)] text-[rgba(18,52,60,0.42)] cursor-not-allowed"
+                      : "store-button-accent"
+                  }`}
+                >
+                  {isLoading
+                    ? "Processing..."
+                    : hasInventoryIssues
+                      ? "Resolve stock alerts to continue"
+                      : "Proceed to payment"}
+                </button>
+              </aside>
+            </div>
+          </div>
+        </Center>
+      </>
+    );
+  }
 
   return (
     <>
