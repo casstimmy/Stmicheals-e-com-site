@@ -14,6 +14,7 @@ import {
 import { getPrimaryProductImage, normalizeProductImages, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImages";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig, getPublicSitePath } from "@/lib/publicSite";
 import { resolveHotelCatalogSections, resolveHotelRoomById } from "@/lib/hotelStorefront";
+import { isHotelRoomProduct } from "@/lib/hotelCatalog";
 import { getStorefrontProducts } from "@/lib/storefrontCatalog";
 
 export default function HotelRoomDetailPage({ site, room, relatedRooms }) {
@@ -141,7 +142,7 @@ export async function getServerSideProps(context) {
     const products = await getStorefrontProducts({ site: siteKey });
     const room = resolveHotelRoomById(id, products);
 
-    if (!room) {
+    if (!room || !isHotelRoomProduct(room)) {
       return { notFound: true };
     }
 

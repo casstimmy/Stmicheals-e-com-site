@@ -206,18 +206,14 @@ export default function SiteProductsPage({ site, products }) {
                     </div>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
+                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
                     <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Published items</p>
+                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Products</p>
                       <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{catalogInsights.productCount}</p>
                     </div>
                     <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Available now</p>
+                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Available</p>
                       <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{catalogInsights.availableCount}</p>
-                    </div>
-                    <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Price range</p>
-                      <p className="mt-2 text-xl font-bold text-[var(--foreground-strong)]">₦{catalogInsights.minPrice.toLocaleString()} - ₦{catalogInsights.maxPrice.toLocaleString()}</p>
                     </div>
                   </div>
 
@@ -271,15 +267,12 @@ export default function SiteProductsPage({ site, products }) {
                       <div>
                         <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Current view</p>
                         <h2 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)] sm:text-[2rem]">
-                          {filteredProducts.length} result{filteredProducts.length === 1 ? "" : "s"} ready to review
+                          {filteredProducts.length} result{filteredProducts.length === 1 ? "" : "s"}
                         </h2>
-                        <p className="mt-2 text-sm leading-7 store-shell-muted">
-                          Filter by aisle, search with keywords, or sort by price without losing the current URL state.
-                        </p>
                       </div>
 
                       <div className="store-button-secondary inline-flex min-h-[3rem] items-center rounded-[1rem] px-4 py-3 text-sm font-semibold">
-                        {filteredProducts.length} of {catalogInsights.productCount} published
+                        {catalogInsights.productCount} total
                       </div>
                     </div>
 
@@ -329,11 +322,7 @@ export default function SiteProductsPage({ site, products }) {
                             Clear filters
                           </button>
                         </>
-                      ) : (
-                        <p className="text-sm store-shell-muted">
-                          Search, category routing, and price sorting all update the URL so the catalog view stays shareable.
-                        </p>
-                      )}
+                      ) : null}
                     </div>
                   </div>
 

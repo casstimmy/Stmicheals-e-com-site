@@ -185,15 +185,7 @@ export default function CartPage() {
         return;
       }
 
-      const payRes = await axios.post("/api/paystack/initiate", {
-        orderId,
-      });
-
-      if (payRes.data?.authorizationUrl) {
-        window.location.href = payRes.data.authorizationUrl;
-      } else {
-        setCheckoutError("Failed to initiate payment.");
-      }
+      router.push(getPublicScopedHref(siteKey, `/checkout/order-confirmation/${orderId}`));
     } catch (error) {
       setCheckoutError(
         error.response?.data?.message ||
@@ -226,7 +218,7 @@ export default function CartPage() {
                       Cart and delivery review
                     </h1>
                     <p className="mt-3 max-w-2xl text-base leading-8 store-shell-muted">
-                      Review stock-aware quantities, confirm delivery details, and start payment only after the server rechecks the final order state.
+                      Review stock-aware quantities, confirm delivery details, and place the order after the server rechecks the final order state.
                     </p>
                   </div>
                   <div className="store-button-secondary inline-flex min-h-[3rem] items-center rounded-[1rem] px-4 py-3 text-sm font-semibold">
@@ -245,7 +237,7 @@ export default function CartPage() {
                       detail: "Shipping totals update with the selected destination.",
                     },
                     {
-                      label: "3. Start payment",
+                      label: "3. Place order",
                       detail: "The server revalidates prices, stock, and totals.",
                     },
                   ].map((step) => (
@@ -622,7 +614,7 @@ export default function CartPage() {
                     ? "Processing..."
                     : hasInventoryIssues
                       ? "Resolve stock alerts to continue"
-                      : "Proceed to payment"}
+                      : "Place order and contact us"}
                 </button>
               </aside>
             </div>
@@ -659,7 +651,7 @@ export default function CartPage() {
                     detail: "Shipping costs update instantly by destination.",
                   },
                   {
-                    label: "3. Start payment",
+                    label: "3. Place order",
                     detail: "Order totals are revalidated on the server.",
                   },
                 ].map((step) => (
@@ -1029,7 +1021,7 @@ export default function CartPage() {
                   ? "Processing..."
                   : hasInventoryIssues
                     ? "Resolve stock alerts to continue"
-                    : "Proceed to Payment"}
+                    : "Place order and contact us"}
               </button>
             </div>
           </div>

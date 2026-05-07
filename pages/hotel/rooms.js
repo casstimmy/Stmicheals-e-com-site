@@ -1,4 +1,5 @@
 import HotelRoomsPage from "@/components/HotelRoomsPage";
+import { isHotelRoomProduct } from "@/lib/hotelCatalog";
 import { resolveHotelCatalogSections } from "@/lib/hotelStorefront";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig } from "@/lib/publicSite";
 import { getStorefrontProducts } from "@/lib/storefrontCatalog";
@@ -12,11 +13,12 @@ export async function getServerSideProps() {
     const siteKey = PUBLIC_SITE_KEYS.HOTEL;
     const products = await getStorefrontProducts({ site: siteKey });
     const sections = resolveHotelCatalogSections(products);
+    const rooms = sections.rooms.filter(isHotelRoomProduct);
 
     return {
       props: {
         site: getPublicSiteConfig(siteKey),
-        rooms: JSON.parse(JSON.stringify(sections.rooms)),
+        rooms: JSON.parse(JSON.stringify(rooms)),
       },
     };
   } catch (error) {

@@ -51,16 +51,8 @@ export default function Footer() {
               <p className={`${isHotelSite ? "hotel-shell-muted" : "store-shell-muted"} mt-4 max-w-2xl text-base leading-8`}>
                 {site.key === "hotel"
                   ? "A refined hotel presence with rooms, lounge reservations, and direct guest support gathered into one polished footer."
-                  : `A calmer warehouse storefront with clearer navigation, dependable checkout, and direct access to delivery, support, and policy information.`}
+                  : `A warehouse storefront with support details and policy links.`}
               </p>
-
-              <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                {serviceHighlights.map((highlight) => (
-                  <div key={highlight} className={`${isHotelSite ? "hotel-shell-card text-[#fff1dc]" : "store-shell-card"} rounded-[1.25rem] px-4 py-4 text-sm font-medium shadow-sm`}>
-                    {highlight}
-                  </div>
-                ))}
-              </div>
 
               <div className="mt-5 grid gap-3 min-[420px]:grid-cols-2 xl:max-w-md">
                 {companyLinks.map((link) => (

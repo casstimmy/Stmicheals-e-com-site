@@ -13,13 +13,13 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
         <section className="grid gap-6 xl:grid-cols-[0.74fr_1.26fr]">
           <div className="store-shell rounded-[2rem] px-6 py-7 md:px-8 md:py-8">
             <span className="store-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em]">
-              Fresh in the warehouse
+              New arrivals
             </span>
             <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">
-              New {site.shortLabel} arrivals with faster decision points.
+              New {site.shortLabel} arrivals
             </h2>
             <p className="mt-3 text-base leading-8 store-shell-muted">
-              The newest published items are grouped with price signals, category paths, and stock-aware cards so customers can move faster without scanning noise.
+              The latest items are grouped for quick browsing.
             </p>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
@@ -89,7 +89,7 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
               href={getPublicSitePath(site.key, "/products")}
               className="store-button-primary mt-6 inline-flex min-h-[3.2rem] items-center justify-center rounded-[1.1rem] px-5 py-3 text-sm font-semibold"
             >
-              Open full warehouse catalog
+              Browse products
             </Link>
           </div>
 
@@ -97,14 +97,14 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
             <div className="mb-6 flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-5 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                  Available now
+                  Latest items
                 </p>
                 <h3 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">
-                  Warehouse picks ready for checkout
+                  Products ready to view
                 </h3>
               </div>
               <p className="max-w-md text-sm leading-7 store-shell-muted">
-                Each card surfaces stock status, pricing, and reviews without overloading the browsing path.
+                Each card keeps only the useful details.
               </p>
             </div>
 

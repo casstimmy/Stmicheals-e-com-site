@@ -112,7 +112,7 @@ export default function ProductBox({
                 <p className="mt-2 text-sm leading-6 store-shell-muted">
                     {reviewSummary.count > 0
                         ? `${reviewSummary.averageLabel} / 5 from ${reviewSummary.count} review${reviewSummary.count === 1 ? "" : "s"}`
-                        : "New in the warehouse with no published reviews yet."}
+                        : "No reviews yet."}
                 </p>
 
                 <div className="mt-4 flex items-end justify-between gap-4">
@@ -127,8 +127,8 @@ export default function ProductBox({
 
                 <div className="mt-4 rounded-[1.05rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.78)] px-3.5 py-3 text-sm leading-6 text-[rgba(18,52,60,0.72)]">
                     {isInStock
-                        ? `You can reserve up to ${availableQuantity} unit${availableQuantity === 1 ? "" : "s"} for delivery in the current cart window.`
-                        : "This item is currently unavailable while stock is being refreshed."}
+                        ? `Available for delivery: ${availableQuantity} unit${availableQuantity === 1 ? "" : "s"}.`
+                        : "This item is currently unavailable."}
                 </div>
 
                 <button
