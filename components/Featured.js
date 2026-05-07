@@ -164,24 +164,6 @@ export default function Featured({ product, catalogInsights, site }) {
                   </div>
                 </div>
 
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <div className="rounded-[1.15rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.8)] px-4 py-4">
-                    <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[rgba(18,52,60,0.48)]">
-                      Category
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-[var(--foreground-strong)]">
-                      {product.categoryName || product.category || "Uncategorized"}
-                    </p>
-                  </div>
-                  <div className="rounded-[1.15rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.8)] px-4 py-4">
-                    <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[rgba(18,52,60,0.48)]">
-                      Availability
-                    </p>
-                    <p className="mt-2 text-sm font-semibold text-[var(--foreground-strong)]">
-                      {availableQuantity > 0 ? `${availableQuantity} ready for delivery` : "Temporarily unavailable"}
-                    </p>
-                  </div>
-                </div>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
