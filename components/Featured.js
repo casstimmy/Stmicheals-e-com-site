@@ -35,24 +35,6 @@ export default function Featured({ product, catalogInsights, site }) {
     normalizedDescription && normalizedDescription.toLowerCase() !== (product.name || "").trim().toLowerCase()
       ? normalizedDescription
       : "";
-  const catalogStats = [
-    {
-      label: "Ready to order",
-      value: `${catalogInsights?.availableCount || 0}`,
-      meta: "stock-aware items",
-    },
-    {
-      label: "Active aisles",
-      value: `${catalogInsights?.categoryCount || 0}`,
-      meta: "clear category routes",
-    },
-    {
-      label: "Price entry",
-      value: `₦${catalogInsights?.minPrice?.toLocaleString?.() || "0"}`,
-      meta: "from current catalog",
-    },
-  ];
-
   return (
     <div className="px-4 py-12 sm:px-8 lg:py-16">
       <Center>
@@ -74,28 +56,11 @@ export default function Featured({ product, catalogInsights, site }) {
                 </p>
               ) : null}
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-3">
-                {catalogStats.map((stat) => (
-                  <div key={stat.label} className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.5)]">
-                      {stat.label}
-                    </p>
-                    <p className="mt-3 text-2xl font-bold text-[var(--foreground-strong)]">
-                      {stat.value}
-                    </p>
-                    <p className="mt-1 text-sm store-shell-muted">{stat.meta}</p>
-                  </div>
-                ))}
-              </div>
-
               <div className="mt-8 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4 sm:p-5">
                 <div className="flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.24em] text-[rgba(18,52,60,0.5)]">
-                      Browse with context
-                    </p>
                     <h2 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">
-                      Shop the warehouse by real demand, not clutter.
+                      Browse the current catalog.
                     </h2>
                   </div>
                   <Link
@@ -123,11 +88,7 @@ export default function Featured({ product, catalogInsights, site }) {
                         </span>
                       </Link>
                     ))
-                  ) : (
-                    <p className="text-sm store-shell-muted">
-                      Categories will appear here as more warehouse products are published.
-                    </p>
-                  )}
+                  ) : null}
                 </div>
               </div>
 
@@ -228,17 +189,13 @@ export default function Featured({ product, catalogInsights, site }) {
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                     Checkout standard
                   </p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">
-                    Server checks price, stock, and delivery totals before payment starts.
-                  </p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Simple checkout checks before you place an order.</p>
                 </div>
                 <div className="store-shell-card rounded-[1.5rem] px-5 py-5">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                     Best for
                   </p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">
-                    Repeat household orders, pantry restocks, and quick beverage replenishment.
-                  </p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Everyday orders and quick restocks.</p>
                 </div>
               </div>
             </div>

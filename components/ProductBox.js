@@ -127,7 +127,7 @@ export default function ProductBox({
 
                 <div className="mt-4 rounded-[1.05rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.78)] px-3.5 py-3 text-sm leading-6 text-[rgba(18,52,60,0.72)]">
                     {isInStock
-                        ? `Available for delivery: ${availableQuantity} unit${availableQuantity === 1 ? "" : "s"}.`
+                        ? `${availableQuantity} unit${availableQuantity === 1 ? "" : "s"} available.`
                         : "This item is currently unavailable."}
                 </div>
 

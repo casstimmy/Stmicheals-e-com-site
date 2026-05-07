@@ -18,43 +18,12 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
             <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">
               New {site.shortLabel} arrivals
             </h2>
-            <p className="mt-3 text-base leading-8 store-shell-muted">
-              The latest items are grouped for quick browsing.
-            </p>
-
-            <div className="mt-6 grid gap-3 sm:grid-cols-3 xl:grid-cols-1">
-              <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                  Published now
-                </p>
-                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">
-                  {newProducts?.length || 0}
-                </p>
-              </div>
-              <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                  In stock
-                </p>
-                <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">
-                  {insights.availableCount}
-                </p>
-              </div>
-              <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                  Price band
-                </p>
-                <p className="mt-2 text-xl font-bold text-[var(--foreground-strong)]">
-                  ₦{insights.minPrice.toLocaleString()} - ₦{insights.maxPrice.toLocaleString()}
-                </p>
-              </div>
-            </div>
+            <p className="mt-3 text-base leading-8 store-shell-muted">The latest items are grouped for quick browsing.</p>
 
             <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4">
               <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3">
-                <p className="text-sm font-semibold text-[var(--foreground-strong)]">Popular category routes</p>
-                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.48)]">
-                  Top {insights.topCategories.length}
-                </span>
+                <p className="text-sm font-semibold text-[var(--foreground-strong)]">Popular categories</p>
+                <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.48)]">Top {insights.topCategories.length}</span>
               </div>
 
               <div className="mt-4 grid gap-3">
@@ -68,19 +37,14 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
                       }}
                       className="store-button-secondary flex items-center justify-between rounded-[1.1rem] px-4 py-3 text-sm font-medium"
                     >
-                      <span>
                         <span className="block font-semibold text-[var(--foreground-strong)]">{category.name}</span>
-                        <span className="mt-1 block text-xs text-[rgba(18,52,60,0.56)]">
-                          {category.availableCount} currently available
-                        </span>
-                      </span>
                       <span className="rounded-full bg-[rgba(31,44,51,0.08)] px-2.5 py-1 text-xs font-semibold text-[rgba(18,52,60,0.72)]">
                         {category.count}
                       </span>
                     </Link>
                   ))
                 ) : (
-                  <p className="text-sm store-shell-muted">Category routing will appear here when more items are published.</p>
+                  <p className="text-sm store-shell-muted">Categories will appear here when more items are published.</p>
                 )}
               </div>
             </div>
