@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getPrimaryProductImage } from "@/lib/productImages";
+import { getPrimaryProductImage, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImages";
 import {
   getHotelRoomAmenities,
   getHotelRoomBedLabel,
@@ -9,7 +9,9 @@ import {
 } from "@/lib/hotelCatalog";
 import { PUBLIC_SITE_KEYS, getPublicSitePath } from "@/lib/publicSite";
 
-export default function HotelRoomCard({ room, featured = false }) {
+export default function HotelRoomCard({ room, featured = false, imageLoading, imageFetchPriority }) {
+  const primaryImage = getPrimaryProductImage(room.images);
+  const resolvedImageLoading = imageLoading || (primaryImage === PRODUCT_IMAGE_PLACEHOLDER ? "eager" : undefined);
   const roomHref = getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, `/rooms/${room._id}`);
   const bookingHref = {
     pathname: getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/booking"),
@@ -21,9 +23,11 @@ export default function HotelRoomCard({ room, featured = false }) {
     <article className={`hotel-card flex h-full flex-col overflow-hidden rounded-[1.5rem] ${featured ? "shadow-[0_28px_54px_rgba(7,13,16,0.14)]" : "shadow-sm"}`}>
       <Link href={roomHref} className="relative block h-56 overflow-hidden bg-white sm:h-64">
         <Image
-          src={getPrimaryProductImage(room.images)}
+          src={primaryImage}
           alt={room.name}
           fill
+          loading={resolvedImageLoading}
+          fetchPriority={imageFetchPriority}
           sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 33vw"
           className="object-cover transition duration-500 hover:scale-[1.03]"
         />

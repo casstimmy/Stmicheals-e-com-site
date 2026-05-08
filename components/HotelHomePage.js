@@ -71,7 +71,8 @@ export default function HotelHomePage({ site, rooms, dining, featuredRoom, secti
                     src={featuredRoom ? getPrimaryProductImage(featuredRoom.images) : PRODUCT_IMAGE_PLACEHOLDER}
                     alt={featuredRoom?.name || site.displayName}
                     fill
-                    priority
+                    loading="eager"
+                    fetchPriority="high"
                     sizes="(max-width: 1024px) 100vw, 48vw"
                     className="object-cover"
                   />
@@ -111,8 +112,14 @@ export default function HotelHomePage({ site, rooms, dining, featuredRoom, secti
             </div>
 
             <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-              {previewRooms.map((room) => (
-                <HotelRoomCard key={room._id} room={room} featured />
+              {previewRooms.map((room, index) => (
+                <HotelRoomCard
+                  key={room._id}
+                  room={room}
+                  featured
+                  imageLoading={index === 0 ? "eager" : undefined}
+                  imageFetchPriority={index === 0 ? "high" : undefined}
+                />
               ))}
             </div>
           </section>

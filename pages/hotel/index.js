@@ -10,7 +10,7 @@ export default function HotelHomePage(props) {
 export async function getServerSideProps() {
   try {
     const siteKey = PUBLIC_SITE_KEYS.HOTEL;
-    const resolvedProducts = await getStorefrontProducts({ limit: 12, site: siteKey });
+    const resolvedProducts = await getStorefrontProducts({ site: siteKey });
     const sections = resolveHotelCatalogSections(resolvedProducts);
     const featuredRoom = sections.featuredRoom;
 
