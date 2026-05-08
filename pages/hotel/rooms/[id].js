@@ -131,6 +131,8 @@ export default function HotelRoomDetailPage({ site, room, relatedRooms }) {
                 </Link>
               </div>
 
+            </section>
+
             <HotelBookingForm
               rooms={[room]}
               selectedRoomId={String(room._id)}
