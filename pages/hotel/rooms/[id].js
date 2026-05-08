@@ -10,6 +10,7 @@ import {
   getHotelRoomBedLabel,
   getHotelRoomOccupancy,
   getHotelRoomRateLabel,
+  getHotelPropertyValue,
 } from "@/lib/hotelCatalog";
 import { getPrimaryProductImage, normalizeProductImages, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImages";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig, getPublicSitePath } from "@/lib/publicSite";
@@ -20,6 +21,11 @@ import { getStorefrontProducts } from "@/lib/storefrontCatalog";
 export default function HotelRoomDetailPage({ site, room, relatedRooms }) {
   const galleryImages = normalizeProductImages(room.images);
   const amenities = getHotelRoomAmenities(room);
+  const floorArea = getHotelPropertyValue(room, ["Floor area", "Room size", "Size"]);
+  const viewType = getHotelPropertyValue(room, ["View", "Room view", "Facing"]);
+  const stayStyle = getHotelPropertyValue(room, ["Stay style", "Experience", "Use case"]);
+  const checkInNote = getHotelPropertyValue(room, ["Check-in note", "Arrival", "Access"]);
+  const comfortHighlights = [floorArea, viewType, stayStyle, checkInNote].filter(Boolean);
 
   return (
     <>
@@ -42,6 +48,15 @@ export default function HotelRoomDetailPage({ site, room, relatedRooms }) {
 
               <h1 className="mt-4 text-3xl font-bold text-[#fff1dc] sm:text-4xl">{room.name}</h1>
               <p className="hotel-shell-muted mt-4 text-base leading-8">{room.description}</p>
+
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/booking")} className="hotel-button-primary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold">
+                  Request this stay
+                </Link>
+                <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/rooms")} className="hotel-button-secondary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold">
+                  Back to rooms
+                </Link>
+              </div>
 
               <div className="mt-6 relative overflow-hidden rounded-[1.6rem] bg-[rgba(255,250,243,0.08)]">
                 <Image
@@ -81,6 +96,21 @@ export default function HotelRoomDetailPage({ site, room, relatedRooms }) {
               </div>
 
               <div className="hotel-shell-card mt-6 rounded-[1.5rem] p-5">
+                <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[rgba(245,238,226,0.56)]">More room details</p>
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                  {comfortHighlights.length > 0 ? (
+                    comfortHighlights.map((detail) => (
+                      <div key={detail} className="rounded-[1.1rem] bg-[rgba(255,250,243,0.1)] px-4 py-3 text-sm font-semibold text-[#f6d48a]">
+                        {detail}
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-[rgba(245,238,226,0.72)]">Detailed room notes will appear here when the catalog includes them.</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="hotel-shell-card mt-6 rounded-[1.5rem] p-5">
                 <p className="text-sm font-semibold uppercase tracking-[0.22em] text-[rgba(245,238,226,0.56)]">Included comforts</p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {amenities.map((amenity) => (
@@ -91,15 +121,15 @@ export default function HotelRoomDetailPage({ site, room, relatedRooms }) {
                 </div>
               </div>
 
+
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-                <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/rooms")} className="hotel-button-secondary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold">
-                  Back to rooms
-                </Link>
                 <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/lounge")} className="hotel-button-primary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold">
                   Explore lounge menu
                 </Link>
+                <Link href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/booking")} className="hotel-button-secondary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold">
+                  Request availability
+                </Link>
               </div>
-            </section>
 
             <HotelBookingForm
               rooms={[room]}
