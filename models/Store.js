@@ -17,6 +17,9 @@ const StoreSchema = new mongoose.Schema(
     storeName: { type: String, default: "" },
     companyName: { type: String, default: "" },
     locations: [LocationSchema],
+    shippingBaseCost: { type: Number, default: 2000 },
+    shippingRatePerKm: { type: Number, default: 100 },
+    shippingFallbackCost: { type: Number, default: 2000 },
   },
   { timestamps: true }
 );

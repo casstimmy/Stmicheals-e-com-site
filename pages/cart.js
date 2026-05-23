@@ -36,7 +36,6 @@ export default function CartPage() {
     address: "",
     city: SUPPORTED_SHIPPING_DESTINATIONS[0] || "",
   });
-  const [shippingCost, setShippingCost] = useState(2000);
 
   useEffect(() => {
     axios
@@ -61,24 +60,16 @@ export default function CartPage() {
 
   // Fetch shipping cost when city changes
   useEffect(() => {
-    if (!customer.city) {
-      return;
-    }
-
-    if (cartProducts.length === 0) {
-      setShippingCost(0);
-      setShippingDetails(null);
+    if (!customer.city || cartProducts.length === 0) {
       return;
     }
 
     axios
       .post("/api/shipping-cost", { destination: customer.city })
       .then((res) => {
-        setShippingCost(res.data.cost);
         setShippingDetails(res.data);
       })
       .catch(() => {
-        setShippingCost(2000);
         setShippingDetails(null);
       });
   }, [cartProducts.length, customer.city]);
@@ -120,6 +111,7 @@ export default function CartPage() {
     0
   );
   const totalItems = cartProducts.reduce((sum, item) => sum + item.qty, 0);
+  const shippingCost = cartProducts.length === 0 ? 0 : Number(shippingDetails?.cost || 0);
   const hasInventoryIssues = cartLines.some((line) => line.isSoldOut || line.exceedsStock);
   const inventoryAlertText = cartLines
     .filter((line) => line.isSoldOut || line.exceedsStock)

@@ -52,8 +52,15 @@ export default function OrderConfirmationPage() {
 
         if (paymentReference && !verificationStartedRef.current) {
           verificationStartedRef.current = true;
-          await axios.post("/api/paystack/verify", { reference: paymentReference });
-          clearCartRef.current();
+          try {
+            await axios.post("/api/paystack/verify", { reference: paymentReference });
+          } catch (error) {
+            if (!cancelled) {
+              setVerificationError(
+                error.response?.data?.message || "We could not confirm this payment yet."
+              );
+            }
+          }
         }
 
         const response = await axios.get("/api/orders", {
@@ -61,14 +68,12 @@ export default function OrderConfirmationPage() {
         });
         if (!cancelled) {
           setOrder(response.data);
-          if (response.data?.paid) {
-            clearCartRef.current();
-          }
+          clearCartRef.current();
         }
       } catch (error) {
         if (!cancelled) {
           setVerificationError(
-            error.response?.data?.message || "We could not confirm this payment yet."
+            error.response?.data?.message || "We could not load this order right now."
           );
         }
       } finally {
@@ -176,6 +181,7 @@ export default function OrderConfirmationPage() {
   const orderDate = new Date(order.createdAt).toLocaleString();
   const itemCount = order.items?.length || 0;
   const paymentStatusLabel = order.paid ? "Confirmed" : order.paymentStatus || "Pending";
+  const fulfillmentLabel = order.status === "Delivered" ? "Delivered" : "Inventory Reserved";
 
   return (
     <>
@@ -217,7 +223,7 @@ export default function OrderConfirmationPage() {
               Payment: {paymentStatusLabel}
             </span>
             <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
-              Fulfillment: {order.status}
+              Fulfillment: {fulfillmentLabel}
             </span>
           </div>
 
@@ -228,7 +234,7 @@ export default function OrderConfirmationPage() {
             </div>
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
               <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Fulfillment</p>
-              <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{order.status}</p>
+              <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{fulfillmentLabel}</p>
             </div>
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
               <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Items in order</p>
