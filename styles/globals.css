@@ -15,9 +15,35 @@
   --brand: #167d8f;
   --brand-strong: #0d5e6d;
   --brand-soft: rgba(22, 125, 143, 0.14);
+  --brand-shadow: 0 18px 40px rgba(13, 94, 109, 0.18);
   --accent: #d8ac4f;
   --accent-deep: #ba8418;
+  --accent-soft: rgba(216, 172, 79, 0.16);
+  --accent-shadow: 0 18px 36px rgba(186, 132, 24, 0.18);
+  --surface-secondary: rgba(18, 57, 64, 0.92);
+  --surface-card-light: rgba(255, 255, 255, 0.84);
+  --surface-card-elevated: rgba(255, 255, 255, 0.96);
+  --surface-card-muted: #eef7fa;
+  --border-strong: rgba(64, 132, 146, 0.24);
+  --focus-ring: rgba(216, 172, 79, 0.36);
   --shadow-soft: 0 28px 72px rgba(15, 39, 46, 0.12);
+  --page-glow-primary: rgba(216, 172, 79, 0.2);
+  --page-glow-secondary: rgba(22, 125, 143, 0.12);
+  --theme-shell-bg: linear-gradient(135deg, rgba(255, 252, 245, 0.98), rgba(243, 248, 249, 0.96) 52%, rgba(225, 243, 246, 0.94) 100%);
+  --site-footer-bg: linear-gradient(135deg, rgba(255, 252, 246, 0.94), rgba(244, 248, 247, 0.96) 52%, rgba(231, 241, 241, 0.94) 100%);
+  --store-shell-bg: linear-gradient(180deg, rgba(255, 252, 247, 0.99), rgba(249, 246, 240, 0.98)), linear-gradient(90deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px), linear-gradient(0deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px);
+  --store-shell-accent-bar: linear-gradient(90deg, rgba(176, 114, 42, 0.92), rgba(31, 44, 51, 0.82));
+  --store-header-bg: rgba(255, 251, 245, 0.92);
+  --store-header-topbar-bg: linear-gradient(90deg, rgba(28, 40, 46, 0.97), rgba(42, 58, 65, 0.95));
+  --store-footer-bg: linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(246, 242, 235, 0.98)), linear-gradient(90deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px), linear-gradient(0deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px);
+  --hotel-shell-bg: linear-gradient(145deg, rgba(18, 24, 28, 0.98), rgba(10, 16, 20, 0.95) 52%, rgba(32, 44, 42, 0.94) 100%);
+  --hotel-section-bg: linear-gradient(135deg, rgba(255, 250, 243, 0.98), rgba(246, 239, 227, 0.97) 50%, rgba(232, 241, 238, 0.97) 100%);
+  --hotel-header-bg: rgba(16, 20, 24, 0.78);
+  --hotel-header-topbar-bg: linear-gradient(90deg, rgba(34, 24, 9, 0.96), rgba(67, 49, 18, 0.94) 48%, rgba(28, 42, 40, 0.92));
+  --hotel-footer-bg: linear-gradient(145deg, rgba(19, 25, 29, 0.97), rgba(11, 16, 20, 0.95) 54%, rgba(35, 47, 44, 0.94) 100%);
+  --radius-shell: 1.3rem;
+  --radius-card: 1.05rem;
+  --radius-control: 0.82rem;
 }
 
 * {
@@ -33,9 +59,9 @@ body {
   min-height: 100vh;
   background-color: var(--background);
   background:
-    radial-gradient(circle at top left, rgba(216, 172, 79, 0.2), transparent 24%),
-    radial-gradient(circle at top right, rgba(22, 125, 143, 0.12), transparent 28%),
-    linear-gradient(180deg, #fffdf8 0%, #f7f0e3 40%, #eef4f3 100%);
+    radial-gradient(circle at top left, var(--page-glow-primary), transparent 24%),
+    radial-gradient(circle at top right, var(--page-glow-secondary), transparent 28%),
+    linear-gradient(180deg, rgba(255, 253, 248, 0.98) 0%, var(--background) 40%, var(--surface-card-muted) 100%);
   color: var(--foreground);
   font-family: var(--font-sans), sans-serif;
   text-rendering: optimizeLegibility;
@@ -63,7 +89,7 @@ textarea {
 }
 
 :focus-visible {
-  outline: 3px solid rgba(247, 195, 46, 0.55);
+  outline: 3px solid var(--focus-ring);
   outline-offset: 3px;
 }
 
@@ -138,29 +164,24 @@ h4 {
 }
 
 .theme-shell-light {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 252, 245, 0.98),
-    rgba(243, 248, 249, 0.96) 52%,
-    rgba(225, 243, 246, 0.94) 100%
-  );
-  border: 1px solid rgba(20, 109, 126, 0.14);
-  box-shadow: 0 28px 72px rgba(18, 52, 60, 0.1);
+  background: var(--theme-shell-bg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   color: var(--foreground);
 }
 
 .theme-card-soft {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.07));
   border: 1px solid var(--border-subtle);
-  box-shadow: 0 12px 32px rgba(3, 27, 34, 0.16);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(12px);
   color: var(--panel-foreground);
 }
 
 .theme-card-light {
-  background: rgba(255, 255, 255, 0.76);
-  border: 1px solid rgba(20, 109, 126, 0.12);
-  box-shadow: 0 14px 34px rgba(18, 52, 60, 0.08);
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(12px);
   color: var(--foreground);
 }
@@ -170,14 +191,14 @@ h4 {
 }
 
 .theme-input {
-  border: 1px solid rgba(111, 220, 243, 0.22);
+  border: 1px solid var(--border-subtle);
   background: rgba(4, 53, 67, 0.5);
   color: var(--panel-foreground);
 }
 
 .theme-input-light {
-  border: 1px solid rgba(20, 109, 126, 0.16);
-  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid var(--border-subtle);
+  background: rgba(255, 255, 255, 0.84);
   color: var(--foreground);
 }
 
@@ -186,7 +207,7 @@ h4 {
 }
 
 .theme-input-readonly {
-  border: 1px solid rgba(20, 109, 126, 0.16);
+  border: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.55);
   color: rgba(18, 52, 60, 0.76);
 }
@@ -198,8 +219,8 @@ h4 {
 .theme-button-accent {
   background: linear-gradient(180deg, var(--accent), var(--accent-deep));
   color: #0f3137;
-  border: 1px solid rgba(186, 132, 24, 0.22);
-  box-shadow: 0 18px 36px rgba(247, 195, 46, 0.2);
+  border: 1px solid var(--accent-soft);
+  box-shadow: var(--accent-shadow);
 }
 
 .theme-button-accent:hover {
@@ -209,8 +230,8 @@ h4 {
 .theme-button-primary {
   background: linear-gradient(180deg, var(--brand), var(--brand-strong));
   color: white;
-  border: 1px solid rgba(111, 220, 243, 0.18);
-  box-shadow: 0 18px 36px rgba(13, 94, 109, 0.18);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--brand-shadow);
 }
 
 .theme-button-primary:hover {
@@ -218,10 +239,10 @@ h4 {
 }
 
 .theme-button-secondary {
-  background: linear-gradient(180deg, rgba(12, 89, 104, 0.86), rgba(8, 68, 80, 0.94));
+  background: linear-gradient(180deg, var(--surface), var(--surface-strong));
   color: var(--panel-foreground);
-  border: 1px solid rgba(111, 220, 243, 0.18);
-  box-shadow: 0 16px 34px rgba(12, 70, 82, 0.16);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
 }
 
 .theme-button-secondary:hover {
@@ -229,9 +250,9 @@ h4 {
 }
 
 .theme-tag {
-  background: rgba(216, 172, 79, 0.12);
-  border: 1px solid rgba(216, 172, 79, 0.36);
-  color: #b57c0b;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--accent-deep);
   box-shadow: 0 10px 24px rgba(186, 132, 24, 0.08);
 }
 
@@ -246,45 +267,37 @@ h4 {
 }
 
 .site-footer-panel {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 252, 246, 0.94),
-    rgba(244, 248, 247, 0.96) 52%,
-    rgba(231, 241, 241, 0.94) 100%
-  );
-  border: 1px solid rgba(22, 125, 143, 0.14);
-  box-shadow: 0 30px 70px rgba(18, 52, 60, 0.08);
+  background: var(--site-footer-bg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(18px);
 }
 
 .theme-footer-link {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(22, 125, 143, 0.12);
+  border: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.68);
   box-shadow: 0 12px 24px rgba(18, 52, 60, 0.05);
 }
 
 .theme-footer-link:hover {
-  background: rgba(22, 125, 143, 0.08);
+  background: var(--brand-soft);
   color: var(--brand-strong);
   transform: translateY(-1px);
 }
 
 .theme-divider {
-  border-color: rgba(22, 125, 143, 0.14);
+  border-color: var(--border-subtle);
 }
 
 .store-shell {
   position: relative;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(255, 252, 247, 0.99), rgba(249, 246, 240, 0.98)),
-    linear-gradient(90deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px);
+  background: var(--store-shell-bg);
   background-size: auto, 32px 32px, 32px 32px;
-  border: 1px solid rgba(31, 44, 51, 0.1);
-  box-shadow: 0 28px 74px rgba(18, 29, 35, 0.08);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   color: var(--foreground);
 }
 
@@ -294,13 +307,13 @@ h4 {
   inset: 0 auto auto 0;
   height: 0.35rem;
   width: 100%;
-  background: linear-gradient(90deg, rgba(176, 114, 42, 0.92), rgba(31, 44, 51, 0.82));
+  background: var(--store-shell-accent-bar);
 }
 
 .store-shell-card {
-  background: rgba(255, 255, 255, 0.84);
-  border: 1px solid rgba(31, 44, 51, 0.1);
-  box-shadow: 0 16px 36px rgba(18, 29, 35, 0.06);
+  background: var(--surface-card-light);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   color: var(--foreground);
 }
 
@@ -309,17 +322,17 @@ h4 {
 }
 
 .store-tag {
-  background: rgba(176, 114, 42, 0.1);
-  border: 1px solid rgba(176, 114, 42, 0.24);
-  color: #8d5a1f;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--accent-deep);
   box-shadow: 0 10px 22px rgba(176, 114, 42, 0.08);
 }
 
 .store-button-primary {
-  background: linear-gradient(180deg, #24353b, #19282e);
+  background: linear-gradient(180deg, var(--brand), var(--brand-strong));
   color: #fffdf8;
-  border: 1px solid rgba(31, 44, 51, 0.2);
-  box-shadow: 0 16px 34px rgba(18, 29, 35, 0.14);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--brand-shadow);
 }
 
 .store-button-primary:hover {
@@ -327,10 +340,10 @@ h4 {
 }
 
 .store-button-accent {
-  background: linear-gradient(180deg, #d59a4f, #b0722a);
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
   color: #1f2427;
-  border: 1px solid rgba(141, 90, 31, 0.18);
-  box-shadow: 0 18px 36px rgba(176, 114, 42, 0.16);
+  border: 1px solid var(--accent-soft);
+  box-shadow: var(--accent-shadow);
 }
 
 .store-button-accent:hover {
@@ -340,7 +353,7 @@ h4 {
 .store-button-secondary {
   background: rgba(255, 255, 255, 0.82);
   color: var(--foreground-strong);
-  border: 1px solid rgba(31, 44, 51, 0.12);
+  border: 1px solid var(--border-subtle);
   box-shadow: 0 12px 24px rgba(18, 29, 35, 0.05);
 }
 
@@ -349,56 +362,53 @@ h4 {
 }
 
 .store-divider {
-  border-color: rgba(31, 44, 51, 0.1);
+  border-color: var(--border-subtle);
 }
 
 .store-header {
-  border-bottom: 1px solid rgba(31, 44, 51, 0.08);
-  background: rgba(255, 251, 245, 0.92);
-  box-shadow: 0 16px 34px rgba(18, 29, 35, 0.06);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--store-header-bg);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(18px);
 }
 
 .store-header-topbar {
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  background: linear-gradient(90deg, rgba(28, 40, 46, 0.97), rgba(42, 58, 65, 0.95));
+  background: var(--store-header-topbar-bg);
   color: rgba(250, 244, 232, 0.94);
 }
 
 .store-header-logo {
-  border: 1px solid rgba(31, 44, 51, 0.08);
+  border: 1px solid var(--border-subtle);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 243, 237, 0.96));
-  box-shadow: 0 12px 28px rgba(18, 29, 35, 0.06);
+  box-shadow: var(--shadow-soft);
 }
 
 .store-footer-panel {
-  background:
-    linear-gradient(180deg, rgba(255, 252, 247, 0.98), rgba(246, 242, 235, 0.98)),
-    linear-gradient(90deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px),
-    linear-gradient(0deg, rgba(31, 44, 51, 0.03) 1px, transparent 1px);
+  background: var(--store-footer-bg);
   background-size: auto, 32px 32px, 32px 32px;
-  border: 1px solid rgba(31, 44, 51, 0.1);
-  box-shadow: 0 28px 68px rgba(18, 29, 35, 0.08);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(12px);
 }
 
 .store-footer-link {
   display: inline-flex;
   align-items: center;
-  border: 1px solid rgba(31, 44, 51, 0.1);
+  border: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 10px 22px rgba(18, 29, 35, 0.04);
   color: var(--foreground-strong);
 }
 
 .store-footer-link:hover {
-  background: rgba(248, 242, 232, 0.92);
-  color: #8d5a1f;
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--brand-strong);
   transform: translateY(-1px);
 }
 
 .store-footer-accent {
-  color: #8d5a1f;
+  color: var(--accent-deep);
 }
 
 .hotel-page {
@@ -413,7 +423,7 @@ h4 {
   height: 24rem;
   width: 24rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(216, 172, 79, 0.18), transparent 66%);
+  background: radial-gradient(circle, var(--page-glow-primary), transparent 66%);
   filter: blur(28px);
   pointer-events: none;
 }
@@ -425,7 +435,7 @@ h4 {
   height: 26rem;
   width: 26rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(18, 82, 78, 0.16), transparent 68%);
+  background: radial-gradient(circle, var(--page-glow-secondary), transparent 68%);
   filter: blur(30px);
   pointer-events: none;
 }
@@ -433,8 +443,8 @@ h4 {
 .hotel-shell {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(145deg, rgba(18, 24, 28, 0.98), rgba(10, 16, 20, 0.95) 52%, rgba(32, 44, 42, 0.94) 100%);
-  border: 1px solid rgba(216, 172, 79, 0.22);
+  background: var(--hotel-shell-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   box-shadow: 0 40px 96px rgba(7, 13, 16, 0.28);
   color: #f5eee2;
 }
@@ -446,7 +456,7 @@ h4 {
   height: 16rem;
   width: 16rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(216, 172, 79, 0.18), transparent 70%);
+  background: radial-gradient(circle, var(--page-glow-primary), transparent 70%);
   filter: blur(20px);
   pointer-events: none;
 }
@@ -458,7 +468,7 @@ h4 {
   height: 18rem;
   width: 18rem;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(49, 88, 83, 0.22), transparent 70%);
+  background: radial-gradient(circle, var(--page-glow-secondary), transparent 70%);
   filter: blur(22px);
   pointer-events: none;
 }
@@ -467,14 +477,14 @@ h4 {
   position: relative;
   background: linear-gradient(180deg, rgba(255, 250, 243, 0.16), rgba(255, 255, 255, 0.08));
   border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(14px);
   color: #f8f0e3;
 }
 
 .hotel-shell-kicker {
-  background: rgba(216, 172, 79, 0.12);
-  border: 1px solid rgba(216, 172, 79, 0.34);
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: #f6d48a;
   box-shadow: 0 12px 26px rgba(216, 172, 79, 0.08);
 }
@@ -484,16 +494,16 @@ h4 {
 }
 
 .hotel-section {
-  background: linear-gradient(135deg, rgba(255, 250, 243, 0.98), rgba(246, 239, 227, 0.97) 50%, rgba(232, 241, 238, 0.97) 100%);
-  border: 1px solid rgba(63, 77, 74, 0.14);
-  box-shadow: 0 28px 72px rgba(12, 21, 27, 0.1);
+  background: var(--hotel-section-bg);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   color: var(--foreground);
 }
 
 .hotel-card {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(252, 247, 239, 0.88));
-  border: 1px solid rgba(63, 77, 74, 0.12);
-  box-shadow: 0 16px 36px rgba(12, 21, 27, 0.08);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(10px);
   color: var(--foreground);
   transition:
@@ -504,19 +514,19 @@ h4 {
 
 .hotel-card-soft {
   background: linear-gradient(180deg, rgba(247, 242, 232, 0.84), rgba(236, 243, 240, 0.82));
-  border: 1px solid rgba(63, 77, 74, 0.12);
+  border: 1px solid var(--border-subtle);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
 .hotel-kicker {
-  background: rgba(216, 172, 79, 0.12);
-  border: 1px solid rgba(216, 172, 79, 0.32);
-  color: #9a6a11;
+  background: var(--accent-soft);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: var(--accent-deep);
   box-shadow: 0 10px 24px rgba(186, 132, 24, 0.08);
 }
 
 .hotel-divider {
-  border-color: rgba(93, 73, 29, 0.16);
+  border-color: var(--border-subtle);
 }
 
 .hotel-muted-page {
@@ -524,7 +534,7 @@ h4 {
 }
 
 .hotel-input-light {
-  border: 1px solid rgba(104, 87, 46, 0.18);
+  border: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.86);
   color: var(--foreground);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
@@ -535,10 +545,10 @@ h4 {
 }
 
 .hotel-button-primary {
-  background: linear-gradient(180deg, #e5c372, #bc8522);
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
   color: #1b1b18;
-  border: 1px solid rgba(117, 78, 19, 0.22);
-  box-shadow: 0 18px 36px rgba(188, 133, 34, 0.18);
+  border: 1px solid var(--accent-soft);
+  box-shadow: var(--accent-shadow);
 }
 
 .hotel-button-primary:hover {
@@ -546,10 +556,10 @@ h4 {
 }
 
 .hotel-button-secondary {
-  background: linear-gradient(180deg, rgba(24, 33, 37, 0.9), rgba(13, 20, 24, 0.96));
+  background: linear-gradient(180deg, var(--surface-strong), var(--surface-secondary));
   color: #f7efe1;
-  border: 1px solid rgba(216, 172, 79, 0.18);
-  box-shadow: 0 18px 40px rgba(8, 12, 15, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--shadow-soft);
 }
 
 .hotel-button-secondary:hover {
@@ -559,8 +569,8 @@ h4 {
 .hotel-button-ghost {
   background: rgba(255, 255, 255, 0.74);
   color: var(--foreground-strong);
-  border: 1px solid rgba(93, 73, 29, 0.14);
-  box-shadow: 0 14px 30px rgba(12, 21, 27, 0.06);
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
 }
 
 .hotel-button-ghost:hover {
@@ -569,39 +579,39 @@ h4 {
 
 .hotel-badge {
   background: rgba(255, 249, 240, 0.94);
-  border: 1px solid rgba(216, 172, 79, 0.2);
+  border: 1px solid var(--accent-soft);
   color: var(--foreground-strong);
 }
 
 .hotel-rate-pill {
-  background: linear-gradient(180deg, rgba(29, 39, 43, 0.94), rgba(16, 24, 28, 0.94));
-  border: 1px solid rgba(216, 172, 79, 0.24);
+  background: linear-gradient(180deg, var(--surface-strong), var(--surface-secondary));
+  border: 1px solid rgba(255, 255, 255, 0.12);
   color: #f8edd8;
 }
 
 .hotel-header {
-  border-bottom: 1px solid rgba(216, 172, 79, 0.14);
-  background: rgba(16, 20, 24, 0.78);
-  box-shadow: 0 18px 42px rgba(7, 13, 16, 0.18);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--hotel-header-bg);
+  box-shadow: var(--shadow-soft);
   backdrop-filter: blur(18px);
 }
 
 .hotel-header-topbar {
-  border-bottom: 1px solid rgba(216, 172, 79, 0.12);
-  background: linear-gradient(90deg, rgba(34, 24, 9, 0.96), rgba(67, 49, 18, 0.94) 48%, rgba(28, 42, 40, 0.92));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--hotel-header-topbar-bg);
   color: #f7ecd7;
 }
 
 .hotel-header-logo {
-  border: 1px solid rgba(216, 172, 79, 0.18);
-  background: linear-gradient(180deg, rgba(26, 32, 35, 0.95), rgba(14, 20, 24, 0.95));
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(180deg, var(--surface-strong), var(--surface-secondary));
+  box-shadow: var(--shadow-soft);
 }
 
 .hotel-footer-panel {
-  background: linear-gradient(145deg, rgba(19, 25, 29, 0.97), rgba(11, 16, 20, 0.95) 54%, rgba(35, 47, 44, 0.94) 100%);
-  border: 1px solid rgba(216, 172, 79, 0.18);
-  box-shadow: 0 34px 82px rgba(7, 13, 16, 0.24);
+  background: var(--hotel-footer-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: var(--shadow-soft);
   color: #f5eee2;
 }
 
@@ -610,7 +620,7 @@ h4 {
   align-items: center;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 250, 243, 0.06);
-  box-shadow: 0 12px 24px rgba(7, 13, 16, 0.08);
+  box-shadow: var(--shadow-soft);
   color: #f5eee2;
   transition:
     transform 220ms ease,
@@ -621,17 +631,17 @@ h4 {
 }
 
 .hotel-footer-link:hover {
-  background: rgba(216, 172, 79, 0.12);
+  background: var(--accent-soft);
   color: #f8d78f;
   transform: translateY(-1px);
 }
 
 .hotel-footer-divider {
-  border-color: rgba(216, 172, 79, 0.16);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 .hotel-footer-accent {
-  color: #f8d78f;
+  color: var(--accent);
 }
 
 .hotel-interactive {
@@ -687,10 +697,10 @@ h4 {
 
 .app-loader-panel {
   width: min(24rem, calc(100vw - 2rem));
-  border-radius: 1.75rem;
-  border: 1px solid rgba(20, 109, 126, 0.16);
+  border-radius: var(--radius-shell);
+  border: 1px solid var(--border-subtle);
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 24px 52px rgba(18, 52, 60, 0.12);
+  box-shadow: var(--shadow-soft);
   padding: 2rem 1.5rem;
   text-align: center;
 }
@@ -701,10 +711,10 @@ h4 {
   height: 6rem;
   width: 6rem;
   place-items: center;
-  border-radius: 1.5rem;
-  border: 1px solid rgba(20, 109, 126, 0.12);
+  border-radius: var(--radius-card);
+  border: 1px solid var(--border-subtle);
   background: #ffffff;
-  box-shadow: 0 18px 36px rgba(18, 52, 60, 0.1);
+  box-shadow: var(--shadow-soft);
   animation: app-loader-float 1.6s ease-in-out infinite;
 }
 
@@ -734,7 +744,7 @@ h4 {
   height: 0.4rem;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(20, 109, 126, 0.12);
+  background: var(--brand-soft);
 }
 
 .app-loader-progress span {
@@ -742,8 +752,38 @@ h4 {
   height: 100%;
   width: 38%;
   border-radius: inherit;
-  background: #167d8f;
+  background: var(--brand);
   animation: app-loader-sweep 1.15s ease-in-out infinite;
+}
+
+.rounded-xl,
+.rounded-2xl {
+  border-radius: var(--radius-card) !important;
+}
+
+.rounded-lg {
+  border-radius: var(--radius-control) !important;
+}
+
+[class*="rounded-[2rem]"],
+[class*="rounded-[1.85rem]"],
+[class*="rounded-[1.75rem]"] {
+  border-radius: var(--radius-shell) !important;
+}
+
+[class*="rounded-[1.6rem]"],
+[class*="rounded-[1.5rem]"],
+[class*="rounded-[1.4rem]"],
+[class*="rounded-[1.35rem]"],
+[class*="rounded-[1.25rem]"] {
+  border-radius: var(--radius-card) !important;
+}
+
+[class*="rounded-[1.2rem]"],
+[class*="rounded-[1.15rem]"],
+[class*="rounded-[1.1rem]"],
+[class*="rounded-[1rem]"] {
+  border-radius: var(--radius-control) !important;
 }
 
 @keyframes app-loader-sweep {
