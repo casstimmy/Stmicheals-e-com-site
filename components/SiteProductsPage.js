@@ -475,14 +475,14 @@ export default function SiteProductsPage({ site, products }) {
                 </>
               ) : (
                 <p className="text-sm theme-muted-page">
-                  Use search, sort, or quick category chips to tighten the catalog view.
+                  Search or browse categories to narrow the catalog.
                 </p>
               )}
               <Link
                 href={getPublicSitePath(site.key, "/categories")}
                 className="theme-card-light rounded-full px-4 py-2 text-sm font-medium text-[var(--foreground-strong)] shadow-sm"
               >
-                Guided category browser
+                Browse categories
               </Link>
             </div>
 

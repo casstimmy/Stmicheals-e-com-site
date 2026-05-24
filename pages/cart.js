@@ -139,9 +139,9 @@ export default function CartPage() {
   const totalAmount = pricingTotals?.total ?? subtotal + shippingCost;
   const quoteDestination = activePricingPreview?.shippingQuote?.destination || customer.city;
   const quoteMessage = activePricingPreview
-    ? `Inventory system quote for ${quoteDestination}: ₦${shippingCost.toLocaleString()}${discountTotal > 0 ? ". Online campaign adjustments are already included." : "."}`
+    ? `Delivery fee for ${quoteDestination}: ₦${shippingCost.toLocaleString()}${discountTotal > 0 ? ". Savings are already included." : "."}`
     : customer.city && cartProducts.length > 0
-      ? "Inventory system recalculating delivery fee and online campaign pricing for this cart."
+      ? "Updating the delivery fee for this address."
       : "";
   const summaryItems = [
     { label: "Items subtotal", value: `₦${baseSubtotal.toLocaleString()}` },
@@ -249,7 +249,7 @@ export default function CartPage() {
                       Cart and delivery review
                     </h1>
                     <p className="mt-3 max-w-2xl text-base leading-8 store-shell-muted">
-                      Review stock-aware quantities, confirm the inventory-driven delivery fee, and place a manual web order that notifies both you and the business.
+                      Review your items, confirm your delivery details, and place your order.
                     </p>
                   </div>
                   <div className="store-button-secondary inline-flex min-h-[3rem] items-center rounded-[1rem] px-4 py-3 text-sm font-semibold">
@@ -261,15 +261,15 @@ export default function CartPage() {
                   {[
                     {
                       label: "1. Review basket",
-                      detail: "Check live quantity limits before payment starts.",
+                      detail: "Check your quantities before placing the order.",
                     },
                     {
                       label: "2. Confirm delivery",
-                      detail: "Inventory pricing and delivery fees refresh for the selected destination.",
+                      detail: "Delivery fees update for your address.",
                     },
                     {
                       label: "3. Place order",
-                      detail: "The order is stored for manual confirmation and email acknowledgement.",
+                      detail: "Place your order and receive confirmation by email.",
                     },
                   ].map((step) => (
                     <div key={step.label} className="store-shell-card rounded-[1.35rem] px-4 py-4">
@@ -295,7 +295,7 @@ export default function CartPage() {
                   <>
                     {hasInventoryIssues && (
                       <div className="mt-6 rounded-[1.4rem] border border-amber-200/80 bg-amber-50 px-5 py-4 text-sm text-amber-800">
-                        Resolve stock alerts before payment can begin. {inventoryAlertText}
+                        Resolve stock alerts before you continue. {inventoryAlertText}
                       </div>
                     )}
 
@@ -522,7 +522,7 @@ export default function CartPage() {
               <aside className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Order summary</h2>
                 <p className="mt-2 text-sm leading-7 store-shell-muted">
-                  Delivery fees and any online campaign adjustments come from the inventory system. Submitting this form saves a manual-entry web order for team confirmation.
+                  Delivery fees and any savings are shown below so you can review the final total before placing your order.
                 </p>
 
                 <div className="mt-5 space-y-3">
@@ -628,7 +628,7 @@ export default function CartPage() {
                 )}
 
                 <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                  Prices, stock, and inventory-driven delivery fees are revalidated on the server before the order is saved. Signed-in customers still get their profile details prefilled automatically, and customer plus business emails are issued after order placement.
+                  Prices and delivery fees are confirmed before your order is placed. Signed-in customers can also use their saved details automatically.
                 </div>
 
                 <button
@@ -644,7 +644,7 @@ export default function CartPage() {
                     ? "Processing..."
                     : hasInventoryIssues
                       ? "Resolve stock alerts to continue"
-                      : "Place manual web order"}
+                      : "Place order"}
                 </button>
               </aside>
             </div>
@@ -674,15 +674,15 @@ export default function CartPage() {
                 {[
                   {
                     label: "1. Review basket",
-                    detail: "Check stock-aware quantities before payment.",
+                    detail: "Check your quantities before placing the order.",
                   },
                   {
                     label: "2. Confirm delivery",
-                    detail: "Inventory pricing and delivery fees refresh for the selected destination.",
+                    detail: "Delivery fees update for your address.",
                   },
                   {
                     label: "3. Place order",
-                    detail: "The order is stored for manual confirmation and email acknowledgement.",
+                    detail: "Place your order and receive confirmation by email.",
                   },
                 ].map((step) => (
                   <div key={step.label} className="theme-card-light rounded-[1.5rem] px-4 py-4 shadow-sm">
@@ -708,7 +708,7 @@ export default function CartPage() {
                 <>
                   {hasInventoryIssues && (
                     <div className="mb-6 rounded-[1.5rem] border border-amber-200/80 bg-amber-50 px-5 py-4 text-sm text-amber-800">
-                      Resolve stock alerts before payment can begin. {inventoryAlertText}
+                      Resolve stock alerts before you continue. {inventoryAlertText}
                     </div>
                   )}
 
@@ -1032,8 +1032,8 @@ export default function CartPage() {
               )}
 
               <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50/85">
-                Prices, stock, and inventory-driven delivery fees are revalidated on the server before the order is saved.
-                Signed-in customers also get profile details prefilled automatically, and customer plus business emails are issued after order placement.
+                Prices and delivery fees are confirmed before your order is placed.
+                Signed-in customers can also use their saved details automatically.
               </div>
 
               <button
@@ -1049,7 +1049,7 @@ export default function CartPage() {
                   ? "Processing..."
                   : hasInventoryIssues
                     ? "Resolve stock alerts to continue"
-                    : "Place manual web order"}
+                    : "Place order"}
               </button>
             </div>
           </div>

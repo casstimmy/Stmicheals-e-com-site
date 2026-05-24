@@ -40,28 +40,28 @@ export default function TermsOfServicePage() {
         {
           heading: "Storefront use",
           body: [
-            "By placing orders through this storefront, customers agree to provide accurate details for fulfillment, payment verification, and customer communication.",
+            "By placing orders through this storefront, customers agree to provide accurate contact, delivery, and payment details.",
             "The store may restrict, suspend, or cancel activity that appears fraudulent, abusive, technically harmful, or inconsistent with lawful use of the service.",
           ],
         },
         {
           heading: "Catalog accuracy and availability",
           body: [
-            "Product listings, prices, and availability are presented in good faith, but inventory and pricing are revalidated by the server before payment begins.",
-            "If stock changes, pricing errors, or service interruptions affect an order, the store may pause or reject checkout until the order can be confirmed correctly.",
+            "Product listings, prices, and availability are presented in good faith, but they may change before checkout is completed.",
+            "If stock changes, pricing errors, or service interruptions affect an order, the store may pause, update, or cancel the order until it can be confirmed correctly.",
           ],
         },
         {
-          heading: "Accounts and verification",
+          heading: "Accounts and sign-in",
           body: [
-            "Customer account access uses email one-time passcodes. Customers are responsible for controlling access to the email address used for sign-in and checkout.",
-            "The store may reject OTP or session activity that appears invalid, expired, abusive, or inconsistent with expected verification controls.",
+            "Customer accounts use email sign-in codes. Customers are responsible for access to the email address used for sign-in and checkout.",
+            "The store may reject sign-in or session activity that appears invalid, expired, abusive, or inconsistent with expected security checks.",
           ],
         },
         {
           heading: "Orders, payments, and service limitations",
           body: [
-            "Orders are not treated as fully completed until payment, inventory reservation, and relevant server-side checks succeed. A payment attempt alone does not guarantee final acceptance if validation fails.",
+            "Orders may need store review or payment confirmation before they are fully accepted. A payment attempt alone does not guarantee final acceptance if a problem is found.",
             "The storefront is provided on a commercially reasonable basis. Temporary service interruptions, third-party provider issues, and network failures may affect access to the service.",
           ],
         },
@@ -71,7 +71,7 @@ export default function TermsOfServicePage() {
       title={site.key === "hotel" ? "Guest Terms of Service" : "Terms of Service"}
       intro={site.key === "hotel"
         ? `These terms describe the rules governing use of the ${site.shortLabel.toLowerCase()} public site, reservation requests, guest communications, and booking confirmation through ${site.displayName}.`
-        : `These terms describe the basic rules governing use of the ${site.shortLabel.toLowerCase()} public site, customer accounts, ordering, and payment initiation through ${site.displayName}.`}
+        : `These terms describe the basic rules for using the ${site.shortLabel.toLowerCase()} public site, customer accounts, and ordering through ${site.displayName}.`}
       sections={sections}
     />
   );

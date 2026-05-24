@@ -40,15 +40,15 @@ export default function ShippingPolicyPage() {
         {
           heading: "Delivery coverage",
           body: [
-            "Delivery availability depends on the supported destinations configured in the inventory system. Delivery fees and eligible online campaign pricing are calculated from that inventory setup for each web order.",
-            "Customers should choose the correct destination and provide a complete address so fulfilment can be coordinated accurately.",
+            "Delivery availability depends on the destinations we currently serve. Delivery fees are shown during checkout and may change if your address or cart changes before you place the order.",
+            "Customers should choose the correct destination and provide a complete address so delivery can be arranged accurately.",
           ],
         },
         {
           heading: "Order processing and confirmation",
           body: [
-            "Fulfilment begins only after the order, stock reservation, and manual payment workflow have been reviewed by the team. Delivery timelines may vary based on destination, order volume, and operational demand.",
-            "Customers should monitor their email and phone contact details for order acknowledgements, manual payment follow-up, or clarification requests related to fulfilment.",
+            "Orders are reviewed after they are placed, and delivery times may vary based on destination, order volume, and store operations.",
+            "Customers should keep their email and phone available for updates, delivery questions, or any follow-up the team may need.",
           ],
         },
         {
@@ -61,8 +61,8 @@ export default function ShippingPolicyPage() {
         {
           heading: "Fees and changes",
           body: [
-            "Displayed delivery fees are part of the server-validated order total and may change if the cart contents, destination, or active online campaigns change before the order is submitted.",
-            "Customers should review the final server-calculated total before placing the order for manual confirmation.",
+            "Displayed delivery fees are part of the final order total and may change if the cart or destination changes before the order is placed.",
+            "Customers should review the final total before placing the order.",
           ],
         },
       ];
@@ -71,7 +71,7 @@ export default function ShippingPolicyPage() {
       title={site.key === "hotel" ? "Guest Service Policy" : "Shipping Policy"}
       intro={site.key === "hotel"
         ? `This policy outlines how reservation follow-up, guest coordination, and service confirmation work for requests placed through the ${site.shortLabel.toLowerCase()} side of the public site.`
-        : `This policy outlines how delivery coverage, inventory-driven fees, and fulfilment coordination work for orders placed through the ${site.shortLabel.toLowerCase()} side of the public site.`}
+        : `This policy outlines how delivery coverage, delivery fees, and order follow-up work for orders placed through the ${site.shortLabel.toLowerCase()} side of the public site.`}
       sections={sections}
     />
   );

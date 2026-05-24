@@ -86,7 +86,7 @@ export default function ProductBox({
                                 ? "bg-emerald-50 text-emerald-700"
                                 : "bg-rose-50 text-rose-700"
                         }`}>
-                            {isInStock ? `${availableQuantity} ready` : "Sold out"}
+                            {isInStock ? "Available" : "Sold out"}
                         </span>
                     </div>
 
@@ -124,13 +124,6 @@ export default function ProductBox({
                         View details
                     </Link>
                 </div>
-
-                <div className="mt-4 rounded-[1.05rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.78)] px-3.5 py-3 text-sm leading-6 text-[rgba(18,52,60,0.72)]">
-                    {isInStock
-                        ? `${availableQuantity} unit${availableQuantity === 1 ? "" : "s"} available.`
-                        : "This item is currently unavailable."}
-                </div>
-
                 <button
                     onClick={handleAddToCart}
                     disabled={!isInStock || hasReachedCartLimit}

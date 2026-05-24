@@ -48,27 +48,22 @@ export default function ProductPage({ product, relatedProducts }) {
   const resolvedDescription =
     normalizedDescription && normalizedDescription.toLowerCase() !== (product.name || "").trim().toLowerCase()
       ? normalizedDescription
-      : "Warehouse-stocked item with live availability, inventory-driven web pricing, and server-validated manual-entry checkout.";
+      : "";
   const detailStats = [
     {
-      label: "Rating",
-      value: reviewSummary.count ? `${reviewSummary.averageLabel} / 5` : "New",
-      meta: reviewSummary.count ? `${reviewSummary.count} published review${reviewSummary.count === 1 ? "" : "s"}` : "No reviews yet",
+      label: "Reviews",
+      value: reviewSummary.count ? `${reviewSummary.averageLabel} / 5` : "No reviews yet",
+      meta: reviewSummary.count ? `${reviewSummary.count} published review${reviewSummary.count === 1 ? "" : "s"}` : "",
     },
     {
-      label: "SKU",
-      value: product.sku || "Pending",
-      meta: "reference identifier",
+      label: "Availability",
+      value: isInStock ? "In stock" : "Unavailable",
+      meta: isInStock ? `${availableQuantity} ready for delivery` : "Check related items below",
     },
     {
       label: "In your cart",
       value: `${cartQuantity}`,
-      meta: "reserved units",
-    },
-    {
-      label: "Availability",
-      value: isInStock ? `${availableQuantity}` : "Paused",
-      meta: isInStock ? "ready for delivery" : "temporarily unavailable",
+      meta: `${cartQuantity} item${cartQuantity === 1 ? "" : "s"} selected`,
     },
   ];
 
@@ -129,7 +124,7 @@ export default function ProductPage({ product, relatedProducts }) {
         <Header siteKey={siteKey} />
         <Center>
           <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
-            <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[1.02fr_0.98fr] xl:items-start">
+            <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] xl:items-start">
               <section className="store-shell rounded-[2rem] p-4 sm:p-6 lg:p-7">
                 <div className="flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
                   <div>
@@ -218,18 +213,20 @@ export default function ProductPage({ product, relatedProducts }) {
                 <h1 className="mt-5 text-3xl font-extrabold text-[var(--foreground-strong)] sm:text-[2.6rem]">
                   {product.name}
                 </h1>
-                <p className="mt-4 text-base leading-8 store-shell-muted">
-                  {resolvedDescription}
-                </p>
+                {resolvedDescription ? (
+                  <p className="mt-4 text-base leading-8 store-shell-muted">
+                    {resolvedDescription}
+                  </p>
+                ) : null}
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <div className="mt-6 grid gap-3 sm:grid-cols-3">
                   {detailStats.map((stat) => (
                     <div key={stat.label} className="store-shell-card rounded-[1.25rem] px-4 py-4">
                       <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                         {stat.label}
                       </p>
                       <p className="mt-2 text-xl font-bold text-[var(--foreground-strong)]">{stat.value}</p>
-                      <p className="mt-1 text-sm store-shell-muted">{stat.meta}</p>
+                      {stat.meta ? <p className="mt-1 text-sm store-shell-muted">{stat.meta}</p> : null}
                     </div>
                   ))}
                 </div>
@@ -241,15 +238,14 @@ export default function ProductPage({ product, relatedProducts }) {
                   <p className="mt-2 text-3xl font-bold text-[#8d5a1f] sm:text-[2.2rem]">
                     ₦{product.salePriceIncTax?.toLocaleString()}
                   </p>
-                  <p className="mt-3 text-sm leading-7 store-shell-muted">
-                    Online campaign pricing and delivery fees are sourced from the inventory system, and the final web order is saved for manual confirmation after checkout.
-                  </p>
                 </div>
 
                 <div className="mt-5 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
                   {availableQuantity === 0
-                    ? "This item is temporarily unavailable. Review related products for alternatives in the same catalog flow."
-                    : `You currently have ${cartQuantity} of ${availableQuantity} available unit${availableQuantity === 1 ? "" : "s"} reserved in your cart.`}
+                    ? "This item is currently unavailable."
+                    : cartQuantity > 0
+                      ? `${cartQuantity} item${cartQuantity === 1 ? "" : "s"} currently in your cart.`
+                      : "Add this item to your cart when you are ready."}
                 </div>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -288,8 +284,8 @@ export default function ProductPage({ product, relatedProducts }) {
               </aside>
             </div>
 
-            <div className="mx-auto mt-8 grid max-w-7xl gap-6 lg:grid-cols-[0.86fr_1.14fr]">
-              <section className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
+            <div className="mx-auto mt-8 grid max-w-7xl gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:items-start">
+              <section className="store-shell-card rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <div className="border-b border-[rgba(31,44,51,0.08)] pb-4">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                     Share your review
@@ -301,7 +297,7 @@ export default function ProductPage({ product, relatedProducts }) {
                 </div>
               </section>
 
-              <section className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
+              <section className="store-shell-card rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <div className="flex flex-col gap-4 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
@@ -363,7 +359,7 @@ export default function ProductPage({ product, relatedProducts }) {
                     ))
                   ) : (
                     <div className="rounded-[1.35rem] border border-dashed border-[rgba(31,44,51,0.18)] px-5 py-10 text-center">
-                      <p className="store-shell-muted">No reviews yet. Be the first to review this product.</p>
+                      <p className="store-shell-muted">No reviews yet.</p>
                     </div>
                   )}
                 </div>
@@ -378,7 +374,7 @@ export default function ProductPage({ product, relatedProducts }) {
                     <h2 className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">More from the same catalog flow</h2>
                   </div>
                   <p className="text-sm leading-7 store-shell-muted">
-                    Related picks are drawn from the same warehouse stream to keep browsing relevant.
+                    Related picks you may also like.
                   </p>
                 </div>
 

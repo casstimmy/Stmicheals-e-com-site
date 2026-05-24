@@ -47,15 +47,15 @@ export default function PrivacyPolicyPage() {
         {
           heading: "How we use your data",
           body: [
-            "Customer data is used to create and manage manual-entry web orders, calculate inventory-driven delivery charges, verify account access with one-time passcodes, and communicate about payment or fulfilment status.",
-            "We do not use your order data for unrelated purposes without a lawful basis, and we limit internal access to the information needed to operate the service.",
+            "Customer data is used to create and manage orders, arrange delivery, send sign-in codes, and share order updates.",
+            "We do not use your order data for unrelated purposes without a lawful basis, and we limit internal access to the information needed to support customers and run the service.",
           ],
         },
         {
           heading: "Payments and communications",
           body: [
-            "Web orders are acknowledged through customer and business email notifications, and the team may follow up directly to complete the manual payment workflow where required.",
-            "Email communication may be used for account verification, order acknowledgements, fulfilment updates, and service follow-up. Customers should ensure their contact details remain accurate for service continuity.",
+            "Order updates may be sent by email, and the team may contact customers directly if more information is needed to complete an order.",
+            "Email communication may be used for sign-in codes, order updates, and support follow-up. Customers should ensure their contact details remain accurate for service continuity.",
           ],
         },
         {
@@ -71,7 +71,7 @@ export default function PrivacyPolicyPage() {
       title="Privacy Policy"
       intro={site.key === "hotel"
         ? `This policy explains how ${site.displayName} handles guest information used for booking requests, table reservations, reservation management, and guest communication.`
-        : `This policy explains how ${site.displayName} handles customer information used for orders, account access, delivery coordination, and manual web-order communication.`}
+        : `This policy explains how ${site.displayName} handles customer information used for orders, account access, and delivery coordination.`}
       sections={sections}
     />
   );

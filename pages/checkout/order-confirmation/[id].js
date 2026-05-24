@@ -30,7 +30,7 @@ function resolvePaymentStatusLabel(order) {
   }
 
   if (MANUAL_PAYMENT_CHANNELS.has(String(order?.paymentChannel || "").trim().toLowerCase())) {
-    return "Manual confirmation pending";
+    return "Awaiting confirmation";
   }
 
   return order?.paymentStatus || "Pending";
@@ -119,10 +119,10 @@ export default function OrderConfirmationPage() {
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
             <div className="max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center shadow-sm">
-              <h1 className="text-2xl font-bold text-amber-900">Order acknowledgement pending</h1>
+              <h1 className="text-2xl font-bold text-amber-900">Order update pending</h1>
               <p className="mt-3 text-amber-800">{loadError}</p>
               <p className="mt-3 text-sm text-amber-700">
-                If you just placed the order, refresh shortly. The team receives the web order for manual confirmation.
+                If you just placed the order, refresh shortly. We may still be updating the latest details.
               </p>
               <Link
                 href={getPublicScopedHref(siteKey, "/")}
@@ -192,10 +192,10 @@ export default function OrderConfirmationPage() {
             Your order has been received
           </h1>
           <p className="mx-auto mb-4 max-w-2xl text-center text-lg theme-muted-page">
-            Order <strong>#{order._id}</strong> was recorded on <em>{orderDate}</em>. Customer and business notifications have been issued, and the team will confirm the manual payment workflow from the inventory system.
+            Order <strong>#{order._id}</strong> was recorded on <em>{orderDate}</em>. We have sent your confirmation email, and the team will contact you if any follow-up is needed.
           </p>
           <p className="mb-8 text-center text-sm theme-muted-page">
-            Any online campaign pricing or delivery fee configured for this cart is already reflected in the invoice below.
+            Your delivery fee and final total are shown below.
           </p>
 
           <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
@@ -205,7 +205,7 @@ export default function OrderConfirmationPage() {
               Payment: {paymentStatusLabel}
             </span>
             <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
-              Fulfillment: {order.status}
+              Status: {order.status}
             </span>
             {order.locationName && (
               <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
@@ -220,7 +220,7 @@ export default function OrderConfirmationPage() {
               <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{paymentStatusLabel}</p>
             </div>
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
-              <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Fulfillment</p>
+              <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Order status</p>
               <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{order.status}</p>
             </div>
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
@@ -247,7 +247,7 @@ export default function OrderConfirmationPage() {
                 </div>
 
                 <div className="mt-6 rounded-[1.25rem] border border-[rgba(20,109,126,0.12)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                  Manual web orders stay visible to the team for payment confirmation and fulfilment. Keep your email and phone available for any follow-up.
+                  Keep your email and phone available in case the team needs to reach you about your order.
                 </div>
               </div>
 

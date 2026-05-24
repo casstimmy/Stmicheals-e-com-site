@@ -26,8 +26,8 @@ export default function ContactPage() {
         {
           heading: "Guest support context",
           body: [
-            `The hotel operates in ${STORE_DETAILS.country}, and the registered location code is ${STORE_DETAILS.locationCode}.`,
-            "Reservation confirmations, arrival coordination, and booking changes may require follow-up communication when guest details or availability need clarification.",
+            "The hotel may follow up if booking details, arrival plans, or availability need clarification.",
+            "Please keep your email and phone available after making a request so the team can respond quickly.",
           ],
         },
       ]
@@ -35,7 +35,7 @@ export default function ContactPage() {
         {
           heading: `How to reach the ${site.shortLabel.toLowerCase()} desk`,
           body: [
-            `Customers can contact the business by email at ${STORE_DETAILS.email} or by phone using ${STORE_DETAILS.phoneNumbers.join(" or ")} for general inquiries, order follow-up, and service questions.`,
+            `Customers can contact the business by email at ${STORE_DETAILS.email} or by phone using ${STORE_DETAILS.phoneNumbers.join(" or ")} for general questions, order updates, and delivery support.`,
             "For faster support, use the same email address connected to the order or account you are asking about.",
           ],
         },
@@ -43,14 +43,14 @@ export default function ContactPage() {
           heading: "Helpful details to include",
           body: [
             "When following up on an order, include your order reference, delivery city, and a short summary of the issue so the team can review the request quickly.",
-            "For account-access questions, mention whether the issue relates to OTP delivery, session access, or profile information so support can respond with the right next step.",
+            "For account-access questions, mention whether the issue relates to your sign-in code, your email address, or your saved details so support can respond with the right next step.",
           ],
         },
         {
-          heading: "Business and delivery context",
+          heading: "When we may follow up",
           body: [
-            `The business operates in ${STORE_DETAILS.country}, and the registered location code is ${STORE_DETAILS.locationCode}.`,
-            `Delivery coordination, ${site.shortLabel.toLowerCase()} totals, and payment confirmation may require follow-up communication when order details need clarification.`,
+            "We may contact you if we need to confirm delivery details, payment information, or another part of your order.",
+            "Please keep your phone and email available after placing an order in case the team needs clarification.",
           ],
         },
       ];
@@ -60,7 +60,7 @@ export default function ContactPage() {
       title="Contact Us"
       intro={isHotelSite
         ? `Reach the ${site.shortLabel.toLowerCase()} side for help with reservations, stay changes, arrival coordination, lounge bookings, or general guest inquiries.`
-        : `Reach the ${site.shortLabel.toLowerCase()} side for help with orders, delivery questions, account verification, or general business inquiries.`}
+        : `Reach the ${site.shortLabel.toLowerCase()} side for help with orders, delivery questions, sign-in codes, or general business inquiries.`}
       sections={sections}
       eyebrow={isHotelSite ? "Guest support" : "Customer support"}
       supportHref="/about"

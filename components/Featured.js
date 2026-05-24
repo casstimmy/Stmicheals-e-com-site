@@ -23,7 +23,7 @@ export default function Featured({ product, catalogInsights, site }) {
   if (!product) {
     return (
       <div className="px-4 py-16 text-center theme-muted-page sm:px-8">
-        We are preparing the featured experience.
+        We are preparing something special for this spot.
       </div>
     );
   }
@@ -36,42 +36,42 @@ export default function Featured({ product, catalogInsights, site }) {
       ? normalizedDescription
       : "";
   return (
-    <div className="px-4 py-12 sm:px-8 lg:py-16">
+    <div className="px-4 py-8 sm:px-8 lg:py-10">
       <Center>
-        <section className="store-shell rounded-[2rem] px-6 py-7 md:px-8 md:py-9 lg:px-10 lg:py-10">
-          <div className="relative mx-auto grid max-w-7xl gap-8 xl:grid-cols-[1.08fr_0.92fr] xl:items-start">
+        <section className="store-shell rounded-[2rem] px-5 py-6 md:px-7 md:py-7 lg:px-8 lg:py-8">
+          <div className="relative mx-auto grid max-w-7xl gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(320px,0.9fr)] xl:items-start">
             <div>
               <span className="store-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em]">
                 {site.heroEyebrow}
               </span>
-              <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-[1.02] text-[var(--foreground-strong)] lg:text-[4.25rem]">
+              <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-[1.02] text-[var(--foreground-strong)] lg:text-[3.95rem]">
                 {site.heroTitle}
               </h1>
-              <p className="mt-5 max-w-3xl text-base leading-8 store-shell-muted lg:text-lg">
+              <p className="mt-4 max-w-3xl text-base leading-8 store-shell-muted lg:text-lg">
                 {site.heroDescription}
               </p>
               {productDescription ? (
-                <p className="mt-4 max-w-3xl text-sm leading-7 text-[rgba(18,52,60,0.66)] sm:text-base">
+                <p className="mt-3 max-w-3xl text-sm leading-7 text-[rgba(18,52,60,0.66)] sm:text-base">
                   Featured pick: {productDescription}
                 </p>
               ) : null}
 
-              <div className="mt-8 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4 sm:p-5">
-                <div className="flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
+              <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4 sm:p-5">
+                <div className="flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <h2 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">
-                      Browse the current catalog.
+                    <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">
+                      Browse the latest products.
                     </h2>
                   </div>
                   <Link
                     href={getPublicSitePath(site.key, "/products")}
-                    className="store-button-secondary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold"
+                    className="store-button-secondary inline-flex min-h-[2.9rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold"
                   >
-                    Browse full catalog
+                    Browse products
                   </Link>
                 </div>
 
-                <div className="mt-4 flex flex-wrap gap-3">
+                <div className="mt-4 flex flex-wrap gap-2.5">
                   {topCategories.length > 0 ? (
                     topCategories.map((category) => (
                       <Link
@@ -92,7 +92,7 @@ export default function Featured({ product, catalogInsights, site }) {
                 </div>
               </div>
 
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link
                   href={getPublicProductPath(site.key, product._id)}
                   className="store-button-primary inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.1rem] px-6 py-3 font-semibold sm:min-w-[12rem]"
@@ -123,15 +123,15 @@ export default function Featured({ product, catalogInsights, site }) {
                 </button>
               </div>
               {availableQuantity === 0 && (
-                <p className="mt-4 text-sm theme-muted-page">
-                  This feature is temporarily unavailable while inventory is refreshed.
+                <p className="mt-3 text-sm theme-muted-page">
+                  This item is currently unavailable.
                 </p>
               )}
             </div>
 
-            <div className="grid gap-4">
-              <div className="store-shell-card rounded-[1.75rem] p-4 sm:p-5">
-                <div className="rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.9)] p-4">
+            <div className="grid gap-3.5 xl:sticky xl:top-28">
+              <div className="store-shell-card rounded-[1.65rem] p-4 sm:p-5">
+                <div className="rounded-[1.45rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.9)] p-4">
                   <div className="aspect-[4/3] overflow-hidden rounded-[1.35rem] bg-[linear-gradient(180deg,_rgba(248,243,236,0.96),_rgba(255,255,255,0.98))]">
                 <Image
                   src={productImage}
@@ -145,7 +145,7 @@ export default function Featured({ product, catalogInsights, site }) {
                   </div>
                 </div>
 
-                <div className="mt-5 flex items-start justify-between gap-4">
+                <div className="mt-4 flex items-start justify-between gap-4">
                   <div>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.5)]">
                       {site.featuredProductLabel}
@@ -166,14 +166,14 @@ export default function Featured({ product, catalogInsights, site }) {
 
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div className="store-shell-card rounded-[1.5rem] px-5 py-5">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="store-shell-card rounded-[1.4rem] px-5 py-4.5">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                    Checkout standard
+                    Easy checkout
                   </p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Simple checkout checks before you place an order.</p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Simple checkout before you place your order.</p>
                 </div>
-                <div className="store-shell-card rounded-[1.5rem] px-5 py-5">
+                <div className="store-shell-card rounded-[1.4rem] px-5 py-4.5">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                     Best for
                   </p>

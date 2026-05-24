@@ -39,8 +39,7 @@ export default function LandingGateway() {
                   Choose the experience you want to enter.
                 </h1>
                 <p className="mt-5 max-w-2xl text-base leading-8 theme-muted-page sm:text-lg">
-                  The public site now separates warehouse-store operations from hotel-facing operations.
-                  Choose the right branch below to enter the correct experience.
+                  Choose the store side for shopping or the hotel side for rooms, dining, and reservations.
                 </p>
 
                 <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -80,11 +79,10 @@ export default function LandingGateway() {
                     />
                   </div>
                   <h2 className="mt-6 text-3xl font-bold text-[var(--foreground-strong)]">
-                    One name. Two public experiences.
+                    One name. Two easy ways to browse.
                   </h2>
                   <p className="mt-4 text-sm leading-7 theme-muted-page sm:text-base">
-                    Products are now filtered by their assigned locations so warehouse products appear on the
-                    store side, hotel products appear on the hotel side, and shared products can appear on both.
+                    Use the store side for groceries and household items. Use the hotel side for rooms, dining, and reservations.
                   </p>
                 </div>
               </div>

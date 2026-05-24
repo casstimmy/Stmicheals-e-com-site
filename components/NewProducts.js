@@ -8,25 +8,25 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
   const insights = catalogInsights || getCatalogInsights(newProducts || []);
 
   return (
-    <div className="px-4 pb-14 sm:px-8 lg:pb-16">
+    <div className="px-4 pb-10 sm:px-8 lg:pb-12">
       <Center>
-        <section className="grid gap-6 xl:grid-cols-[0.74fr_1.26fr]">
-          <div className="store-shell rounded-[2rem] px-6 py-7 md:px-8 md:py-8">
+        <section className="grid gap-5 xl:grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)]">
+          <div className="store-shell rounded-[2rem] px-5 py-6 md:px-6 md:py-7">
             <span className="store-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em]">
               New arrivals
             </span>
             <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">
               New {site.shortLabel} arrivals
             </h2>
-            <p className="mt-3 text-base leading-8 store-shell-muted">The latest items are grouped for quick browsing.</p>
+            <p className="mt-3 max-w-md text-base leading-8 store-shell-muted">The latest items are grouped here for quick browsing.</p>
 
-            <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4">
+            <div className="mt-5 rounded-[1.45rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4">
               <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3">
                 <p className="text-sm font-semibold text-[var(--foreground-strong)]">Popular categories</p>
                 <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.48)]">Top {insights.topCategories.length}</span>
               </div>
 
-              <div className="mt-4 grid gap-3">
+              <div className="mt-4 grid gap-2.5">
                 {insights.topCategories.length > 0 ? (
                   insights.topCategories.map((category) => (
                     <Link
@@ -51,14 +51,14 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
 
             <Link
               href={getPublicSitePath(site.key, "/products")}
-              className="store-button-primary mt-6 inline-flex min-h-[3.2rem] items-center justify-center rounded-[1.1rem] px-5 py-3 text-sm font-semibold"
+              className="store-button-primary mt-5 inline-flex min-h-[3.15rem] items-center justify-center rounded-[1.1rem] px-5 py-3 text-sm font-semibold"
             >
               Browse products
             </Link>
           </div>
 
-          <div className="store-shell rounded-[2rem] px-5 py-6 sm:px-6 sm:py-7 md:px-7">
-            <div className="mb-6 flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-5 sm:flex-row sm:items-end sm:justify-between">
+          <div className="store-shell rounded-[2rem] px-5 py-5 sm:px-6 sm:py-6 md:px-7">
+            <div className="mb-5 flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
               <div>
                 <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                   Latest items
@@ -67,7 +67,7 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
                   Products ready to view
                 </h3>
               </div>
-              <p className="max-w-md text-sm leading-7 store-shell-muted">
+              <p className="max-w-sm text-sm leading-7 store-shell-muted">
                 Each card keeps only the useful details.
               </p>
             </div>

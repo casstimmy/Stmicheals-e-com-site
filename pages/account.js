@@ -234,13 +234,13 @@ export default function AccountPage() {
           <div className="theme-shell-light mx-auto max-w-4xl rounded-[2rem] p-8">
             <div className="border-b border-[rgba(20,109,126,0.12)] pb-6">
               <span className="theme-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] shadow-sm">
-                Passwordless customer account
+                Customer account
               </span>
               <h1 className="mb-3 mt-4 text-3xl font-extrabold text-[var(--foreground-strong)]">
                 My Account
               </h1>
               <p className="max-w-2xl theme-muted-page">
-                Sign in with a one-time code to manage your online customer profile and review orders securely.
+                Sign in with a code sent to your email to view your orders and update your details.
               </p>
             </div>
 
@@ -250,23 +250,23 @@ export default function AccountPage() {
               <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
                 <div className="theme-card-light rounded-[1.75rem] p-8 shadow-xl">
                   <p className="text-xs font-semibold uppercase tracking-[0.28em] text-[rgba(18,52,60,0.54)]">
-                    Secure customer access
+                    Easy account access
                   </p>
                   <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">
-                    One code. Full visibility into your orders.
+                    One code to view your account.
                   </h2>
                   <p className="mt-4 max-w-xl theme-muted-page">
-                    Use the same email you checkout with. We will send a one-time passcode so only you can view order history and update delivery details.
+                    Use the same email you use for your orders. We will send a sign-in code so only you can view your order history and update your details.
                   </p>
 
                   <div className="mt-8 grid gap-4 md:grid-cols-3">
                     <div className="rounded-2xl bg-[rgba(20,148,182,0.08)] p-4 backdrop-blur-sm">
-                      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Lookup</p>
-                      <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">OTP-secured</p>
+                      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Sign-in</p>
+                      <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">Email code</p>
                     </div>
                     <div className="rounded-2xl bg-[rgba(20,148,182,0.08)] p-4 backdrop-blur-sm">
-                      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Customer type</p>
-                      <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">ONLINE</p>
+                      <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Orders</p>
+                      <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">All in one place</p>
                     </div>
                     <div className="rounded-2xl bg-[rgba(20,148,182,0.08)] p-4 backdrop-blur-sm">
                       <p className="text-sm uppercase tracking-[0.22em] text-[rgba(18,52,60,0.54)]">Access</p>
@@ -279,7 +279,7 @@ export default function AccountPage() {
                   <form onSubmit={handleRequestOtp} className="space-y-4">
                     <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Request a sign-in code</h2>
                     <p className="text-sm theme-muted-page">
-                      New and returning customers can use email OTP sign-in.
+                      Use your email to get a sign-in code.
                     </p>
 
                     <div className="rounded-[1.25rem] border border-[rgba(20,109,126,0.12)] bg-[rgba(22,125,143,0.06)] px-4 py-4 text-sm theme-muted-page">
@@ -363,7 +363,7 @@ export default function AccountPage() {
                     <p className="text-xs uppercase tracking-[0.28em] text-[rgba(18,52,60,0.54)]">Signed in</p>
                     <h2 className="mt-3 text-3xl font-bold text-[var(--foreground-strong)]">Welcome back, {customer?.name || customer?.email}</h2>
                     <p className="mt-3 theme-muted-page">
-                      Customer type: {customer?.type || "ONLINE"} · {customer?.email}
+                      {customer?.email}
                     </p>
                   </div>
                   <button
@@ -473,7 +473,7 @@ export default function AccountPage() {
                       <div>
                         <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Your orders</h2>
                         <p className="mt-2 text-sm theme-muted-page">
-                          Payment status, fulfillment progress, and order recap in one view.
+                          Track your order status and view order details in one place.
                         </p>
                       </div>
                     </div>

@@ -34,16 +34,16 @@ export default function AboutPage() {
         {
           heading: `What the ${site.shortLabel.toLowerCase()} side is built for`,
           body: [
-            `${site.displayName} is structured to help customers move from discovery to checkout with clearer product visibility, stock-aware ordering, and inventory-driven web pricing.`,
-            "This public side focuses on practical essentials, organized browsing, and a cleaner customer journey for repeat grocery and household purchasing.",
+            `${site.displayName} helps customers shop groceries, drinks, and household items in one simple storefront.`,
+            "This side focuses on practical essentials, clear browsing, and an easier path from product discovery to order placement.",
           ],
         },
         {
-          heading: `How the ${site.shortLabel.toLowerCase()} catalog operates`,
+          heading: `How ordering works on the ${site.shortLabel.toLowerCase()} side`,
           body: [
-            "Products, inventory, online campaign pricing, and delivery fees are validated by the server so the customer sees a more consistent ordering experience from cart to order confirmation.",
-            "When a customer places a web order, acknowledgement emails are sent to both the customer and the business while the team completes the manual payment workflow.",
-            "Account access is handled through email one-time passcodes, helping customers review activity and continue their shopping flow without a traditional password setup.",
+            "Products, prices, and delivery fees are checked before an order is placed so customers can review a clear final total.",
+            "When an order is placed, both the customer and the store receive a confirmation email.",
+            "Customers can also sign in with an email code to review past orders and update their details.",
           ],
         },
         {
@@ -60,7 +60,7 @@ export default function AboutPage() {
       title="About Us"
       intro={isHotelSite
         ? `Learn how ${site.displayName} approaches direct reservations, guest communication, and lounge service on the hotel side of St Michael's.`
-        : `Learn how ${site.displayName} approaches catalog browsing, inventory-driven web orders, and customer support for this side of the business.`}
+        : `Learn how ${site.displayName} supports product browsing, ordering, and customer support on this side of the business.`}
       sections={sections}
       eyebrow={`About the ${site.shortLabel.toLowerCase()} side`}
       backHref={isHotelSite ? "/rooms" : "/products"}

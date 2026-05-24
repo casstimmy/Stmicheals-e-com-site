@@ -117,7 +117,7 @@ export default function Header({ siteKey }) {
   ];
 
   return (
-    <header className={isHotelSite ? "hotel-header sticky top-0 z-40" : "store-header sticky top-0 z-40"}>
+    <header className={isHotelSite ? "hotel-header sticky top-0 z-[80]" : "store-header sticky top-0 z-[80]"}>
       <div className={isHotelSite ? "hotel-header-topbar text-[0.72rem] uppercase tracking-[0.24em]" : "store-header-topbar text-[0.72rem] uppercase tracking-[0.24em]"}>
         <Center>
           <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
@@ -230,7 +230,7 @@ export default function Header({ siteKey }) {
           </div>
 
           {navOpen && (
-            <div className="absolute inset-x-0 top-full z-50 pt-3 md:hidden">
+            <div className="absolute inset-x-0 top-full z-[90] pt-3 md:hidden">
               <nav
                 id="mobile-site-nav"
                 className={isHotelSite ? "overflow-hidden rounded-[1.75rem] border border-[rgba(216,172,79,0.14)] bg-[rgba(13,18,22,0.96)] shadow-[0_24px_52px_rgba(7,13,16,0.26)] backdrop-blur-xl" : "overflow-hidden rounded-[1.75rem] border border-[rgba(31,44,51,0.1)] bg-[rgba(255,252,247,0.99)] shadow-[0_24px_52px_rgba(18,29,35,0.1)] backdrop-blur-xl"}
