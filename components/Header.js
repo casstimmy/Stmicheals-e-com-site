@@ -117,7 +117,7 @@ export default function Header({ siteKey }) {
   ];
 
   return (
-    <header className={isHotelSite ? "hotel-header sticky top-0 z-[80]" : "store-header sticky top-0 z-[80]"}>
+    <header className={isHotelSite ? "hotel-header sticky top-0 z-[100] w-full" : "store-header sticky top-0 z-[100] w-full"}>
       <div className={isHotelSite ? "hotel-header-topbar text-[0.72rem] uppercase tracking-[0.24em]" : "store-header-topbar text-[0.72rem] uppercase tracking-[0.24em]"}>
         <Center>
           <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
