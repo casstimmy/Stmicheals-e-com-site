@@ -42,6 +42,7 @@ export default function ProductPage({ product, relatedProducts }) {
   const reviewSummary = getReviewSummary(reviews);
   const availableQuantity = getAvailableInventoryQuantity(product);
   const isInStock = availableQuantity > 0;
+  const storeAvailabilityLabel = isInStock ? "200 Ready" : "Currently unavailable";
   const cartQuantity = cartProducts.find((item) => item.id === product._id)?.qty || 0;
   const hasReachedCartLimit = isInStock && cartQuantity >= availableQuantity;
   const normalizedDescription = product.description?.trim() || "";
@@ -57,13 +58,14 @@ export default function ProductPage({ product, relatedProducts }) {
     },
     {
       label: "Availability",
-      value: isInStock ? "In stock" : "Unavailable",
+      value: storeAvailabilityLabel,
       meta: isInStock ? `${availableQuantity} ready for delivery` : "Check related items below",
     },
     {
       label: "In your cart",
       value: `${cartQuantity}`,
       meta: `${cartQuantity} item${cartQuantity === 1 ? "" : "s"} selected`,
+      spanFull: true,
     },
   ];
 
@@ -125,7 +127,7 @@ export default function ProductPage({ product, relatedProducts }) {
         <Center>
           <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
             <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] xl:items-start">
-              <section className="store-shell rounded-[2rem] p-4 sm:p-6 lg:p-7">
+              <section className="store-shell flex h-full flex-col rounded-[2rem] p-4 sm:p-6 lg:p-7">
                 <div className="flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
@@ -178,8 +180,8 @@ export default function ProductPage({ product, relatedProducts }) {
                   ))}
                 </div>
 
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <div className="store-shell-card rounded-[1.3rem] px-4 py-4">
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
+                  <div className="store-shell-card flex h-full flex-col justify-between rounded-[1.3rem] px-4 py-4">
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                       Category
                     </p>
@@ -187,26 +189,24 @@ export default function ProductPage({ product, relatedProducts }) {
                       {product.categoryName || product.category || "Uncategorized"}
                     </p>
                   </div>
-                  <div className="store-shell-card rounded-[1.3rem] px-4 py-4">
+                  <div className="store-shell-card flex h-full flex-col justify-between rounded-[1.3rem] px-4 py-4">
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                       Reservation status
                     </p>
-                    <p className="mt-2 text-base font-semibold text-[var(--foreground-strong)]">
-                      {isInStock ? `${availableQuantity} ready for delivery` : "Temporarily unavailable"}
-                    </p>
+                    <p className="mt-2 text-base font-semibold text-[var(--foreground-strong)]">{storeAvailabilityLabel}</p>
                   </div>
                 </div>
               </section>
 
-              <aside className="store-shell rounded-[2rem] p-5 sm:p-7 md:sticky md:top-32">
-                <div className="flex flex-wrap gap-3">
+              <aside className="store-shell flex h-full flex-col rounded-[2rem] p-5 sm:p-7 md:sticky md:top-28">
+                <div className="flex flex-wrap items-center gap-3">
                   <span className="store-tag rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em]">
                     {product.categoryName || product.category || "Uncategorized"}
                   </span>
                   <span className={`rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] ${
                     isInStock ? "bg-emerald-50 text-emerald-700" : "bg-rose-50 text-rose-700"
                   }`}>
-                    {isInStock ? `${availableQuantity} ready` : "Currently unavailable"}
+                    {storeAvailabilityLabel}
                   </span>
                 </div>
 
@@ -214,14 +214,14 @@ export default function ProductPage({ product, relatedProducts }) {
                   {product.name}
                 </h1>
                 {resolvedDescription ? (
-                  <p className="mt-4 text-base leading-8 store-shell-muted">
+                  <p className="mt-4 max-w-[34rem] text-base leading-8 store-shell-muted">
                     {resolvedDescription}
                   </p>
                 ) : null}
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
+                <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
                   {detailStats.map((stat) => (
-                    <div key={stat.label} className="store-shell-card rounded-[1.25rem] px-4 py-4">
+                    <div key={stat.label} className={`store-shell-card flex h-full flex-col rounded-[1.25rem] px-4 py-4 ${stat.spanFull ? "sm:col-span-2" : ""}`}>
                       <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                         {stat.label}
                       </p>
@@ -231,21 +231,23 @@ export default function ProductPage({ product, relatedProducts }) {
                   ))}
                 </div>
 
-                <div className="mt-6 rounded-[1.45rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.62)] px-5 py-5">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                    Current price
-                  </p>
-                  <p className="mt-2 text-3xl font-bold text-[#8d5a1f] sm:text-[2.2rem]">
-                    ₦{product.salePriceIncTax?.toLocaleString()}
-                  </p>
-                </div>
+                <div className="mt-6 space-y-5 border-t border-[rgba(31,44,51,0.08)] pt-6">
+                  <div className="rounded-[1.45rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.62)] px-5 py-5">
+                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                      Current price
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-[#8d5a1f] sm:text-[2.2rem]">
+                      ₦{product.salePriceIncTax?.toLocaleString()}
+                    </p>
+                  </div>
 
-                <div className="mt-5 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                  {availableQuantity === 0
-                    ? "This item is currently unavailable."
-                    : cartQuantity > 0
-                      ? `${cartQuantity} item${cartQuantity === 1 ? "" : "s"} currently in your cart.`
-                      : "Add this item to your cart when you are ready."}
+                  <div className="rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
+                    {availableQuantity === 0
+                      ? "This item is currently unavailable."
+                      : cartQuantity > 0
+                        ? `${cartQuantity} item${cartQuantity === 1 ? "" : "s"} currently in your cart.`
+                        : "Add this item to your cart when you are ready."}
+                  </div>
                 </div>
 
                 <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -284,20 +286,20 @@ export default function ProductPage({ product, relatedProducts }) {
               </aside>
             </div>
 
-            <div className="mx-auto mt-8 grid max-w-7xl gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:items-start">
-              <section className="store-shell-card rounded-[2rem] p-5 sm:p-6 lg:p-7">
+            <div className="mx-auto mt-8 grid max-w-7xl gap-6 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] xl:items-stretch">
+              <section className="store-shell-card flex h-full flex-col rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <div className="border-b border-[rgba(31,44,51,0.08)] pb-4">
                   <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                     Share your review
                   </p>
                   <h2 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">Tell other customers what to expect</h2>
                 </div>
-                <div className="mt-5 store-shell-card rounded-[1.4rem] p-4 sm:p-5">
+                <div className="mt-5 flex-1 store-shell-card rounded-[1.4rem] p-4 sm:p-5">
                   <ReviewForm productId={product._id} onSubmitted={handleReviewSubmitted} />
                 </div>
               </section>
 
-              <section className="store-shell-card rounded-[2rem] p-5 sm:p-6 lg:p-7">
+              <section className="store-shell-card flex h-full flex-col rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <div className="flex flex-col gap-4 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
@@ -305,21 +307,21 @@ export default function ProductPage({ product, relatedProducts }) {
                     </p>
                     <h2 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">Published feedback</h2>
                   </div>
-                  <div className="flex flex-wrap gap-3">
-                    <div className="store-shell-card rounded-[1rem] px-4 py-3 text-sm">
+                  <div className="flex flex-wrap items-stretch gap-3">
+                    <div className="store-shell-card flex min-w-[7.5rem] flex-col justify-between rounded-[1rem] px-4 py-3 text-sm">
                       <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.48)]">Average</span>
                       <span className="mt-1 block text-lg font-bold text-[var(--foreground-strong)]">
                         {reviewSummary.count ? reviewSummary.averageLabel : "New"}
                       </span>
                     </div>
-                    <div className="store-shell-card rounded-[1rem] px-4 py-3 text-sm">
+                    <div className="store-shell-card flex min-w-[7.5rem] flex-col justify-between rounded-[1rem] px-4 py-3 text-sm">
                       <span className="block text-[0.68rem] font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.48)]">Reviews</span>
                       <span className="mt-1 block text-lg font-bold text-[var(--foreground-strong)]">{reviewSummary.count}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-5 space-y-4">
+                <div className="mt-5 flex-1 space-y-4">
                   {reviews.length > 0 ? (
                     reviews.map((review, index) => (
                       <div key={index} className="store-shell-card rounded-[1.35rem] p-4 sm:p-5">

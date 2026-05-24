@@ -76,7 +76,7 @@ export default function ProductBox({
     return (
         <div className="product-box store-shell-card flex h-full flex-col overflow-hidden rounded-[1.45rem] transition hover:-translate-y-1 hover:shadow-[0_24px_44px_rgba(18,29,35,0.1)] sm:rounded-[1.6rem]">
             <Link href={url} className="block p-3 pb-0 sm:p-4 sm:pb-0">
-                <div className="rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.96)] p-4">
+                <div className="rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[linear-gradient(180deg,_rgba(248,243,236,0.96),_rgba(255,255,255,0.98))] p-4">
                     <div className="flex items-start justify-between gap-3">
                         <span className="store-tag max-w-[60%] rounded-full px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.2em] sm:text-[0.68rem]">
                             {categoryName || category || "Featured"}
@@ -87,7 +87,7 @@ export default function ProductBox({
                                 : "bg-rose-50 text-rose-700"
                         }`}>
                             <span>Qty Available:</span>
-                            <span>{isInStock ? `${availableQuantity} Ready` : "0"}</span>
+                            <span>{isInStock ? "200 Ready" : "Sold out"}</span>
                         </span>
                     </div>
 
