@@ -28,7 +28,7 @@ export default function CartPage() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-  const [shippingDetails, setShippingDetails] = useState(null);
+  const [pricingPreview, setPricingPreview] = useState(null);
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
@@ -58,7 +58,6 @@ export default function CartPage() {
       .catch(() => {});
   }, []);
 
-  // Fetch shipping cost when city changes
   useEffect(() => {
     if (!customer.city) {
       return;
@@ -69,24 +68,32 @@ export default function CartPage() {
     }
 
     let cancelled = false;
+    const previewCartProducts = cartProducts.map((item) => ({
+      _id: item.id,
+      quantity: item.qty || 1,
+    }));
 
     axios
-      .post("/api/shipping-cost", { destination: customer.city })
+      .post("/api/shipping-cost", {
+        destination: customer.city,
+        cartProducts: previewCartProducts,
+        siteKey,
+      })
       .then((res) => {
         if (!cancelled) {
-          setShippingDetails(res.data);
+          setPricingPreview(res.data);
         }
       })
       .catch(() => {
         if (!cancelled) {
-          setShippingDetails(null);
+          setPricingPreview(null);
         }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [cartProducts.length, customer.city]);
+  }, [cartProducts, customer.city, siteKey]);
 
   useEffect(() => {
     const ids = cartProducts.map((p) => p.id);
@@ -124,8 +131,25 @@ export default function CartPage() {
     (sum, line) => sum + (line.product.salePriceIncTax || 0) * line.quantity,
     0
   );
-  const activeShippingDetails = customer.city && cartProducts.length > 0 ? shippingDetails : null;
-  const shippingCost = !customer.city || cartProducts.length === 0 ? 0 : activeShippingDetails?.cost ?? 2000;
+  const activePricingPreview = customer.city && cartProducts.length > 0 ? pricingPreview : null;
+  const pricingTotals = activePricingPreview?.totals || null;
+  const baseSubtotal = pricingTotals?.baseSubtotal ?? subtotal;
+  const discountTotal = pricingTotals?.discountTotal ?? 0;
+  const shippingCost = !customer.city || cartProducts.length === 0 ? 0 : pricingTotals?.shippingCost ?? 0;
+  const totalAmount = pricingTotals?.total ?? subtotal + shippingCost;
+  const quoteDestination = activePricingPreview?.shippingQuote?.destination || customer.city;
+  const quoteMessage = activePricingPreview
+    ? `Inventory system quote for ${quoteDestination}: ₦${shippingCost.toLocaleString()}${discountTotal > 0 ? ". Online campaign adjustments are already included." : "."}`
+    : customer.city && cartProducts.length > 0
+      ? "Inventory system recalculating delivery fee and online campaign pricing for this cart."
+      : "";
+  const summaryItems = [
+    { label: "Items subtotal", value: `₦${baseSubtotal.toLocaleString()}` },
+    ...(discountTotal > 0
+      ? [{ label: "Campaign adjustment", value: `-₦${discountTotal.toLocaleString()}` }]
+      : []),
+    { label: "Delivery fee", value: `₦${shippingCost.toLocaleString()}` },
+  ];
   const totalItems = cartProducts.reduce((sum, item) => sum + item.qty, 0);
   const hasInventoryIssues = cartLines.some((line) => line.isSoldOut || line.exceedsStock);
   const inventoryAlertText = cartLines
@@ -225,7 +249,7 @@ export default function CartPage() {
                       Cart and delivery review
                     </h1>
                     <p className="mt-3 max-w-2xl text-base leading-8 store-shell-muted">
-                      Review stock-aware quantities, confirm delivery details, and place the order after the server rechecks the final order state.
+                      Review stock-aware quantities, confirm the inventory-driven delivery fee, and place a manual web order that notifies both you and the business.
                     </p>
                   </div>
                   <div className="store-button-secondary inline-flex min-h-[3rem] items-center rounded-[1rem] px-4 py-3 text-sm font-semibold">
@@ -241,11 +265,11 @@ export default function CartPage() {
                     },
                     {
                       label: "2. Confirm delivery",
-                      detail: "Shipping totals update with the selected destination.",
+                      detail: "Inventory pricing and delivery fees refresh for the selected destination.",
                     },
                     {
                       label: "3. Place order",
-                      detail: "The server revalidates prices, stock, and totals.",
+                      detail: "The order is stored for manual confirmation and email acknowledgement.",
                     },
                   ].map((step) => (
                     <div key={step.label} className="store-shell-card rounded-[1.35rem] px-4 py-4">
@@ -498,14 +522,13 @@ export default function CartPage() {
               <aside className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Order summary</h2>
                 <p className="mt-2 text-sm leading-7 store-shell-muted">
-                  Delivery totals update when the destination changes. Payment only begins after the server confirms the final order state.
+                  Delivery fees and any online campaign adjustments come from the inventory system. Submitting this form saves a manual-entry web order for team confirmation.
                 </p>
 
                 <div className="mt-5 space-y-3">
                   {[
                     { label: "Items", value: totalItems },
-                    { label: "Subtotal", value: `₦${subtotal.toLocaleString()}` },
-                    { label: "Shipping", value: `₦${shippingCost.toLocaleString()}` },
+                    ...summaryItems,
                   ].map((item) => (
                     <div key={item.label} className="store-shell-card flex items-center justify-between rounded-[1.2rem] px-4 py-4 text-sm">
                       <span className="store-shell-muted">{item.label}</span>
@@ -517,14 +540,13 @@ export default function CartPage() {
                 <div className="mt-4 rounded-[1.4rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(31,44,51,0.04)] px-4 py-4">
                   <div className="flex items-center justify-between gap-3 text-[var(--foreground-strong)]">
                     <span className="text-sm font-semibold uppercase tracking-[0.18em]">Total</span>
-                    <span className="text-2xl font-bold">₦{(subtotal + shippingCost).toLocaleString()}</span>
+                    <span className="text-2xl font-bold">₦{totalAmount.toLocaleString()}</span>
                   </div>
                 </div>
 
-                {activeShippingDetails && (
+                {quoteMessage && (
                   <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                    Delivery quote for {activeShippingDetails.destination}: ₦{shippingCost.toLocaleString()}
-                    {activeShippingDetails.isFallback ? " (standard rate applied)" : ""}
+                    {quoteMessage}
                   </div>
                 )}
 
@@ -585,7 +607,7 @@ export default function CartPage() {
                         className={storeInputClassName}
                         value={customer.city}
                         onChange={(e) => {
-                          setShippingDetails(null);
+                          setPricingPreview(null);
                           setCustomer({ ...customer, city: e.target.value });
                         }}
                       >
@@ -606,7 +628,7 @@ export default function CartPage() {
                 )}
 
                 <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                  Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts. Signed-in customers also get profile details prefilled automatically.
+                  Prices, stock, and inventory-driven delivery fees are revalidated on the server before the order is saved. Signed-in customers still get their profile details prefilled automatically, and customer plus business emails are issued after order placement.
                 </div>
 
                 <button
@@ -622,7 +644,7 @@ export default function CartPage() {
                     ? "Processing..."
                     : hasInventoryIssues
                       ? "Resolve stock alerts to continue"
-                      : "Place order and contact us"}
+                      : "Place manual web order"}
                 </button>
               </aside>
             </div>
@@ -656,11 +678,11 @@ export default function CartPage() {
                   },
                   {
                     label: "2. Confirm delivery",
-                    detail: "Shipping costs update instantly by destination.",
+                    detail: "Inventory pricing and delivery fees refresh for the selected destination.",
                   },
                   {
                     label: "3. Place order",
-                    detail: "Order totals are revalidated on the server.",
+                    detail: "The order is stored for manual confirmation and email acknowledgement.",
                   },
                 ].map((step) => (
                   <div key={step.label} className="theme-card-light rounded-[1.5rem] px-4 py-4 shadow-sm">
@@ -924,24 +946,21 @@ export default function CartPage() {
                   <span>Items:</span>
                   <span>{totalItems}</span>
                 </div>
-                <div className="flex justify-between border-b border-cyan-200/10 pb-2">
-                  <span>Subtotal:</span>
-                  <span>₦{subtotal.toLocaleString()}</span>
-                </div>
-                <div className="flex justify-between border-b border-cyan-200/10 pb-2">
-                  <span>Shipping:</span>
-                  <span>₦{shippingCost.toLocaleString()}</span>
-                </div>
+                {summaryItems.map((item) => (
+                  <div key={item.label} className="flex justify-between border-b border-cyan-200/10 pb-2">
+                    <span>{item.label}:</span>
+                    <span>{item.value}</span>
+                  </div>
+                ))}
                 <div className="flex justify-between text-lg sm:text-xl font-semibold pt-4">
                   <span>Total:</span>
-                  <span>₦{(subtotal + shippingCost).toLocaleString()}</span>
+                  <span>₦{totalAmount.toLocaleString()}</span>
                 </div>
               </div>
 
-              {activeShippingDetails && (
+              {quoteMessage && (
                 <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50">
-                  Delivery quote for {activeShippingDetails.destination}: ₦{shippingCost.toLocaleString()}
-                  {activeShippingDetails.isFallback ? " (standard rate applied)" : ""}
+                  {quoteMessage}
                 </div>
               )}
 
@@ -992,7 +1011,7 @@ export default function CartPage() {
                       className="theme-input mt-1 w-full rounded-xl px-4 py-3"
                       value={customer.city}
                       onChange={(e) => {
-                        setShippingDetails(null);
+                        setPricingPreview(null);
                         setCustomer({ ...customer, city: e.target.value });
                       }}
                     >
@@ -1013,8 +1032,8 @@ export default function CartPage() {
               )}
 
               <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50/85">
-                Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts.
-                Signed-in customers also get profile details prefilled automatically.
+                Prices, stock, and inventory-driven delivery fees are revalidated on the server before the order is saved.
+                Signed-in customers also get profile details prefilled automatically, and customer plus business emails are issued after order placement.
               </div>
 
               <button
@@ -1030,7 +1049,7 @@ export default function CartPage() {
                   ? "Processing..."
                   : hasInventoryIssues
                     ? "Resolve stock alerts to continue"
-                    : "Place order and contact us"}
+                    : "Place manual web order"}
               </button>
             </div>
           </div>

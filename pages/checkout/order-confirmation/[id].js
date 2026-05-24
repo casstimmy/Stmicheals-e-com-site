@@ -2,7 +2,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 import Image from "next/image";
 import Head from "next/head";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Header from "@/components/Header";
 import Center from "@/components/Center";
@@ -15,21 +15,36 @@ import {
   normalizePublicSite,
 } from "@/lib/publicSite";
 
+const MANUAL_PAYMENT_CHANNELS = new Set(["manual-entry", "manual", "pos"]);
+
+function formatCurrency(value) {
+  return Number(value || 0).toLocaleString("en-NG", {
+    style: "currency",
+    currency: "NGN",
+  });
+}
+
+function resolvePaymentStatusLabel(order) {
+  if (order?.paid || order?.paymentStatus === "Paid") {
+    return "Paid";
+  }
+
+  if (MANUAL_PAYMENT_CHANNELS.has(String(order?.paymentChannel || "").trim().toLowerCase())) {
+    return "Manual confirmation pending";
+  }
+
+  return order?.paymentStatus || "Pending";
+}
+
 export default function OrderConfirmationPage() {
   const router = useRouter();
   const siteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
   const site = getPublicSiteConfig(siteKey);
-  const { id, reference, trxref } = router.query;
+  const { id } = router.query;
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [verificationError, setVerificationError] = useState("");
-  const verificationStartedRef = useRef(false);
+  const [loadError, setLoadError] = useState("");
   const { clearCart } = useContext(CartContext);
-  const clearCartRef = useRef(clearCart);
-
-  useEffect(() => {
-    clearCartRef.current = clearCart;
-  }, [clearCart]);
 
   useEffect(() => {
     if (!router.isReady || !id) {
@@ -38,71 +53,55 @@ export default function OrderConfirmationPage() {
 
     let cancelled = false;
 
-    async function finalizeOrder() {
-      setLoading(true);
-      setVerificationError("");
-
-      try {
-        const paymentReference =
-          typeof reference === "string" && reference.trim()
-            ? reference.trim()
-            : typeof trxref === "string" && trxref.trim()
-              ? trxref.trim()
-              : "";
-
-        if (paymentReference && !verificationStartedRef.current) {
-          verificationStartedRef.current = true;
-          await axios.post("/api/paystack/verify", { reference: paymentReference });
-          clearCartRef.current();
+    axios
+      .get("/api/orders", {
+        params: { id },
+      })
+      .then((response) => {
+        if (cancelled) {
+          return;
         }
 
-        const response = await axios.get("/api/orders", {
-          params: { id },
-        });
+        setOrder(response.data);
+        clearCart();
+      })
+      .catch((error) => {
         if (!cancelled) {
-          setOrder(response.data);
-          if (response.data?.paid) {
-            clearCartRef.current();
-          }
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setVerificationError(
-            error.response?.data?.message || "We could not confirm this payment yet."
+          setLoadError(
+            error.response?.data?.message ||
+              "We could not load this order right now."
           );
         }
-      } finally {
+      })
+      .finally(() => {
         if (!cancelled) {
           setLoading(false);
         }
-      }
-    }
-
-    finalizeOrder();
+      });
 
     return () => {
       cancelled = true;
     };
-  }, [id, reference, router.isReady, trxref]);
+  }, [clearCart, id, router.isReady]);
 
   if (loading) {
     return (
       <>
         <Head>
-          <title>{`Confirming Order | ${site.displayName}`}</title>
+          <title>{`Loading Order | ${site.displayName}`}</title>
         </Head>
         <Header siteKey={siteKey} />
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
             <div className="theme-shell-light mx-auto max-w-xl rounded-[2rem] px-6 py-10 text-center shadow-[0_30px_70px_rgba(18,52,60,0.08)]">
-            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Confirming your order</h1>
-            <p className="mt-3 theme-muted-page">We are validating payment and loading your final order details.</p>
-            <Link
-              href={getPublicScopedHref(siteKey, "/")}
-              className="theme-card-light mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm"
-            >
-              Return to home
-            </Link>
+              <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Loading your order</h1>
+              <p className="mt-3 theme-muted-page">We are retrieving the final order details and invoice summary.</p>
+              <Link
+                href={getPublicScopedHref(siteKey, "/")}
+                className="theme-card-light mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm"
+              >
+                Return to home
+              </Link>
             </div>
           </div>
         </Center>
@@ -110,27 +109,27 @@ export default function OrderConfirmationPage() {
     );
   }
 
-  if (verificationError && !order) {
+  if (loadError && !order) {
     return (
       <>
         <Head>
-          <title>{`Payment Pending | ${site.displayName}`}</title>
+          <title>{`Order Pending | ${site.displayName}`}</title>
         </Head>
         <Header siteKey={siteKey} />
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
-            <div className="max-w-xl rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center shadow-sm">
-            <h1 className="text-2xl font-bold text-red-800">Payment confirmation pending</h1>
-            <p className="mt-3 text-red-700">{verificationError}</p>
-            <p className="mt-3 text-sm text-red-600">
-              If payment was completed, your order will remain available once verification succeeds.
-            </p>
-            <Link
-              href={getPublicScopedHref(siteKey, "/")}
-              className="mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] border border-red-200 bg-white px-5 py-3 text-sm font-semibold text-red-700 shadow-sm"
-            >
-              Go to home
-            </Link>
+            <div className="max-w-xl rounded-2xl border border-amber-200 bg-amber-50 px-6 py-8 text-center shadow-sm">
+              <h1 className="text-2xl font-bold text-amber-900">Order acknowledgement pending</h1>
+              <p className="mt-3 text-amber-800">{loadError}</p>
+              <p className="mt-3 text-sm text-amber-700">
+                If you just placed the order, refresh shortly. The team receives the web order for manual confirmation.
+              </p>
+              <Link
+                href={getPublicScopedHref(siteKey, "/")}
+                className="mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] border border-amber-200 bg-white px-5 py-3 text-sm font-semibold text-amber-900 shadow-sm"
+              >
+                Go to home
+              </Link>
             </div>
           </div>
         </Center>
@@ -148,14 +147,14 @@ export default function OrderConfirmationPage() {
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
             <div className="theme-shell-light mx-auto max-w-xl rounded-[2rem] px-6 py-10 text-center">
-            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Order not found</h1>
-            <p className="mt-3 theme-muted-page">We could not locate that order record. Return to the storefront and try again from your recent orders.</p>
-            <Link
-              href={getPublicScopedHref(siteKey, "/")}
-              className="theme-button-primary mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold"
-            >
-              Go to home
-            </Link>
+              <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Order not found</h1>
+              <p className="mt-3 theme-muted-page">We could not locate that order record. Return to the storefront and try again from your recent orders.</p>
+              <Link
+                href={getPublicScopedHref(siteKey, "/")}
+                className="theme-button-primary mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold"
+              >
+                Go to home
+              </Link>
             </div>
           </div>
         </Center>
@@ -163,19 +162,13 @@ export default function OrderConfirmationPage() {
     );
   }
 
-  const shippingCost = (order.shippingCost).toLocaleString("en-NG", {
-    style: "currency",
-    currency: "NGN",
-  });
-
-  const totalAmount = (order.subtotal + order.shippingCost).toLocaleString("en-NG", {
-    style: "currency",
-    currency: "NGN",
-  });
-
+  const subtotal = Number(order.subtotal || 0);
+  const shippingCost = Number(order.shippingCost || 0);
+  const totalAmount = Number(order.total || subtotal + shippingCost);
   const orderDate = new Date(order.createdAt).toLocaleString();
   const itemCount = order.items?.length || 0;
-  const paymentStatusLabel = order.paid ? "Confirmed" : order.paymentStatus || "Pending";
+  const paymentStatusLabel = resolvePaymentStatusLabel(order);
+  const customerDetails = order.shippingDetails || order.customerSnapshot || order.customer || {};
 
   return (
     <>
@@ -184,30 +177,25 @@ export default function OrderConfirmationPage() {
       </Head>
       <Header siteKey={siteKey} />
       <Center>
-        <div className="theme-shell-light mx-auto my-16 max-w-3xl rounded-2xl px-6 py-10">
-          {verificationError && (
-            <div className="mb-6 rounded-xl border border-amber-200/80 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-              {verificationError}
-            </div>
-          )}
-
-          {/* Logo */}
+        <div className="theme-shell-light mx-auto my-16 max-w-4xl rounded-2xl px-6 py-10">
           <div className="flex justify-center mb-8">
             <Image
               src="/images/st-micheals-logo.png"
-              alt="St Micheal's Logo"
+              alt="St Michael's Logo"
               width={80}
               height={80}
               className="size-20"
             />
           </div>
 
-          {/* Thank You Header */}
           <h1 className="mb-4 text-center text-3xl font-bold text-[var(--foreground-strong)] md:text-4xl">
-            Thank you for your purchase!
+            Your order has been received
           </h1>
-          <p className="mb-8 text-center text-lg theme-muted-page">
-            Order <strong>#{order._id}</strong> placed on <em>{orderDate}</em>.
+          <p className="mx-auto mb-4 max-w-2xl text-center text-lg theme-muted-page">
+            Order <strong>#{order._id}</strong> was recorded on <em>{orderDate}</em>. Customer and business notifications have been issued, and the team will confirm the manual payment workflow from the inventory system.
+          </p>
+          <p className="mb-8 text-center text-sm theme-muted-page">
+            Any online campaign pricing or delivery fee configured for this cart is already reflected in the invoice below.
           </p>
 
           <div className="mb-8 flex flex-wrap items-center justify-center gap-3">
@@ -219,6 +207,11 @@ export default function OrderConfirmationPage() {
             <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
               Fulfillment: {order.status}
             </span>
+            {order.locationName && (
+              <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
+                Location: {order.locationName}
+              </span>
+            )}
           </div>
 
           <div className="mb-8 grid gap-4 md:grid-cols-3">
@@ -237,72 +230,86 @@ export default function OrderConfirmationPage() {
           </div>
 
           <section className="theme-card-light space-y-4 rounded-[1.5rem] p-6 shadow-sm">
-            <h2 className="border-b border-[rgba(20,109,126,0.12)] pb-2 text-xl font-semibold text-[var(--foreground-strong)]">
-              Customer Details
-            </h2>
-            <div className="grid gap-3 text-sm theme-muted-page">
-              <p><span className="font-medium text-[var(--foreground-strong)]">Name:</span> {order.customerSnapshot?.name || order.customer?.name}</p>
-              <p><span className="font-medium text-[var(--foreground-strong)]">Email:</span> {order.customerSnapshot?.email || order.customer?.email}</p>
-              <p><span className="font-medium text-[var(--foreground-strong)]">Phone:</span> {order.customerSnapshot?.phone || order.customer?.phone}</p>
-              <p>
-                <span className="font-medium text-[var(--foreground-strong)]">Address:</span>{" "}
-                {order.customerSnapshot?.address || order.customer?.address}
-                {(order.customerSnapshot?.city || order.customer?.city) ? `, ${order.customerSnapshot?.city || order.customer?.city}` : ""}
-              </p>
-            </div>
+            <div className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
+              <div>
+                <h2 className="border-b border-[rgba(20,109,126,0.12)] pb-2 text-xl font-semibold text-[var(--foreground-strong)]">
+                  Customer details
+                </h2>
+                <div className="mt-4 grid gap-3 text-sm theme-muted-page">
+                  <p><span className="font-medium text-[var(--foreground-strong)]">Name:</span> {customerDetails.name || "N/A"}</p>
+                  <p><span className="font-medium text-[var(--foreground-strong)]">Email:</span> {customerDetails.email || "N/A"}</p>
+                  <p><span className="font-medium text-[var(--foreground-strong)]">Phone:</span> {customerDetails.phone || "N/A"}</p>
+                  <p>
+                    <span className="font-medium text-[var(--foreground-strong)]">Address:</span>{" "}
+                    {customerDetails.address || "N/A"}
+                    {customerDetails.city ? `, ${customerDetails.city}` : ""}
+                  </p>
+                </div>
 
-            <div className="pt-6">
-              <h3 className="mb-4 border-b border-[rgba(20,109,126,0.12)] pb-2 text-lg font-semibold text-[var(--foreground-strong)]">
-                Items in Your Order
-              </h3>
+                <div className="mt-6 rounded-[1.25rem] border border-[rgba(20,109,126,0.12)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
+                  Manual web orders stay visible to the team for payment confirmation and fulfilment. Keep your email and phone available for any follow-up.
+                </div>
+              </div>
 
-              {order.items && order.items.length > 0 ? (
-                <ul className="space-y-4">
-                  {order.items.map(({ _id, quantity, price, productId }) => {
-                    const name = productId?.name || "Unnamed Product";
-                    const unitPrice = productId?.salePriceIncTax ?? price ?? 0;
-                    const totalPrice = unitPrice * quantity;
-                    const image = getPrimaryProductImage(productId?.images);
+              <div>
+                <h2 className="border-b border-[rgba(20,109,126,0.12)] pb-2 text-xl font-semibold text-[var(--foreground-strong)]">
+                  Items in your order
+                </h2>
 
-                    return (
-                      <li
-                        key={_id}
-                        className="flex flex-col justify-between gap-4 rounded-[1.25rem] border border-[rgba(20,109,126,0.12)] bg-white/75 p-4 md:flex-row md:items-center"
-                      >
-                        <div className="flex gap-4">
-                          <Image
-                            src={image}
-                            alt={name}
-                            width={64}
-                            height={64}
-                            className="h-16 w-16 rounded border border-[rgba(20,109,126,0.12)] object-cover"
-                          />
-                          <div>
-                            <p className="text-lg font-medium text-[var(--foreground-strong)]">{name}</p>
-                            <p className="text-sm theme-muted-page">
-                              {quantity} × ₦{unitPrice.toLocaleString()}
-                            </p>
+                {order.items && order.items.length > 0 ? (
+                  <ul className="mt-4 space-y-4">
+                    {order.items.map(({ _id, quantity, price, productId, name }) => {
+                      const itemName = productId?.name || name || "Unnamed Product";
+                      const unitPrice = Number(price ?? productId?.salePriceIncTax ?? 0);
+                      const lineTotal = unitPrice * Number(quantity || 0);
+                      const image = getPrimaryProductImage(productId?.images);
+
+                      return (
+                        <li
+                          key={_id || `${itemName}-${quantity}`}
+                          className="flex flex-col justify-between gap-4 rounded-[1.25rem] border border-[rgba(20,109,126,0.12)] bg-white/75 p-4 md:flex-row md:items-center"
+                        >
+                          <div className="flex gap-4">
+                            <Image
+                              src={image}
+                              alt={itemName}
+                              width={64}
+                              height={64}
+                              className="h-16 w-16 rounded border border-[rgba(20,109,126,0.12)] object-cover"
+                            />
+                            <div>
+                              <p className="text-lg font-medium text-[var(--foreground-strong)]">{itemName}</p>
+                              <p className="text-sm theme-muted-page">
+                                {quantity} × ₦{unitPrice.toLocaleString()}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                        <div className="text-right font-bold text-[var(--foreground-strong)]">
-                          ₦{totalPrice.toLocaleString()}
-                        </div>
-                      </li>
-                    );
-                  })}
-                </ul>
-              ) : (
-                <p className="text-sm theme-muted-page">No items found in this order.</p>
-              )}
-            </div>
+                          <div className="text-right font-bold text-[var(--foreground-strong)]">
+                            ₦{lineTotal.toLocaleString()}
+                          </div>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="mt-4 text-sm theme-muted-page">No items found in this order.</p>
+                )}
 
-            <div className="space-y-2 border-t border-[rgba(20,109,126,0.12)] pt-4">
-              <p className="text-lg font-medium text-[var(--foreground-strong)]">
-                Shipping Cost: <span className="text-[var(--accent)]">{shippingCost}</span>
-              </p>
-              <p className="text-xl font-bold text-[var(--foreground-strong)]">
-                Total Paid: <span className="text-[var(--accent)]">{totalAmount}</span>
-              </p>
+                <div className="mt-6 space-y-3 border-t border-[rgba(20,109,126,0.12)] pt-4">
+                  <div className="flex items-center justify-between text-sm theme-muted-page">
+                    <span>Items subtotal</span>
+                    <strong className="text-[var(--foreground-strong)]">{formatCurrency(subtotal)}</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-sm theme-muted-page">
+                    <span>Delivery fee</span>
+                    <strong className="text-[var(--foreground-strong)]">{formatCurrency(shippingCost)}</strong>
+                  </div>
+                  <div className="flex items-center justify-between text-lg font-bold text-[var(--foreground-strong)]">
+                    <span>Total</span>
+                    <span>{formatCurrency(totalAmount)}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -311,13 +318,13 @@ export default function OrderConfirmationPage() {
               href={getPublicScopedHref(order.siteKey || siteKey, "/")}
               className="theme-button-primary inline-block rounded-md px-6 py-3 text-lg font-semibold transition-all duration-200"
             >
-              Continue Shopping
+              Continue shopping
             </Link>
             <Link
               href={getPublicScopedHref(order.siteKey || siteKey, "/account")}
               className="theme-card-light inline-block rounded-md px-6 py-3 text-lg font-semibold text-[var(--foreground-strong)] shadow-sm"
             >
-              View My Orders
+              View my orders
             </Link>
           </div>
         </div>

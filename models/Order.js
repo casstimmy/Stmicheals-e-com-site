@@ -13,6 +13,30 @@ const CustomerSnapshotSchema = new mongoose.Schema(
   { _id: false }
 );
 
+const ShippingDetailsSchema = new mongoose.Schema(
+  {
+    name: String,
+    email: String,
+    phone: String,
+    address: String,
+    city: String,
+  },
+  { _id: false }
+);
+
+const OrderItemSchema = new mongoose.Schema(
+  {
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
+    quantity: { type: Number, required: true },
+    price: { type: Number, required: true },
+    name: String,
+    category: String,
+    description: String,
+    images: [String],
+  },
+  { _id: false }
+);
+
 const OrderSchema = new mongoose.Schema(
   {
     customer: { type: mongoose.Schema.Types.ObjectId, ref: "Customer" },
@@ -21,18 +45,20 @@ const OrderSchema = new mongoose.Schema(
       enum: [PUBLIC_SITE_KEYS.STORE, PUBLIC_SITE_KEYS.HOTEL],
       default: PUBLIC_SITE_KEYS.STORE,
     },
+    locationId: {
+      type: mongoose.Schema.Types.ObjectId,
+      default: null,
+      index: true,
+    },
+    locationName: {
+      type: String,
+      default: "",
+      index: true,
+    },
     customerSnapshot: CustomerSnapshotSchema,
-    items: [
-  {
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true },
-    quantity: { type: Number, required: true},
-    price: { type: Number, required: true },
-    name: String,
-    category: String,
-    description: String,
-    images: [String],
-  },
-],
+    shippingDetails: ShippingDetailsSchema,
+    items: [OrderItemSchema],
+    cartProducts: [OrderItemSchema],
 
     subtotal: Number,
     shippingCost: Number,
@@ -41,13 +67,14 @@ const OrderSchema = new mongoose.Schema(
     paid: { type: Boolean, default: false },
     paymentReference: { type: String },
     paymentStatus: { type: String, default: "Pending" },
-    paymentChannel: { type: String, default: "paystack" },
+    paymentChannel: { type: String, default: "manual-entry" },
     reservationStatus: {
       type: String,
       enum: ["active", "releasing", "released", "finalizing", "finalized"],
       default: "active",
     },
     reservationExpiresAt: Date,
+    inventoryFinalizedBy: { type: String, enum: ["paystack", "admin", "pos", null], default: null },
     reservationReleasedAt: Date,
     finalizedAt: Date,
     cancellationReason: String,

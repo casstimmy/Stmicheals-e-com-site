@@ -34,14 +34,15 @@ export default function AboutPage() {
         {
           heading: `What the ${site.shortLabel.toLowerCase()} side is built for`,
           body: [
-            `${site.displayName} is structured to help customers move from discovery to checkout with clearer product visibility, stock-aware ordering, and dependable payment initiation.`,
+            `${site.displayName} is structured to help customers move from discovery to checkout with clearer product visibility, stock-aware ordering, and inventory-driven web pricing.`,
             "This public side focuses on practical essentials, organized browsing, and a cleaner customer journey for repeat grocery and household purchasing.",
           ],
         },
         {
           heading: `How the ${site.shortLabel.toLowerCase()} catalog operates`,
           body: [
-            "Products, inventory, shipping totals, and payment steps are validated by the server so the customer sees a more consistent ordering experience from cart to confirmation.",
+            "Products, inventory, online campaign pricing, and delivery fees are validated by the server so the customer sees a more consistent ordering experience from cart to order confirmation.",
+            "When a customer places a web order, acknowledgement emails are sent to both the customer and the business while the team completes the manual payment workflow.",
             "Account access is handled through email one-time passcodes, helping customers review activity and continue their shopping flow without a traditional password setup.",
           ],
         },
@@ -59,7 +60,7 @@ export default function AboutPage() {
       title="About Us"
       intro={isHotelSite
         ? `Learn how ${site.displayName} approaches direct reservations, guest communication, and lounge service on the hotel side of St Michael's.`
-        : `Learn how ${site.displayName} approaches catalog browsing, secure checkout, and customer support for this side of the business.`}
+        : `Learn how ${site.displayName} approaches catalog browsing, inventory-driven web orders, and customer support for this side of the business.`}
       sections={sections}
       eyebrow={`About the ${site.shortLabel.toLowerCase()} side`}
       backHref={isHotelSite ? "/rooms" : "/products"}

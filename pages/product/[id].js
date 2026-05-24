@@ -48,7 +48,7 @@ export default function ProductPage({ product, relatedProducts }) {
   const resolvedDescription =
     normalizedDescription && normalizedDescription.toLowerCase() !== (product.name || "").trim().toLowerCase()
       ? normalizedDescription
-      : "Warehouse-stocked item with live availability, destination-based shipping quotes, and server-validated checkout.";
+      : "Warehouse-stocked item with live availability, inventory-driven web pricing, and server-validated manual-entry checkout.";
   const detailStats = [
     {
       label: "Rating",
@@ -242,7 +242,7 @@ export default function ProductPage({ product, relatedProducts }) {
                     ₦{product.salePriceIncTax?.toLocaleString()}
                   </p>
                   <p className="mt-3 text-sm leading-7 store-shell-muted">
-                    Shipping is quoted by destination during checkout, and the server rechecks all order totals before payment begins.
+                    Online campaign pricing and delivery fees are sourced from the inventory system, and the final web order is saved for manual confirmation after checkout.
                   </p>
                 </div>
 
