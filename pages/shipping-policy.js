@@ -40,7 +40,7 @@ export default function ShippingPolicyPage() {
         {
           heading: "Delivery coverage",
           body: [
-            "Delivery availability depends on the supported destinations configured by the store, but web orders currently do not add a delivery-fee charge at checkout.",
+            "Delivery availability depends on the supported destinations configured by the store, and any delivery fee shown at checkout is controlled by the active online campaign and inventory settings.",
             "Customers should choose the correct destination and provide a complete address so delivery can be coordinated accurately.",
           ],
         },
@@ -61,7 +61,7 @@ export default function ShippingPolicyPage() {
         {
           heading: "Fees and changes",
           body: [
-            "Delivery fee is currently waived for web orders, so the final total shown at checkout reflects item prices and any active campaign promotions without an added delivery charge.",
+            "Delivery fee and other online campaign adjustments are pulled from the inventory system, so the final total shown at checkout reflects the live campaign rules active at that time.",
             "Customers should review the final order summary before submitting the order and await manual payment confirmation from the store team.",
           ],
         },
@@ -71,7 +71,7 @@ export default function ShippingPolicyPage() {
       title={site.key === "hotel" ? "Guest Service Policy" : "Shipping Policy"}
       intro={site.key === "hotel"
         ? `This policy outlines how reservation follow-up, guest coordination, and service confirmation work for requests placed through the ${site.shortLabel.toLowerCase()} side of the public site.`
-        : `This policy outlines how delivery coverage, zero-fee web delivery, and fulfillment coordination work for orders placed through the ${site.shortLabel.toLowerCase()} side of the public site.`}
+        : `This policy outlines how delivery coverage, inventory-driven delivery fees, and fulfillment coordination work for orders placed through the ${site.shortLabel.toLowerCase()} side of the public site.`}
       sections={sections}
     />
   );

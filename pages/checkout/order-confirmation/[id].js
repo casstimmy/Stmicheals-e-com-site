@@ -178,7 +178,10 @@ export default function OrderConfirmationPage() {
         style: "currency",
         currency: "NGN",
       })
-    : "Free";
+    : Number(0).toLocaleString("en-NG", {
+        style: "currency",
+        currency: "NGN",
+      });
 
   const totalAmount = Number(order.total || order.subtotal || 0).toLocaleString("en-NG", {
     style: "currency",
@@ -235,6 +238,10 @@ export default function OrderConfirmationPage() {
               Fulfillment: {fulfillmentLabel}
             </span>
           </div>
+
+          <p className="mb-8 text-center text-sm theme-muted-page">
+            Delivery fee and any online campaign pricing on this order were pulled from the inventory system at the time the order was created.
+          </p>
 
           <div className="mb-8 grid gap-4 md:grid-cols-3">
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">

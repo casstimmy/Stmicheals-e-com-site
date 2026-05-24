@@ -35,6 +35,14 @@ export default function CartPage() {
     address: "",
     city: SUPPORTED_SHIPPING_DESTINATIONS[0] || "",
   });
+  const [pricingPreview, setPricingPreview] = useState({
+    baseSubtotal: 0,
+    subtotal: 0,
+    discountTotal: 0,
+    shippingCost: 0,
+    total: 0,
+    ready: false,
+  });
 
   useEffect(() => {
     axios
@@ -74,6 +82,58 @@ export default function CartPage() {
     }
   }, [cartProducts, siteKey]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!cartProducts.length) {
+      return;
+    }
+
+    axios
+      .post("/api/shipping-cost", {
+        destination: customer.city,
+        siteKey,
+        cartProducts: cartProducts.map((item) => ({
+          id: item.id,
+          quantity: item.qty,
+        })),
+      })
+      .then((response) => {
+        if (cancelled) {
+          return;
+        }
+
+        const totals = response.data?.totals || {};
+
+        setPricingPreview({
+          baseSubtotal: Number(totals.baseSubtotal || 0),
+          subtotal: Number(totals.subtotal || 0),
+          discountTotal: Number(totals.discountTotal || 0),
+          shippingCost: Number(totals.shippingCost || 0),
+          total: Number(totals.total || 0),
+          ready: true,
+        });
+      })
+      .catch(() => {
+        if (cancelled) {
+          return;
+        }
+
+        setPricingPreview({
+          baseSubtotal: 0,
+          subtotal: 0,
+          discountTotal: 0,
+          shippingCost: 0,
+          total: 0,
+          ready: false,
+        });
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cartProducts, customer.city, siteKey]);
+
   const displayedProducts = cartProducts.length > 0 ? products : [];
   const cartLines = displayedProducts.map((product) => {
     const cartItem = cartProducts.find((item) => item.id === product._id);
@@ -89,13 +149,20 @@ export default function CartPage() {
       exceedsStock: availableQuantity > 0 && quantity > availableQuantity,
     };
   });
-  const subtotal = cartLines.reduce(
+  const catalogSubtotal = cartLines.reduce(
     (sum, line) => sum + (line.product.salePriceIncTax || 0) * line.quantity,
     0
   );
   const totalItems = cartProducts.reduce((sum, item) => sum + item.qty, 0);
-  const shippingCost = 0;
-  const deliveryFeeLabel = "Free";
+  const previewReady = pricingPreview.ready;
+  const previewLoading = false;
+  const discountTotal = previewReady ? pricingPreview.discountTotal : 0;
+  const shippingCost = previewReady ? pricingPreview.shippingCost : 0;
+  const subtotal = previewReady ? pricingPreview.subtotal : catalogSubtotal;
+  const total = previewReady ? pricingPreview.total : catalogSubtotal + shippingCost;
+  const deliveryFeeLabel = previewLoading
+    ? "Updating..."
+    : `₦${shippingCost.toLocaleString()}`;
   const hasInventoryIssues = cartLines.some((line) => line.isSoldOut || line.exceedsStock);
   const inventoryAlertText = cartLines
     .filter((line) => line.isSoldOut || line.exceedsStock)
@@ -210,7 +277,7 @@ export default function CartPage() {
                     },
                     {
                       label: "2. Confirm delivery",
-                      detail: "Delivery fee is currently waived for web orders.",
+                      detail: "Delivery fee and online campaign pricing sync from the inventory system.",
                     },
                     {
                       label: "3. Place order",
@@ -451,7 +518,7 @@ export default function CartPage() {
                     <div className="mt-6 flex flex-col gap-4 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.7)] px-5 py-5 sm:flex-row sm:items-center sm:justify-between">
                       <div>
                         <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Subtotal</p>
-                        <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">₦{subtotal.toLocaleString()}</p>
+                        <p className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">₦{catalogSubtotal.toLocaleString()}</p>
                       </div>
                       <Link
                         href={getPublicScopedHref(siteKey, "/")}
@@ -467,13 +534,16 @@ export default function CartPage() {
               <aside className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Order summary</h2>
                 <p className="mt-2 text-sm leading-7 store-shell-muted">
-                  Delivery fee is currently waived on web orders, and any active campaign promotions are already reflected in the item prices below.
+                  Delivery fee and online campaign pricing are pulled from the inventory system and checked again when you place the order.
                 </p>
 
                 <div className="mt-5 space-y-3">
                   {[
                     { label: "Items", value: totalItems },
-                    { label: "Subtotal", value: `₦${subtotal.toLocaleString()}` },
+                    { label: "Items subtotal", value: `₦${catalogSubtotal.toLocaleString()}` },
+                    ...(discountTotal > 0
+                      ? [{ label: "Campaign adjustment", value: `-₦${discountTotal.toLocaleString()}` }]
+                      : []),
                     { label: "Delivery fee", value: deliveryFeeLabel },
                   ].map((item) => (
                     <div key={item.label} className="store-shell-card flex items-center justify-between rounded-[1.2rem] px-4 py-4 text-sm">
@@ -486,12 +556,14 @@ export default function CartPage() {
                 <div className="mt-4 rounded-[1.4rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(31,44,51,0.04)] px-4 py-4">
                   <div className="flex items-center justify-between gap-3 text-[var(--foreground-strong)]">
                     <span className="text-sm font-semibold uppercase tracking-[0.18em]">Total</span>
-                    <span className="text-2xl font-bold">₦{(subtotal + shippingCost).toLocaleString()}</span>
+                    <span className="text-2xl font-bold">₦{total.toLocaleString()}</span>
                   </div>
                 </div>
 
                 <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                  Delivery fee is currently waived. Campaign promotions configured for online orders are already reflected in the prices above.
+                  {previewLoading
+                    ? "Updating live delivery fee and online campaign pricing from the inventory system..."
+                    : "The delivery fee and any online campaign adjustments shown here come directly from the inventory system."}
                 </div>
 
                 <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.6)] p-4 sm:p-5">
@@ -621,7 +693,7 @@ export default function CartPage() {
                   },
                   {
                     label: "2. Confirm delivery",
-                    detail: "Delivery fee is currently waived for web orders.",
+                      detail: "Delivery fee and online campaign pricing sync from the inventory system.",
                   },
                   {
                     label: "3. Place order",
@@ -864,7 +936,7 @@ export default function CartPage() {
                     <div className="text-lg text-[var(--foreground-strong)] sm:text-xl">
                       Subtotal:{" "}
                       <span className="font-semibold">
-                        ₦{subtotal.toLocaleString()}
+                        ₦{catalogSubtotal.toLocaleString()}
                       </span>
                     </div>
                     <Link
@@ -890,21 +962,29 @@ export default function CartPage() {
                   <span>{totalItems}</span>
                 </div>
                 <div className="flex justify-between border-b border-cyan-200/10 pb-2">
-                  <span>Subtotal:</span>
-                  <span>₦{subtotal.toLocaleString()}</span>
+                  <span>Items subtotal:</span>
+                  <span>₦{catalogSubtotal.toLocaleString()}</span>
                 </div>
+                {discountTotal > 0 && (
+                  <div className="flex justify-between border-b border-cyan-200/10 pb-2">
+                    <span>Campaign adjustment:</span>
+                    <span>-₦{discountTotal.toLocaleString()}</span>
+                  </div>
+                )}
                 <div className="flex justify-between border-b border-cyan-200/10 pb-2">
                   <span>Delivery fee:</span>
                   <span>{deliveryFeeLabel}</span>
                 </div>
                 <div className="flex justify-between text-lg sm:text-xl font-semibold pt-4">
                   <span>Total:</span>
-                  <span>₦{(subtotal + shippingCost).toLocaleString()}</span>
+                  <span>₦{total.toLocaleString()}</span>
                 </div>
               </div>
 
               <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50">
-                Delivery fee is currently waived. Campaign promotions configured for online orders are already reflected in the prices above.
+                {previewLoading
+                  ? "Updating live delivery fee and online campaign pricing from the inventory system..."
+                  : "The delivery fee and any online campaign adjustments shown here come directly from the inventory system."}
               </div>
 
               <div className="border-t border-cyan-200/10 pt-6">

@@ -16,6 +16,10 @@ const StoreSchema = new mongoose.Schema(
   {
     storeName: { type: String, default: "" },
     companyName: { type: String, default: "" },
+    companyDisplayName: { type: String, default: "" },
+    email: { type: String, default: "" },
+    website: { type: String, default: "" },
+    logo: { type: String, default: "" },
     locations: [LocationSchema],
     shippingBaseCost: { type: Number, default: 2000 },
     shippingRatePerKm: { type: Number, default: 100 },
