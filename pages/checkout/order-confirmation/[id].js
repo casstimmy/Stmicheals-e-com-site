@@ -100,8 +100,8 @@ export default function OrderConfirmationPage() {
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
             <div className="theme-shell-light mx-auto max-w-xl rounded-[2rem] px-6 py-10 text-center shadow-[0_30px_70px_rgba(18,52,60,0.08)]">
-            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Confirming your order</h1>
-            <p className="mt-3 theme-muted-page">We are validating payment and loading your final order details.</p>
+            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Loading your order</h1>
+            <p className="mt-3 theme-muted-page">We are loading your final order details and confirmation summary.</p>
             <Link
               href={getPublicScopedHref(siteKey, "/")}
               className="theme-card-light mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm"
@@ -119,16 +119,16 @@ export default function OrderConfirmationPage() {
     return (
       <>
         <Head>
-          <title>{`Payment Pending | ${site.displayName}`}</title>
+          <title>{`Order Update Pending | ${site.displayName}`}</title>
         </Head>
         <Header siteKey={siteKey} />
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
             <div className="max-w-xl rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center shadow-sm">
-            <h1 className="text-2xl font-bold text-red-800">Payment confirmation pending</h1>
+            <h1 className="text-2xl font-bold text-red-800">Order confirmation pending</h1>
             <p className="mt-3 text-red-700">{verificationError}</p>
             <p className="mt-3 text-sm text-red-600">
-              If payment was completed, your order will remain available once verification succeeds.
+              If your order was just placed, refresh again shortly or contact the store for assistance.
             </p>
             <Link
               href={getPublicScopedHref(siteKey, "/")}
@@ -168,20 +168,29 @@ export default function OrderConfirmationPage() {
     );
   }
 
-  const shippingCost = (order.shippingCost).toLocaleString("en-NG", {
+  const subtotalAmount = Number(order.subtotal || 0).toLocaleString("en-NG", {
     style: "currency",
     currency: "NGN",
   });
 
-  const totalAmount = (order.subtotal + order.shippingCost).toLocaleString("en-NG", {
+  const deliveryFeeLabel = Number(order.shippingCost || 0) > 0
+    ? Number(order.shippingCost || 0).toLocaleString("en-NG", {
+        style: "currency",
+        currency: "NGN",
+      })
+    : "Free";
+
+  const totalAmount = Number(order.total || order.subtotal || 0).toLocaleString("en-NG", {
     style: "currency",
     currency: "NGN",
   });
 
   const orderDate = new Date(order.createdAt).toLocaleString();
   const itemCount = order.items?.length || 0;
-  const paymentStatusLabel = order.paid ? "Confirmed" : order.paymentStatus || "Pending";
-  const fulfillmentLabel = order.status === "Delivered" ? "Delivered" : "Inventory Reserved";
+  const normalizedPaymentChannel = String(order.paymentChannel || "").trim().toLowerCase();
+  const isManualPaymentPending = !order.paid && order.paymentStatus !== "Paid" && ["manual-entry", "manual", "pos"].includes(normalizedPaymentChannel);
+  const paymentStatusLabel = order.paid ? "Paid" : isManualPaymentPending ? "Manual confirmation pending" : order.paymentStatus || "Pending";
+  const fulfillmentLabel = order.status || "Inventory Reserved";
 
   return (
     <>
@@ -210,7 +219,7 @@ export default function OrderConfirmationPage() {
 
           {/* Thank You Header */}
           <h1 className="mb-4 text-center text-3xl font-bold text-[var(--foreground-strong)] md:text-4xl">
-            Thank you for your purchase!
+            Thank you. Your order has been received.
           </h1>
           <p className="mb-8 text-center text-lg theme-muted-page">
             Order <strong>#{order._id}</strong> placed on <em>{orderDate}</em>.
@@ -304,10 +313,16 @@ export default function OrderConfirmationPage() {
 
             <div className="space-y-2 border-t border-[rgba(20,109,126,0.12)] pt-4">
               <p className="text-lg font-medium text-[var(--foreground-strong)]">
-                Shipping Cost: <span className="text-[var(--accent)]">{shippingCost}</span>
+                Subtotal: <span className="text-[var(--accent)]">{subtotalAmount}</span>
+              </p>
+              <p className="text-lg font-medium text-[var(--foreground-strong)]">
+                Delivery fee: <span className="text-[var(--accent)]">{deliveryFeeLabel}</span>
               </p>
               <p className="text-xl font-bold text-[var(--foreground-strong)]">
-                Total Paid: <span className="text-[var(--accent)]">{totalAmount}</span>
+                Total: <span className="text-[var(--accent)]">{totalAmount}</span>
+              </p>
+              <p className="text-sm theme-muted-page">
+                Campaign promotions applied to online orders are already reflected in the item prices above.
               </p>
             </div>
           </section>

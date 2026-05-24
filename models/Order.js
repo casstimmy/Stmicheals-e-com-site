@@ -67,7 +67,7 @@ const OrderSchema = new mongoose.Schema(
     paid: { type: Boolean, default: false },
     paymentReference: { type: String },
     paymentStatus: { type: String, default: "Pending" },
-    paymentChannel: { type: String, default: "paystack" },
+    paymentChannel: { type: String, default: "manual-entry" },
     reservationStatus: {
       type: String,
       enum: ["active", "releasing", "released", "finalizing", "finalized"],

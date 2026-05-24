@@ -47,14 +47,14 @@ export default function PrivacyPolicyPage() {
         {
           heading: "How we use your data",
           body: [
-            "Customer data is used to create and manage orders, calculate delivery charges, verify account access with one-time passcodes, and communicate about payment or fulfillment status.",
+            "Customer data is used to create and manage orders, coordinate delivery, verify account access with one-time passcodes, and communicate about manual payment confirmation or fulfillment status.",
             "We do not use your order data for unrelated purposes without a lawful basis, and we limit internal access to the information needed to operate the service.",
           ],
         },
         {
           heading: "Payments and communications",
           body: [
-            "Payments are initiated through Paystack, and payment details are handled through that provider's secure payment flow rather than being stored directly in the storefront UI.",
+            "The storefront does not currently take direct online card payments. Payment confirmation is handled manually by the store team using the contact details supplied with the order.",
             "Email communication may be used for account verification and order notifications. Customers should ensure their contact details remain accurate for service continuity.",
           ],
         },
@@ -71,7 +71,7 @@ export default function PrivacyPolicyPage() {
       title="Privacy Policy"
       intro={site.key === "hotel"
         ? `This policy explains how ${site.displayName} handles guest information used for booking requests, table reservations, reservation management, and guest communication.`
-        : `This policy explains how ${site.displayName} handles customer information used for orders, account access, delivery coordination, and payment-related communication.`}
+        : `This policy explains how ${site.displayName} handles customer information used for orders, account access, delivery coordination, and order-related communication.`}
       sections={sections}
     />
   );

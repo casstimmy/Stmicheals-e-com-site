@@ -28,7 +28,6 @@ export default function CartPage() {
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
-  const [shippingDetails, setShippingDetails] = useState(null);
   const [customer, setCustomer] = useState({
     name: "",
     email: "",
@@ -57,22 +56,6 @@ export default function CartPage() {
       })
       .catch(() => {});
   }, []);
-
-  // Fetch shipping cost when city changes
-  useEffect(() => {
-    if (!customer.city || cartProducts.length === 0) {
-      return;
-    }
-
-    axios
-      .post("/api/shipping-cost", { destination: customer.city })
-      .then((res) => {
-        setShippingDetails(res.data);
-      })
-      .catch(() => {
-        setShippingDetails(null);
-      });
-  }, [cartProducts.length, customer.city]);
 
   useEffect(() => {
     const ids = cartProducts.map((p) => p.id);
@@ -111,7 +94,8 @@ export default function CartPage() {
     0
   );
   const totalItems = cartProducts.reduce((sum, item) => sum + item.qty, 0);
-  const shippingCost = cartProducts.length === 0 ? 0 : Number(shippingDetails?.cost || 0);
+  const shippingCost = 0;
+  const deliveryFeeLabel = "Free";
   const hasInventoryIssues = cartLines.some((line) => line.isSoldOut || line.exceedsStock);
   const inventoryAlertText = cartLines
     .filter((line) => line.isSoldOut || line.exceedsStock)
@@ -226,7 +210,7 @@ export default function CartPage() {
                     },
                     {
                       label: "2. Confirm delivery",
-                      detail: "Shipping totals update with the selected destination.",
+                      detail: "Delivery fee is currently waived for web orders.",
                     },
                     {
                       label: "3. Place order",
@@ -483,14 +467,14 @@ export default function CartPage() {
               <aside className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Order summary</h2>
                 <p className="mt-2 text-sm leading-7 store-shell-muted">
-                  Delivery totals update when the destination changes. Payment only begins after the server confirms the final order state.
+                  Delivery fee is currently waived on web orders, and any active campaign promotions are already reflected in the item prices below.
                 </p>
 
                 <div className="mt-5 space-y-3">
                   {[
                     { label: "Items", value: totalItems },
                     { label: "Subtotal", value: `₦${subtotal.toLocaleString()}` },
-                    { label: "Shipping", value: `₦${shippingCost.toLocaleString()}` },
+                    { label: "Delivery fee", value: deliveryFeeLabel },
                   ].map((item) => (
                     <div key={item.label} className="store-shell-card flex items-center justify-between rounded-[1.2rem] px-4 py-4 text-sm">
                       <span className="store-shell-muted">{item.label}</span>
@@ -506,12 +490,9 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                {shippingDetails && (
-                  <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                    Delivery quote for {shippingDetails.destination}: ₦{shippingCost.toLocaleString()}
-                    {shippingDetails.isFallback ? " (standard rate applied)" : ""}
-                  </div>
-                )}
+                <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
+                  Delivery fee is currently waived. Campaign promotions configured for online orders are already reflected in the prices above.
+                </div>
 
                 <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.6)] p-4 sm:p-5">
                   <h3 className="text-lg font-semibold text-[var(--foreground-strong)]">Customer information</h3>
@@ -590,7 +571,7 @@ export default function CartPage() {
                 )}
 
                 <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                  Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts. Signed-in customers also get profile details prefilled automatically.
+                  Secure checkout: prices, stock, and campaign pricing are revalidated on the server before the order is submitted. Signed-in customers also get profile details prefilled automatically.
                 </div>
 
                 <button
@@ -640,7 +621,7 @@ export default function CartPage() {
                   },
                   {
                     label: "2. Confirm delivery",
-                    detail: "Shipping costs update instantly by destination.",
+                    detail: "Delivery fee is currently waived for web orders.",
                   },
                   {
                     label: "3. Place order",
@@ -913,8 +894,8 @@ export default function CartPage() {
                   <span>₦{subtotal.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between border-b border-cyan-200/10 pb-2">
-                  <span>Shipping:</span>
-                  <span>₦{shippingCost.toLocaleString()}</span>
+                  <span>Delivery fee:</span>
+                  <span>{deliveryFeeLabel}</span>
                 </div>
                 <div className="flex justify-between text-lg sm:text-xl font-semibold pt-4">
                   <span>Total:</span>
@@ -922,12 +903,9 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {shippingDetails && (
-                <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50">
-                  Delivery quote for {shippingDetails.destination}: ₦{shippingCost.toLocaleString()}
-                  {shippingDetails.isFallback ? " (standard rate applied)" : ""}
-                </div>
-              )}
+              <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50">
+                Delivery fee is currently waived. Campaign promotions configured for online orders are already reflected in the prices above.
+              </div>
 
               <div className="border-t border-cyan-200/10 pt-6">
                 <h3 className="text-lg font-semibold mb-4 text-white">
@@ -996,7 +974,7 @@ export default function CartPage() {
               )}
 
               <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50/85">
-                Secure checkout: prices, stock, and delivery totals are revalidated on the server before payment starts.
+                Secure checkout: prices, stock, and campaign pricing are revalidated on the server before the order is submitted.
                 Signed-in customers also get profile details prefilled automatically.
               </div>
 
