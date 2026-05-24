@@ -40,14 +40,14 @@ export default function ShippingPolicyPage() {
         {
           heading: "Delivery coverage",
           body: [
-            "Delivery availability depends on the supported destinations configured by the store, and any delivery fee shown at checkout is controlled by the active online campaign and inventory settings.",
+            "Shipping availability depends on the supported delivery destinations configured by the store. Delivery charges are quoted based on the selected city and may fall back to a standard rate when live quotes are unavailable.",
             "Customers should choose the correct destination and provide a complete address so delivery can be coordinated accurately.",
           ],
         },
         {
           heading: "Order processing and confirmation",
           body: [
-            "Delivery coordination begins only after the order, stock reservation, and manual payment confirmation flow have been reviewed by the team. Delivery timelines may vary based on destination, order volume, and operational demand.",
+            "Shipping begins only after the order, stock reservation, and payment flow have been validated. Delivery timelines may vary based on destination, order volume, and operational demand.",
             "Customers should monitor their email and phone contact details for updates or clarification requests related to fulfillment.",
           ],
         },
@@ -61,8 +61,8 @@ export default function ShippingPolicyPage() {
         {
           heading: "Fees and changes",
           body: [
-            "Delivery fee and other online campaign adjustments are pulled from the inventory system, so the final total shown at checkout reflects the live campaign rules active at that time.",
-            "Customers should review the final order summary before submitting the order and await manual payment confirmation from the store team.",
+            "Displayed shipping fees are part of the server-validated order total and may be updated if the delivery destination changes before payment is initiated.",
+            "Customers should review the final quoted total before completing payment authorization.",
           ],
         },
       ];
@@ -71,7 +71,7 @@ export default function ShippingPolicyPage() {
       title={site.key === "hotel" ? "Guest Service Policy" : "Shipping Policy"}
       intro={site.key === "hotel"
         ? `This policy outlines how reservation follow-up, guest coordination, and service confirmation work for requests placed through the ${site.shortLabel.toLowerCase()} side of the public site.`
-        : `This policy outlines how delivery coverage, inventory-driven delivery fees, and fulfillment coordination work for orders placed through the ${site.shortLabel.toLowerCase()} side of the public site.`}
+        : `This policy outlines how delivery coverage, shipping charges, and fulfillment coordination work for orders placed through the ${site.shortLabel.toLowerCase()} side of the public site.`}
       sections={sections}
     />
   );

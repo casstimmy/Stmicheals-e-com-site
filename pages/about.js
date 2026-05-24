@@ -34,21 +34,21 @@ export default function AboutPage() {
         {
           heading: `What the ${site.shortLabel.toLowerCase()} side is built for`,
           body: [
-            `${site.displayName} is structured to help customers move from discovery to order placement with clearer product visibility, stock-aware ordering, and dependable follow-up from the store team.`,
+            `${site.displayName} is structured to help customers move from discovery to checkout with clearer product visibility, stock-aware ordering, and dependable payment initiation.`,
             "This public side focuses on practical essentials, organized browsing, and a cleaner customer journey for repeat grocery and household purchasing.",
           ],
         },
         {
           heading: `How the ${site.shortLabel.toLowerCase()} catalog operates`,
           body: [
-            "Products, inventory, and final order totals are validated by the server so the customer sees a more consistent ordering experience from cart to confirmation.",
+            "Products, inventory, shipping totals, and payment steps are validated by the server so the customer sees a more consistent ordering experience from cart to confirmation.",
             "Account access is handled through email one-time passcodes, helping customers review activity and continue their shopping flow without a traditional password setup.",
           ],
         },
         {
           heading: "Customer service focus",
           body: [
-            `The ${site.shortLabel.toLowerCase()} side is designed to keep ordering clear, mobile-friendly, and easy to recover when customers need help with delivery details, account access, or manual payment confirmation.`,
+            `The ${site.shortLabel.toLowerCase()} side is designed to keep ordering clear, mobile-friendly, and easy to recover when customers need help with delivery details, account access, or payment confirmation.`,
             "Policy pages, contact routes, and footer navigation are provided so important information stays accessible across the public site, not hidden behind checkout steps.",
           ],
         },
@@ -59,7 +59,7 @@ export default function AboutPage() {
       title="About Us"
       intro={isHotelSite
         ? `Learn how ${site.displayName} approaches direct reservations, guest communication, and lounge service on the hotel side of St Michael's.`
-        : `Learn how ${site.displayName} approaches catalog browsing, order confirmation, and customer support for this side of the business.`}
+        : `Learn how ${site.displayName} approaches catalog browsing, secure checkout, and customer support for this side of the business.`}
       sections={sections}
       eyebrow={`About the ${site.shortLabel.toLowerCase()} side`}
       backHref={isHotelSite ? "/rooms" : "/products"}

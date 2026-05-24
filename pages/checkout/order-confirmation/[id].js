@@ -52,15 +52,8 @@ export default function OrderConfirmationPage() {
 
         if (paymentReference && !verificationStartedRef.current) {
           verificationStartedRef.current = true;
-          try {
-            await axios.post("/api/paystack/verify", { reference: paymentReference });
-          } catch (error) {
-            if (!cancelled) {
-              setVerificationError(
-                error.response?.data?.message || "We could not confirm this payment yet."
-              );
-            }
-          }
+          await axios.post("/api/paystack/verify", { reference: paymentReference });
+          clearCartRef.current();
         }
 
         const response = await axios.get("/api/orders", {
@@ -68,12 +61,14 @@ export default function OrderConfirmationPage() {
         });
         if (!cancelled) {
           setOrder(response.data);
-          clearCartRef.current();
+          if (response.data?.paid) {
+            clearCartRef.current();
+          }
         }
       } catch (error) {
         if (!cancelled) {
           setVerificationError(
-            error.response?.data?.message || "We could not load this order right now."
+            error.response?.data?.message || "We could not confirm this payment yet."
           );
         }
       } finally {
@@ -100,8 +95,8 @@ export default function OrderConfirmationPage() {
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
             <div className="theme-shell-light mx-auto max-w-xl rounded-[2rem] px-6 py-10 text-center shadow-[0_30px_70px_rgba(18,52,60,0.08)]">
-            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Loading your order</h1>
-            <p className="mt-3 theme-muted-page">We are loading your final order details and confirmation summary.</p>
+            <h1 className="text-2xl font-bold text-[var(--foreground-strong)]">Confirming your order</h1>
+            <p className="mt-3 theme-muted-page">We are validating payment and loading your final order details.</p>
             <Link
               href={getPublicScopedHref(siteKey, "/")}
               className="theme-card-light mt-6 inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-5 py-3 text-sm font-semibold text-[var(--foreground-strong)] shadow-sm"
@@ -119,16 +114,16 @@ export default function OrderConfirmationPage() {
     return (
       <>
         <Head>
-          <title>{`Order Update Pending | ${site.displayName}`}</title>
+          <title>{`Payment Pending | ${site.displayName}`}</title>
         </Head>
         <Header siteKey={siteKey} />
         <Center>
           <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center px-4 py-10">
             <div className="max-w-xl rounded-2xl border border-red-200 bg-red-50 px-6 py-8 text-center shadow-sm">
-            <h1 className="text-2xl font-bold text-red-800">Order confirmation pending</h1>
+            <h1 className="text-2xl font-bold text-red-800">Payment confirmation pending</h1>
             <p className="mt-3 text-red-700">{verificationError}</p>
             <p className="mt-3 text-sm text-red-600">
-              If your order was just placed, refresh again shortly or contact the store for assistance.
+              If payment was completed, your order will remain available once verification succeeds.
             </p>
             <Link
               href={getPublicScopedHref(siteKey, "/")}
@@ -168,32 +163,19 @@ export default function OrderConfirmationPage() {
     );
   }
 
-  const subtotalAmount = Number(order.subtotal || 0).toLocaleString("en-NG", {
+  const shippingCost = (order.shippingCost).toLocaleString("en-NG", {
     style: "currency",
     currency: "NGN",
   });
 
-  const deliveryFeeLabel = Number(order.shippingCost || 0) > 0
-    ? Number(order.shippingCost || 0).toLocaleString("en-NG", {
-        style: "currency",
-        currency: "NGN",
-      })
-    : Number(0).toLocaleString("en-NG", {
-        style: "currency",
-        currency: "NGN",
-      });
-
-  const totalAmount = Number(order.total || order.subtotal || 0).toLocaleString("en-NG", {
+  const totalAmount = (order.subtotal + order.shippingCost).toLocaleString("en-NG", {
     style: "currency",
     currency: "NGN",
   });
 
   const orderDate = new Date(order.createdAt).toLocaleString();
   const itemCount = order.items?.length || 0;
-  const normalizedPaymentChannel = String(order.paymentChannel || "").trim().toLowerCase();
-  const isManualPaymentPending = !order.paid && order.paymentStatus !== "Paid" && ["manual-entry", "manual", "pos"].includes(normalizedPaymentChannel);
-  const paymentStatusLabel = order.paid ? "Paid" : isManualPaymentPending ? "Manual confirmation pending" : order.paymentStatus || "Pending";
-  const fulfillmentLabel = order.status || "Inventory Reserved";
+  const paymentStatusLabel = order.paid ? "Confirmed" : order.paymentStatus || "Pending";
 
   return (
     <>
@@ -222,7 +204,7 @@ export default function OrderConfirmationPage() {
 
           {/* Thank You Header */}
           <h1 className="mb-4 text-center text-3xl font-bold text-[var(--foreground-strong)] md:text-4xl">
-            Thank you. Your order has been received.
+            Thank you for your purchase!
           </h1>
           <p className="mb-8 text-center text-lg theme-muted-page">
             Order <strong>#{order._id}</strong> placed on <em>{orderDate}</em>.
@@ -235,13 +217,9 @@ export default function OrderConfirmationPage() {
               Payment: {paymentStatusLabel}
             </span>
             <span className="theme-card-light rounded-full px-4 py-2 text-sm font-semibold text-[var(--foreground-strong)]">
-              Fulfillment: {fulfillmentLabel}
+              Fulfillment: {order.status}
             </span>
           </div>
-
-          <p className="mb-8 text-center text-sm theme-muted-page">
-            Delivery fee and any online campaign pricing on this order were pulled from the inventory system at the time the order was created.
-          </p>
 
           <div className="mb-8 grid gap-4 md:grid-cols-3">
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
@@ -250,7 +228,7 @@ export default function OrderConfirmationPage() {
             </div>
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
               <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Fulfillment</p>
-              <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{fulfillmentLabel}</p>
+              <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{order.status}</p>
             </div>
             <div className="theme-card-light rounded-[1.5rem] px-5 py-5 shadow-sm">
               <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Items in order</p>
@@ -320,16 +298,10 @@ export default function OrderConfirmationPage() {
 
             <div className="space-y-2 border-t border-[rgba(20,109,126,0.12)] pt-4">
               <p className="text-lg font-medium text-[var(--foreground-strong)]">
-                Subtotal: <span className="text-[var(--accent)]">{subtotalAmount}</span>
-              </p>
-              <p className="text-lg font-medium text-[var(--foreground-strong)]">
-                Delivery fee: <span className="text-[var(--accent)]">{deliveryFeeLabel}</span>
+                Shipping Cost: <span className="text-[var(--accent)]">{shippingCost}</span>
               </p>
               <p className="text-xl font-bold text-[var(--foreground-strong)]">
-                Total: <span className="text-[var(--accent)]">{totalAmount}</span>
-              </p>
-              <p className="text-sm theme-muted-page">
-                Campaign promotions applied to online orders are already reflected in the item prices above.
+                Total Paid: <span className="text-[var(--accent)]">{totalAmount}</span>
               </p>
             </div>
           </section>

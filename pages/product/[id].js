@@ -242,7 +242,7 @@ export default function ProductPage({ product, relatedProducts }) {
                     ₦{product.salePriceIncTax?.toLocaleString()}
                   </p>
                   <p className="mt-3 text-sm leading-7 store-shell-muted">
-                    Delivery fee is currently waived for web orders, and the server rechecks inventory and campaign pricing before the order is submitted.
+                    Shipping is quoted by destination during checkout, and the server rechecks all order totals before payment begins.
                   </p>
                 </div>
 

@@ -1,12 +1,6 @@
 import CartProvider from "@/components/CartContext";
 import AppLoaderOverlay from "@/components/AppLoaderOverlay";
 import Footer from "@/components/Footer";
-import {
-  applySystemThemeToDOM,
-  DEFAULT_SYSTEM_THEME,
-  persistSystemTheme,
-  readCachedSystemTheme,
-} from "@/lib/systemTheme";
 import "@/styles/globals.css";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -29,34 +23,6 @@ export default function App({ Component, pageProps }) {
   const hideFooter = Component.hideFooter === true;
   const [isBootLoading, setIsBootLoading] = useState(true);
   const [isRouteLoading, setIsRouteLoading] = useState(false);
-
-  useEffect(() => {
-    applySystemThemeToDOM(DEFAULT_SYSTEM_THEME);
-
-    const cachedTheme = readCachedSystemTheme();
-    if (cachedTheme) {
-      applySystemThemeToDOM(cachedTheme);
-    }
-
-    let active = true;
-
-    fetch("/api/system-theme")
-      .then((response) => response.json())
-      .then((payload) => {
-        if (!active) return;
-        const nextTheme = payload?.theme || DEFAULT_SYSTEM_THEME;
-        applySystemThemeToDOM(nextTheme);
-        persistSystemTheme(nextTheme);
-      })
-      .catch(() => {
-        if (!active) return;
-        applySystemThemeToDOM(cachedTheme || DEFAULT_SYSTEM_THEME);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, []);
 
   useEffect(() => {
     const bootTimer = window.setTimeout(() => {
