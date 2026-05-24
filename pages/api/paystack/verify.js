@@ -9,6 +9,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
 
+  const secretKey = process.env.PAYSTACK_SECRET_KEY?.trim();
+  if (!secretKey) {
+    return res.status(500).json({ error: "PAYSTACK_SECRET_KEY is not configured" });
+  }
+
   await mongooseConnect();
 
   const { reference } = req.body;
@@ -23,7 +28,7 @@ export default async function handler(req, res) {
       `https://api.paystack.co/transaction/verify/${reference}`,
       {
         headers: {
-          Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+          Authorization: `Bearer ${secretKey}`,
         },
       }
     );

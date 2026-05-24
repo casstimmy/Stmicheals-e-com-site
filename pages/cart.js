@@ -36,7 +36,6 @@ export default function CartPage() {
     address: "",
     city: SUPPORTED_SHIPPING_DESTINATIONS[0] || "",
   });
-  const [shippingCost, setShippingCost] = useState(2000);
 
   useEffect(() => {
     axios
@@ -66,21 +65,27 @@ export default function CartPage() {
     }
 
     if (cartProducts.length === 0) {
-      setShippingCost(0);
-      setShippingDetails(null);
       return;
     }
+
+    let cancelled = false;
 
     axios
       .post("/api/shipping-cost", { destination: customer.city })
       .then((res) => {
-        setShippingCost(res.data.cost);
-        setShippingDetails(res.data);
+        if (!cancelled) {
+          setShippingDetails(res.data);
+        }
       })
       .catch(() => {
-        setShippingCost(2000);
-        setShippingDetails(null);
+        if (!cancelled) {
+          setShippingDetails(null);
+        }
       });
+
+    return () => {
+      cancelled = true;
+    };
   }, [cartProducts.length, customer.city]);
 
   useEffect(() => {
@@ -119,6 +124,8 @@ export default function CartPage() {
     (sum, line) => sum + (line.product.salePriceIncTax || 0) * line.quantity,
     0
   );
+  const activeShippingDetails = customer.city && cartProducts.length > 0 ? shippingDetails : null;
+  const shippingCost = !customer.city || cartProducts.length === 0 ? 0 : activeShippingDetails?.cost ?? 2000;
   const totalItems = cartProducts.reduce((sum, item) => sum + item.qty, 0);
   const hasInventoryIssues = cartLines.some((line) => line.isSoldOut || line.exceedsStock);
   const inventoryAlertText = cartLines
@@ -514,10 +521,10 @@ export default function CartPage() {
                   </div>
                 </div>
 
-                {shippingDetails && (
+                {activeShippingDetails && (
                   <div className="mt-4 rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                    Delivery quote for {shippingDetails.destination}: ₦{shippingCost.toLocaleString()}
-                    {shippingDetails.isFallback ? " (standard rate applied)" : ""}
+                    Delivery quote for {activeShippingDetails.destination}: ₦{shippingCost.toLocaleString()}
+                    {activeShippingDetails.isFallback ? " (standard rate applied)" : ""}
                   </div>
                 )}
 
@@ -577,9 +584,10 @@ export default function CartPage() {
                       <select
                         className={storeInputClassName}
                         value={customer.city}
-                        onChange={(e) =>
-                          setCustomer({ ...customer, city: e.target.value })
-                        }
+                        onChange={(e) => {
+                          setShippingDetails(null);
+                          setCustomer({ ...customer, city: e.target.value });
+                        }}
                       >
                         {SUPPORTED_SHIPPING_DESTINATIONS.map((city) => (
                           <option key={city} value={city}>
@@ -930,10 +938,10 @@ export default function CartPage() {
                 </div>
               </div>
 
-              {shippingDetails && (
+              {activeShippingDetails && (
                 <div className="theme-card-soft rounded-xl px-4 py-3 text-sm text-cyan-50">
-                  Delivery quote for {shippingDetails.destination}: ₦{shippingCost.toLocaleString()}
-                  {shippingDetails.isFallback ? " (standard rate applied)" : ""}
+                  Delivery quote for {activeShippingDetails.destination}: ₦{shippingCost.toLocaleString()}
+                  {activeShippingDetails.isFallback ? " (standard rate applied)" : ""}
                 </div>
               )}
 
@@ -983,9 +991,10 @@ export default function CartPage() {
                     <select
                       className="theme-input mt-1 w-full rounded-xl px-4 py-3"
                       value={customer.city}
-                      onChange={(e) =>
-                        setCustomer({ ...customer, city: e.target.value })
-                      }
+                      onChange={(e) => {
+                        setShippingDetails(null);
+                        setCustomer({ ...customer, city: e.target.value });
+                      }}
                     >
                       {SUPPORTED_SHIPPING_DESTINATIONS.map((city) => (
                         <option key={city} value={city}>

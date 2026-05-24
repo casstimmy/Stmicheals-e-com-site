@@ -28,6 +28,7 @@ export async function createTestProduct(overrides = {}) {
     quantity: 25,
     reservedQuantity: 0,
     category: "Groceries",
+    locations: ["warehouse"],
     images: [
       {
         full: "/images/product-placeholder.svg",
@@ -67,7 +68,12 @@ export async function createReservedOrderFixture({
       city: customer.city,
     },
     cartProducts: [{ _id: String(product._id), quantity }],
+    siteKey: "store",
   });
+
+  if (orderDraft.errors?.length) {
+    throw new Error(orderDraft.errors.join(" "));
+  }
 
   const order = await createReservedOrder({
     customer,

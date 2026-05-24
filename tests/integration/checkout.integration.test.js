@@ -14,6 +14,7 @@ describe("checkout order creation", () => {
       quantity: 10,
       reservedQuantity: 0,
       category: "Groceries",
+      locations: ["warehouse"],
       images: [
         {
           full: "/images/product-placeholder.svg",
@@ -33,6 +34,7 @@ describe("checkout order creation", () => {
           city: "Lagos",
         },
         cartProducts: [{ _id: String(product._id), quantity: 2 }],
+        siteKey: "store",
       },
     });
 
