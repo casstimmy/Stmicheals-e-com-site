@@ -198,7 +198,7 @@ export default function ProductPage({ product, relatedProducts }) {
                 </div>
               </section>
 
-              <aside className="store-shell flex h-full flex-col rounded-[2rem] p-5 sm:p-7 md:sticky md:top-28">
+              <aside className="store-shell flex h-full flex-col rounded-[2rem] p-5 sm:p-7">
                 <div className="flex flex-wrap items-center gap-3">
                   <span className="store-tag rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em]">
                     {product.categoryName || product.category || "Uncategorized"}

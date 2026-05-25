@@ -6,10 +6,10 @@ Scope: webpage-app storefront and shared public-site UI
 ## Current verified state
 
 - Storefront gradients have been restored across the shared webpage theme surfaces.
-- Product cards now show a fixed top-right availability badge of `200 Ready` when the item is in stock.
+- Product cards now show a single-line top-right availability badge of `200 Ready` when the item is in stock.
 - Sold-out product cards still show a sold-out state and keep the disabled purchase behavior.
 - The sticky navigation behavior remains in place from the previous fix by keeping vertical overflow available on the shared app shell.
-- The store product detail view at `/store/product/[id]` has improved card alignment through a more balanced detail grid, clearer price-and-status grouping, and better-balanced review section panels.
+- The store product detail view at `/store/product/[id]` has improved card alignment through a more balanced detail grid, clearer price-and-status grouping, better-balanced review panels, and a non-sticky detail aside that no longer overlaps lower cards while scrolling.
 - The store product route wrapper now uses explicit imports/exports so direct `/store/product/[id]` navigation resolves correctly in local dev.
 
 ## Files updated in this checkpoint

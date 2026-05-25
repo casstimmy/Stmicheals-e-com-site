@@ -81,13 +81,12 @@ export default function ProductBox({
                         <span className="store-tag max-w-[60%] rounded-full px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.2em] sm:text-[0.68rem]">
                             {categoryName || category || "Featured"}
                         </span>
-                        <span className={`inline-flex max-w-[48%] flex-col items-end rounded-[1rem] px-3 py-1.5 text-right text-[0.62rem] font-semibold leading-tight sm:text-[0.66rem] ${
+                        <span className={`inline-flex min-h-[2.25rem] items-center rounded-full px-3 py-1 text-[0.66rem] font-semibold uppercase tracking-[0.14em] sm:text-[0.68rem] ${
                             isInStock
                                 ? "bg-emerald-50 text-emerald-700"
                                 : "bg-rose-50 text-rose-700"
                         }`}>
-                            <span>Qty Available:</span>
-                            <span>{isInStock ? "200 Ready" : "Sold out"}</span>
+                            {isInStock ? "200 Ready" : "Sold out"}
                         </span>
                     </div>
 
