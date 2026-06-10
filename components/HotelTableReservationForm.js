@@ -13,6 +13,21 @@ function formatDateInput(value) {
   return new Date(value.getTime() - value.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
 
+function openNativePicker(event) {
+  event.currentTarget.showPicker?.();
+}
+
+function preventManualPickerEntry(event) {
+  if (event.type === "paste") {
+    event.preventDefault();
+    return;
+  }
+
+  if (!["Tab", "Escape"].includes(event.key)) {
+    event.preventDefault();
+  }
+}
+
 export default function HotelTableReservationForm({
   title = "Reserve a table",
   intro = "Send a lounge table request directly to the hotel and we will confirm your table shortly.",
@@ -34,6 +49,13 @@ export default function HotelTableReservationForm({
   });
   const [submitting, setSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const pickerInputProps = {
+    inputMode: "none",
+    onClick: openNativePicker,
+    onFocus: openNativePicker,
+    onKeyDown: preventManualPickerEntry,
+    onPaste: preventManualPickerEntry,
+  };
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -126,6 +148,7 @@ export default function HotelTableReservationForm({
               value={formValues.reservationDate}
               min={defaultReservationDate}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, reservationDate: event.target.value }))}
+              {...pickerInputProps}
               className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />

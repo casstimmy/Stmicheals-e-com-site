@@ -242,43 +242,13 @@ export default function CartPage() {
               <div className="store-shell rounded-[2rem] p-4 sm:p-6 lg:p-8">
                 <div className="flex flex-col gap-4 border-b border-[rgba(31,44,51,0.08)] pb-6 sm:flex-row sm:items-end sm:justify-between">
                   <div>
-                    <span className="store-tag inline-flex rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em]">
-                      Checkout readiness
-                    </span>
-                    <h1 className="mt-4 text-3xl font-extrabold text-[var(--foreground-strong)] sm:text-[2.4rem]">
-                      Cart and delivery review
+                    <h1 className="text-3xl font-extrabold text-[var(--foreground-strong)] sm:text-[2.4rem]">
+                      Your cart
                     </h1>
-                    <p className="mt-3 max-w-2xl text-base leading-8 store-shell-muted">
-                      Review your items, confirm your delivery details, and place your order.
-                    </p>
                   </div>
                   <div className="store-button-secondary inline-flex min-h-[3rem] items-center rounded-[1rem] px-4 py-3 text-sm font-semibold">
                     {cartLines.length} line{cartLines.length === 1 ? "" : "s"} · {totalItems} item{totalItems === 1 ? "" : "s"}
                   </div>
-                </div>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  {[
-                    {
-                      label: "1. Review basket",
-                      detail: "Check your quantities before placing the order.",
-                    },
-                    {
-                      label: "2. Confirm delivery",
-                      detail: "Delivery fees update for your address.",
-                    },
-                    {
-                      label: "3. Place order",
-                      detail: "Place your order and receive confirmation by email.",
-                    },
-                  ].map((step) => (
-                    <div key={step.label} className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                        {step.label}
-                      </p>
-                      <p className="mt-2 text-sm leading-7 store-shell-muted">{step.detail}</p>
-                    </div>
-                  ))}
                 </div>
 
                 {displayedProducts.length === 0 ? (
@@ -521,9 +491,6 @@ export default function CartPage() {
 
               <aside className="store-shell rounded-[2rem] p-5 sm:p-6 lg:p-7">
                 <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">Order summary</h2>
-                <p className="mt-2 text-sm leading-7 store-shell-muted">
-                  Delivery fees and any savings are shown below so you can review the final total before placing your order.
-                </p>
 
                 <div className="mt-5 space-y-3">
                   {[
@@ -551,7 +518,7 @@ export default function CartPage() {
                 )}
 
                 <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.6)] p-4 sm:p-5">
-                  <h3 className="text-lg font-semibold text-[var(--foreground-strong)]">Customer information</h3>
+                  <h3 className="text-lg font-semibold text-[var(--foreground-strong)]">Delivery details</h3>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     <label className="text-sm font-medium text-[rgba(18,52,60,0.72)] sm:col-span-2">
                       Full name

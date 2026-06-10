@@ -13,6 +13,21 @@ function formatDateInput(value) {
   return new Date(value.getTime() - value.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 }
 
+function openNativePicker(event) {
+  event.currentTarget.showPicker?.();
+}
+
+function preventManualPickerEntry(event) {
+  if (event.type === "paste") {
+    event.preventDefault();
+    return;
+  }
+
+  if (!["Tab", "Escape"].includes(event.key)) {
+    event.preventDefault();
+  }
+}
+
 export default function HotelBookingForm({
   rooms,
   selectedRoomId = "",
@@ -42,6 +57,13 @@ export default function HotelBookingForm({
   const queryRoomId = typeof router.query.roomId === "string" ? router.query.roomId : "";
   const effectiveRoomId = selectedRoomId || formValues.roomId || queryRoomId;
   const selectedRoom = (rooms || []).find((room) => String(room._id) === String(effectiveRoomId));
+  const pickerInputProps = {
+    inputMode: "none",
+    onClick: openNativePicker,
+    onFocus: openNativePicker,
+    onKeyDown: preventManualPickerEntry,
+    onPaste: preventManualPickerEntry,
+  };
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -159,6 +181,7 @@ export default function HotelBookingForm({
               value={formValues.checkInDate}
               min={defaultCheckIn}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, checkInDate: event.target.value }))}
+              {...pickerInputProps}
               className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />
@@ -170,6 +193,7 @@ export default function HotelBookingForm({
               value={formValues.checkOutDate}
               min={formValues.checkInDate || defaultCheckOut}
               onChange={(event) => setFormValues((currentValue) => ({ ...currentValue, checkOutDate: event.target.value }))}
+              {...pickerInputProps}
               className="hotel-input-light rounded-2xl px-4 py-3 outline-none"
               required
             />

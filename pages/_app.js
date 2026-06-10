@@ -6,6 +6,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Sora, Rajdhani } from "next/font/google";
+import { PUBLIC_SITE_KEYS, inferPublicSiteFromPath, normalizePublicSite } from "@/lib/publicSite";
 
 const sora = Sora({
   subsets: ["latin"],
@@ -21,6 +22,10 @@ const rajdhani = Rajdhani({
 export default function App({ Component, pageProps }) {
   const router = useRouter();
   const hideFooter = Component.hideFooter === true;
+  const activeSiteKey = normalizePublicSite(
+    inferPublicSiteFromPath(router.pathname) || PUBLIC_SITE_KEYS.STORE
+  );
+  const hasStoreMobileNav = activeSiteKey === PUBLIC_SITE_KEYS.STORE;
   const [isBootLoading, setIsBootLoading] = useState(true);
   const [isRouteLoading, setIsRouteLoading] = useState(false);
 
@@ -82,7 +87,7 @@ export default function App({ Component, pageProps }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <CartProvider>
-        <div className={`${sora.variable} ${rajdhani.variable} app-shell`}>
+        <div className={`${sora.variable} ${rajdhani.variable} app-shell${hasStoreMobileNav ? " store-mobile-nav-shell" : ""}`}>
           {showLoader && <AppLoaderOverlay />}
           <a href="#main-content" className="skip-link">
             Skip to content

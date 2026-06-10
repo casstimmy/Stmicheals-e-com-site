@@ -18,7 +18,6 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
             <h2 className="mt-4 text-3xl font-bold text-[var(--foreground-strong)]">
               New {site.shortLabel} arrivals
             </h2>
-            <p className="mt-3 max-w-md text-base leading-8 store-shell-muted">The latest items are grouped here for quick browsing.</p>
 
             <div className="mt-5 rounded-[1.45rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4">
               <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3">
@@ -64,12 +63,9 @@ export default function NewProducts({ newProducts, catalogInsights, site }) {
                   Latest items
                 </p>
                 <h3 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">
-                  Products ready to view
+                  Fresh catalog picks
                 </h3>
               </div>
-              <p className="max-w-sm text-sm leading-7 store-shell-muted">
-                Each card keeps only the useful details.
-              </p>
             </div>
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">

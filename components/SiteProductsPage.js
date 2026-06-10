@@ -132,7 +132,7 @@ export default function SiteProductsPage({ site, products }) {
                     <h1 className="mt-4 text-3xl font-extrabold text-[var(--foreground-strong)] sm:text-[2.4rem]">
                       {site.listingTitle}
                     </h1>
-                    <p className="mt-3 text-base leading-8 store-shell-muted">
+                    <p className="mt-3 text-sm leading-7 store-shell-muted">
                       {site.listingDescription}
                     </p>
                   </div>
@@ -192,7 +192,7 @@ export default function SiteProductsPage({ site, products }) {
                         href={getPublicSitePath(site.key, "/categories")}
                         className="store-button-secondary inline-flex min-h-[3rem] items-center justify-center rounded-[1rem] px-4 py-3 text-sm font-semibold"
                       >
-                        Guided category browser
+                        Category view
                       </Link>
                       {hasActiveFilters ? (
                         <button
@@ -206,73 +206,49 @@ export default function SiteProductsPage({ site, products }) {
                     </div>
                   </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
-                    <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Products</p>
-                      <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{catalogInsights.productCount}</p>
-                    </div>
-                    <div className="store-shell-card rounded-[1.35rem] px-4 py-4">
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Available</p>
-                      <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{catalogInsights.availableCount}</p>
-                    </div>
-                  </div>
-
-                  <div className="store-shell-card rounded-[1.6rem] p-5 sm:p-6">
-                    <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3">
-                      <p className="text-sm font-semibold text-[var(--foreground-strong)]">Quick category routes</p>
-                      <span className="text-xs font-semibold uppercase tracking-[0.18em] text-[rgba(18,52,60,0.46)]">Most active</span>
-                    </div>
-                    <div className="mt-4 grid gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setCategoryFilter("all")}
-                        className={`flex items-center justify-between rounded-[1.1rem] px-4 py-3 text-sm font-medium transition ${
-                          normalizedCategoryFilter === "all"
-                            ? "store-button-accent"
-                            : "store-button-secondary"
-                        }`}
-                      >
-                        <span>All categories</span>
-                        <span className="rounded-full bg-[rgba(31,44,51,0.08)] px-2.5 py-1 text-xs font-semibold text-[rgba(18,52,60,0.72)]">
-                          {catalogInsights.productCount}
-                        </span>
-                      </button>
-                      {catalogInsights.topCategories.map((category) => (
+                    {catalogInsights.topCategories.length > 0 ? (
+                      <div className="mt-5 flex flex-wrap gap-2">
                         <button
-                          key={category.name}
                           type="button"
-                          onClick={() => setCategoryFilter(category.name)}
-                          className={`flex items-center justify-between rounded-[1.1rem] px-4 py-3 text-sm font-medium transition ${
-                            normalizedCategoryFilter === category.name
+                          onClick={() => setCategoryFilter("all")}
+                          className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                            normalizedCategoryFilter === "all"
                               ? "store-button-accent"
                               : "store-button-secondary"
                           }`}
                         >
-                          <span>
-                            <span className="block text-left font-semibold">{category.name}</span>
-                            <span className="mt-1 block text-left text-xs text-[rgba(18,52,60,0.56)]">{category.availableCount} available now</span>
-                          </span>
-                          <span className="rounded-full bg-[rgba(31,44,51,0.08)] px-2.5 py-1 text-xs font-semibold text-[rgba(18,52,60,0.72)]">
-                            {category.count}
-                          </span>
+                          All categories
                         </button>
-                      ))}
-                    </div>
-                  </div>
+                        {catalogInsights.topCategories.map((category) => (
+                          <button
+                            key={category.name}
+                            type="button"
+                            onClick={() => setCategoryFilter(category.name)}
+                            className={`rounded-full px-4 py-2 text-sm font-medium transition ${
+                              normalizedCategoryFilter === category.name
+                                ? "store-button-accent"
+                                : "store-button-secondary"
+                            }`}
+                          >
+                            {category.name}
+                          </button>
+                        ))}
+                      </div>
+                    ) : null}
                 </aside>
 
                 <div className="space-y-5">
                   <div className="store-shell-card rounded-[1.6rem] p-5 sm:p-6">
-                    <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                       <div>
-                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Current view</p>
+                        <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Results</p>
                         <h2 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)] sm:text-[2rem]">
                           {filteredProducts.length} result{filteredProducts.length === 1 ? "" : "s"}
                         </h2>
                       </div>
 
-                      <div className="store-button-secondary inline-flex min-h-[3rem] items-center rounded-[1rem] px-4 py-3 text-sm font-semibold">
-                        {catalogInsights.productCount} total
+                      <div className="text-sm font-medium store-shell-muted">
+                        {catalogInsights.availableCount} available now
                       </div>
                     </div>
 

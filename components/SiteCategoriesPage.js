@@ -65,7 +65,6 @@ export default function SiteCategoriesPage({ site, categories, productsByCategor
               <h1 className="mb-3 mt-4 text-3xl font-extrabold text-[var(--foreground-strong)]">
                 {site.categoryTitle}
               </h1>
-              <p className="max-w-2xl theme-muted-page">{site.categoryDescription}</p>
             </div>
 
             <div className="mt-6 grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
@@ -79,15 +78,9 @@ export default function SiteCategoriesPage({ site, categories, productsByCategor
                 />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-                <div className="theme-card-light rounded-[1.5rem] px-5 py-4 shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Categories</p>
-                  <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{categories.length}</p>
-                </div>
-                <div className="theme-card-light rounded-[1.5rem] px-5 py-4 shadow-sm">
-                  <p className="text-xs uppercase tracking-[0.22em] text-[rgba(18,52,60,0.52)]">Products</p>
-                  <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{totalProducts}</p>
-                </div>
+              <div className="theme-card-light flex items-center justify-between rounded-[1.5rem] px-5 py-4 text-sm shadow-sm">
+                <span className="font-semibold text-[var(--foreground-strong)]">{categories.length} categories</span>
+                <span className="theme-muted-page">{totalProducts} products</span>
               </div>
             </div>
 
@@ -143,9 +136,6 @@ export default function SiteCategoriesPage({ site, categories, productsByCategor
                 <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <h2 className="text-xl font-bold text-[var(--foreground-strong)]">{category}</h2>
-                    <p className="mt-1 text-sm theme-muted-page">
-                      {products.length} product{products.length === 1 ? "" : "s"} in this selection
-                    </p>
                   </div>
                   <Link
                     href={{ pathname: getPublicSitePath(site.key, "/products"), query: { category } }}

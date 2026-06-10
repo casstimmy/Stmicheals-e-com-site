@@ -35,14 +35,19 @@ export default function ProductPage({ product, relatedProducts }) {
   const galleryImages = normalizeProductImages(product.images);
   const defaultImage = getPrimaryProductImage(product.images);
   const [activeImage, setActiveImage] = useState(defaultImage);
-  const { addProductToCart, cartProducts } = useContext(CartContext);
+  const {
+    addProductToCart,
+    cartProducts,
+    removeProductFromCart,
+    updateProductQuantity,
+  } = useContext(CartContext);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [reviews, setReviews] = useState(product.reviews || []);
   const mainImageRef = useRef(null);
   const reviewSummary = getReviewSummary(reviews);
   const availableQuantity = getAvailableInventoryQuantity(product);
   const isInStock = availableQuantity > 0;
-  const storeAvailabilityLabel = isInStock ? "200 Ready" : "Currently unavailable";
+  const storeAvailabilityLabel = isInStock ? `${availableQuantity} in stock` : "Currently unavailable";
   const cartQuantity = cartProducts.find((item) => item.id === product._id)?.qty || 0;
   const hasReachedCartLimit = isInStock && cartQuantity >= availableQuantity;
   const normalizedDescription = product.description?.trim() || "";
@@ -50,24 +55,6 @@ export default function ProductPage({ product, relatedProducts }) {
     normalizedDescription && normalizedDescription.toLowerCase() !== (product.name || "").trim().toLowerCase()
       ? normalizedDescription
       : "";
-  const detailStats = [
-    {
-      label: "Reviews",
-      value: reviewSummary.count ? `${reviewSummary.averageLabel} / 5` : "No reviews yet",
-      meta: reviewSummary.count ? `${reviewSummary.count} published review${reviewSummary.count === 1 ? "" : "s"}` : "",
-    },
-    {
-      label: "Availability",
-      value: storeAvailabilityLabel,
-      meta: isInStock ? `${availableQuantity} ready for delivery` : "Check related items below",
-    },
-    {
-      label: "In your cart",
-      value: `${cartQuantity}`,
-      meta: `${cartQuantity} item${cartQuantity === 1 ? "" : "s"} selected`,
-      spanFull: true,
-    },
-  ];
 
   const handleAddToCart = () => {
     if (!isInStock || hasReachedCartLimit) {
@@ -113,6 +100,12 @@ export default function ProductPage({ product, relatedProducts }) {
     addProductToCart(product._id, { maxQuantity: availableQuantity });
   };
 
+  const handleQuantityChange = (nextQuantity) => {
+    updateProductQuantity(product._id, Math.max(1, Math.min(nextQuantity, availableQuantity)), {
+      maxQuantity: availableQuantity,
+    });
+  };
+
   const handleReviewSubmitted = (review) => {
     setReviews((previousReviews) => [review, ...previousReviews]);
   };
@@ -128,16 +121,13 @@ export default function ProductPage({ product, relatedProducts }) {
           <div className="min-h-screen px-3 py-6 sm:px-8 sm:py-8">
             <div className="mx-auto grid max-w-7xl gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)] xl:items-start">
               <section className="store-shell flex h-full flex-col rounded-[2rem] p-4 sm:p-6 lg:p-7">
-                <div className="flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-4 sm:flex-row sm:items-end sm:justify-between">
-                  <div>
-                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                      Product gallery
-                    </p>
-                    <h2 className="mt-2 text-2xl font-bold text-[var(--foreground-strong)]">
-                      Inspect the item before you reserve it
-                    </h2>
-                  </div>
-                  <p className="text-sm leading-7 store-shell-muted">Click the main image to open the full view.</p>
+                <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-4">
+                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                    Product gallery
+                  </p>
+                  <span className="store-button-secondary inline-flex min-h-[2.7rem] items-center rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em]">
+                    {(galleryImages.length || 1)} view{galleryImages.length === 1 ? "" : "s"}
+                  </span>
                 </div>
 
                 <div className="mt-5 rounded-[1.65rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.76)] p-4 sm:p-5">
@@ -179,23 +169,6 @@ export default function ProductPage({ product, relatedProducts }) {
                     </button>
                   ))}
                 </div>
-
-                <div className="mt-5 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
-                  <div className="store-shell-card flex h-full flex-col justify-between rounded-[1.3rem] px-4 py-4">
-                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                      Category
-                    </p>
-                    <p className="mt-2 text-base font-semibold text-[var(--foreground-strong)]">
-                      {product.categoryName || product.category || "Uncategorized"}
-                    </p>
-                  </div>
-                  <div className="store-shell-card flex h-full flex-col justify-between rounded-[1.3rem] px-4 py-4">
-                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                      Reservation status
-                    </p>
-                    <p className="mt-2 text-base font-semibold text-[var(--foreground-strong)]">{storeAvailabilityLabel}</p>
-                  </div>
-                </div>
               </section>
 
               <aside className="store-shell flex h-full flex-col rounded-[2rem] p-5 sm:p-7">
@@ -219,20 +192,8 @@ export default function ProductPage({ product, relatedProducts }) {
                   </p>
                 ) : null}
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:auto-rows-fr">
-                  {detailStats.map((stat) => (
-                    <div key={stat.label} className={`store-shell-card flex h-full flex-col rounded-[1.25rem] px-4 py-4 ${stat.spanFull ? "sm:col-span-2" : ""}`}>
-                      <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                        {stat.label}
-                      </p>
-                      <p className="mt-2 text-xl font-bold text-[var(--foreground-strong)]">{stat.value}</p>
-                      {stat.meta ? <p className="mt-1 text-sm store-shell-muted">{stat.meta}</p> : null}
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 space-y-5 border-t border-[rgba(31,44,51,0.08)] pt-6">
-                  <div className="rounded-[1.45rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.62)] px-5 py-5">
+                <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-[rgba(31,44,51,0.08)] pt-6">
+                  <div>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
                       Current price
                     </p>
@@ -240,32 +201,77 @@ export default function ProductPage({ product, relatedProducts }) {
                       ₦{product.salePriceIncTax?.toLocaleString()}
                     </p>
                   </div>
-
-                  <div className="rounded-[1.35rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(247,243,236,0.86)] px-4 py-4 text-sm leading-7 text-[rgba(18,52,60,0.78)]">
-                    {availableQuantity === 0
-                      ? "This item is currently unavailable."
-                      : cartQuantity > 0
-                        ? `${cartQuantity} item${cartQuantity === 1 ? "" : "s"} currently in your cart.`
-                        : "Add this item to your cart when you are ready."}
+                  <div className="text-right">
+                    <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                      In cart
+                    </p>
+                    <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{cartQuantity}</p>
                   </div>
                 </div>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <button
-                    onClick={handleAddToCart}
-                    disabled={!isInStock || hasReachedCartLimit}
-                    className={`w-full rounded-[1rem] py-3 text-base font-semibold transition ${
-                      isInStock && !hasReachedCartLimit
-                        ? "store-button-accent"
-                        : "bg-[rgba(18,52,60,0.08)] cursor-not-allowed text-[rgba(18,52,60,0.4)]"
-                    }`}
-                  >
-                    {!isInStock
-                      ? "Unavailable"
-                      : hasReachedCartLimit
-                        ? "Cart limit reached"
-                        : "Add to cart"}
-                  </button>
+                <div className="mt-4 flex flex-wrap items-center gap-3 text-sm store-shell-muted">
+                  <span className="store-shell-card inline-flex items-center rounded-full px-4 py-2 font-medium text-[var(--foreground-strong)]">
+                    {storeAvailabilityLabel}
+                  </span>
+                  {reviewSummary.count > 0 ? (
+                    <span>
+                      {reviewSummary.averageLabel} / 5 from {reviewSummary.count} review{reviewSummary.count === 1 ? "" : "s"}
+                    </span>
+                  ) : null}
+                </div>
+
+                <div className="mt-6 grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto]">
+                  {cartQuantity > 0 ? (
+                    <div className="flex flex-col gap-3 sm:flex-row">
+                      <div className="flex flex-1 items-center justify-between rounded-[1rem] border border-[rgba(31,44,51,0.12)] bg-white/86 p-1.5 shadow-sm">
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange(cartQuantity - 1)}
+                          disabled={cartQuantity <= 1}
+                          aria-label={`Decrease ${product.name} quantity`}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[0.9rem] text-lg font-bold text-[var(--foreground-strong)] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          -
+                        </button>
+                        <span className="min-w-[2rem] text-center text-base font-semibold text-[var(--foreground-strong)]">
+                          {cartQuantity}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => handleQuantityChange(cartQuantity + 1)}
+                          disabled={!isInStock || hasReachedCartLimit}
+                          aria-label={`Increase ${product.name} quantity`}
+                          className="inline-flex h-10 w-10 items-center justify-center rounded-[0.9rem] text-lg font-bold text-[var(--foreground-strong)] disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => removeProductFromCart(product._id)}
+                        className="store-button-secondary inline-flex min-h-[3.25rem] items-center justify-center rounded-[1rem] px-4 py-3 text-base font-semibold"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={handleAddToCart}
+                      disabled={!isInStock || hasReachedCartLimit}
+                      className={`w-full rounded-[1rem] py-3 text-base font-semibold transition ${
+                        isInStock && !hasReachedCartLimit
+                          ? "store-button-accent"
+                          : "bg-[rgba(18,52,60,0.08)] cursor-not-allowed text-[rgba(18,52,60,0.4)]"
+                      }`}
+                    >
+                      {!isInStock
+                        ? "Unavailable"
+                        : hasReachedCartLimit
+                          ? "Cart limit reached"
+                          : "Add to cart"}
+                    </button>
+                  )}
                   <Link
                     href={getPublicScopedHref(siteKey, "/cart")}
                     className="store-button-secondary inline-flex items-center justify-center rounded-[1rem] px-4 py-3 text-base font-semibold"
@@ -370,14 +376,11 @@ export default function ProductPage({ product, relatedProducts }) {
 
             {relatedProducts?.length > 0 && (
               <section className="mx-auto mt-10 max-w-7xl store-shell rounded-[2rem] px-5 py-6 sm:px-6 sm:py-7 lg:px-8">
-                <div className="mb-6 flex flex-col gap-2 border-b border-[rgba(31,44,51,0.08)] pb-5 sm:flex-row sm:items-end sm:justify-between">
+                <div className="mb-6 border-b border-[rgba(31,44,51,0.08)] pb-5">
                   <div>
                     <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">Recommended next</p>
-                    <h2 className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">More from the same catalog flow</h2>
+                    <h2 className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">You may also like</h2>
                   </div>
-                  <p className="text-sm leading-7 store-shell-muted">
-                    Related picks you may also like.
-                  </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-6">
