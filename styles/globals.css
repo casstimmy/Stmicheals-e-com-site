@@ -81,7 +81,7 @@ h4 {
   display: flex;
   flex-direction: column;
   isolation: isolate;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .app-shell::before {

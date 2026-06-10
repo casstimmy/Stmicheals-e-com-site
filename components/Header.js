@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import Center from "./Center";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { CartContext } from "./CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -29,6 +29,8 @@ import {
 export default function Header({ siteKey }) {
   const { cartCount } = useContext(CartContext);
   const [navOpen, setNavOpen] = useState(false);
+  const [headerHeight, setHeaderHeight] = useState(0);
+  const headerRef = useRef(null);
   const router = useRouter();
   const activeSiteKey = normalizePublicSite(siteKey || inferPublicSiteFromPath(router.pathname));
   const site = getPublicSiteConfig(activeSiteKey);
@@ -101,6 +103,38 @@ export default function Header({ siteKey }) {
     };
   }, []);
 
+  useEffect(() => {
+    const headerNode = headerRef.current;
+
+    if (!headerNode) {
+      return undefined;
+    }
+
+    const updateHeaderHeight = () => {
+      setHeaderHeight(headerNode.getBoundingClientRect().height);
+    };
+
+    updateHeaderHeight();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", updateHeaderHeight);
+
+      return () => {
+        window.removeEventListener("resize", updateHeaderHeight);
+      };
+    }
+
+    const resizeObserver = new ResizeObserver(() => {
+      updateHeaderHeight();
+    });
+
+    resizeObserver.observe(headerNode);
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, []);
+
   const isActiveRoute = (href) => {
     if (href === getPublicScopedHref(activeSiteKey, "/")) {
       return currentPath === href;
@@ -164,7 +198,8 @@ export default function Header({ siteKey }) {
     },
   ];
   return (
-    <header className={isHotelSite ? "hotel-header sticky top-0 z-[100] w-full" : "store-header sticky top-0 z-[100] w-full"}>
+    <>
+    <header ref={headerRef} className={isHotelSite ? "hotel-header fixed inset-x-0 top-0 z-[110] w-full" : "store-header fixed inset-x-0 top-0 z-[110] w-full"}>
       <div className={isHotelSite ? "hotel-header-topbar text-[0.72rem] uppercase tracking-[0.24em]" : "store-header-topbar hidden text-[0.72rem] uppercase tracking-[0.24em] md:block"}>
         <Center>
           <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
@@ -205,25 +240,7 @@ export default function Header({ siteKey }) {
             </Link>
 
             <div className="flex shrink-0 items-center gap-2 md:hidden">
-              {isStoreSite ? (
-                showCart ? (
-                  <Link
-                    href={cartHref}
-                    data-cart-icon
-                    className={`inline-flex h-11 min-w-[3rem] items-center justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm transition ${
-                      cartIsActive ? "store-button-accent" : "store-button-primary"
-                    }`}
-                    aria-label="View cart"
-                  >
-                    <span className="relative inline-flex items-center justify-center">
-                      <FontAwesomeIcon icon={faCartShopping} className="text-sm" />
-                      <span className="absolute -right-3 -top-3 rounded-full bg-[var(--foreground-strong)] px-1.5 py-[1px] text-[0.62rem] font-semibold text-white shadow-sm">
-                        {cartCount || 0}
-                      </span>
-                    </span>
-                  </Link>
-                ) : null
-              ) : (
+              {isStoreSite ? null : (
                 <>
                   {showCart ? (
                     <Link
@@ -429,20 +446,20 @@ export default function Header({ siteKey }) {
 
           {isStoreSite ? (
             <div className="mt-3 border-t border-[rgba(31,44,51,0.08)] pt-3 md:hidden">
-              <nav aria-label={`${site.shortLabel} mobile navigation`} className="flex gap-2 overflow-x-auto pb-1">
+              <nav aria-label={`${site.shortLabel} mobile navigation`} className="grid grid-cols-5 gap-1.5">
                 {mobileStoreNavLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
                     data-cart-icon={link.label === "Cart" ? true : undefined}
-                    className={`relative inline-flex min-h-[2.9rem] shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                    className={`relative flex min-h-[4rem] flex-col items-center justify-center gap-1 rounded-[1rem] px-2 py-2 text-[0.68rem] font-semibold transition ${
                       link.active
-                        ? "store-button-accent"
-                        : "store-button-secondary"
+                        ? "bg-[rgba(176,114,42,0.12)] text-[#8d5a1f] shadow-[0_12px_22px_rgba(176,114,42,0.1)]"
+                        : "text-[rgba(18,52,60,0.68)] hover:bg-white/76 hover:text-[var(--foreground-strong)]"
                     }`}
                     aria-current={link.active ? "page" : undefined}
                   >
-                    <span className="relative inline-flex items-center justify-center text-sm">
+                    <span className="relative inline-flex items-center justify-center text-base">
                       <FontAwesomeIcon icon={link.icon} />
                       {typeof link.badge === "number" && link.badge > 0 ? (
                         <span className="absolute -right-3 -top-2 inline-flex min-w-[1.15rem] items-center justify-center rounded-full bg-[#1f2427] px-1 py-[1px] text-[0.6rem] font-semibold text-white">
@@ -459,5 +476,11 @@ export default function Header({ siteKey }) {
         </div>
       </Center>
     </header>
+    <div
+      aria-hidden="true"
+      className={isStoreSite ? "h-[10.5rem] md:h-[6.5rem]" : "h-[6.5rem] md:h-[6.5rem]"}
+      style={headerHeight > 0 ? { height: `${headerHeight}px` } : undefined}
+    />
+    </>
   );
 }
