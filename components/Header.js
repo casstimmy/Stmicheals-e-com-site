@@ -163,8 +163,6 @@ export default function Header({ siteKey }) {
       active: currentPath === accountHref || currentPath.startsWith(`${accountHref}/`),
     },
   ];
-  const activeMobileSectionLabel = mobileStoreNavLinks.find((link) => link.active)?.label || site.shortLabel;
-
   return (
     <header className={isHotelSite ? "hotel-header sticky top-0 z-[100] w-full" : "store-header sticky top-0 z-[100] w-full"}>
       <div className={isHotelSite ? "hotel-header-topbar text-[0.72rem] uppercase tracking-[0.24em]" : "store-header-topbar hidden text-[0.72rem] uppercase tracking-[0.24em] md:block"}>
@@ -208,9 +206,23 @@ export default function Header({ siteKey }) {
 
             <div className="flex shrink-0 items-center gap-2 md:hidden">
               {isStoreSite ? (
-                <div className="inline-flex min-h-[2.85rem] items-center rounded-full border border-[rgba(31,44,51,0.12)] bg-white/82 px-3 py-2 text-[0.72rem] font-semibold uppercase tracking-[0.18em] text-[#213238] shadow-sm">
-                  {activeMobileSectionLabel}
-                </div>
+                showCart ? (
+                  <Link
+                    href={cartHref}
+                    data-cart-icon
+                    className={`inline-flex h-11 min-w-[3rem] items-center justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm transition ${
+                      cartIsActive ? "store-button-accent" : "store-button-primary"
+                    }`}
+                    aria-label="View cart"
+                  >
+                    <span className="relative inline-flex items-center justify-center">
+                      <FontAwesomeIcon icon={faCartShopping} className="text-sm" />
+                      <span className="absolute -right-3 -top-3 rounded-full bg-[var(--foreground-strong)] px-1.5 py-[1px] text-[0.62rem] font-semibold text-white shadow-sm">
+                        {cartCount || 0}
+                      </span>
+                    </span>
+                  </Link>
+                ) : null
               ) : (
                 <>
                   {showCart ? (
@@ -414,41 +426,38 @@ export default function Header({ siteKey }) {
               </nav>
             </div>
           )}
+
+          {isStoreSite ? (
+            <div className="mt-3 border-t border-[rgba(31,44,51,0.08)] pt-3 md:hidden">
+              <nav aria-label={`${site.shortLabel} mobile navigation`} className="flex gap-2 overflow-x-auto pb-1">
+                {mobileStoreNavLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    data-cart-icon={link.label === "Cart" ? true : undefined}
+                    className={`relative inline-flex min-h-[2.9rem] shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                      link.active
+                        ? "store-button-accent"
+                        : "store-button-secondary"
+                    }`}
+                    aria-current={link.active ? "page" : undefined}
+                  >
+                    <span className="relative inline-flex items-center justify-center text-sm">
+                      <FontAwesomeIcon icon={link.icon} />
+                      {typeof link.badge === "number" && link.badge > 0 ? (
+                        <span className="absolute -right-3 -top-2 inline-flex min-w-[1.15rem] items-center justify-center rounded-full bg-[#1f2427] px-1 py-[1px] text-[0.6rem] font-semibold text-white">
+                          {link.badge}
+                        </span>
+                      ) : null}
+                    </span>
+                    <span>{link.label}</span>
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          ) : null}
         </div>
       </Center>
-
-      {isStoreSite ? (
-        <nav
-          aria-label={`${site.shortLabel} mobile navigation`}
-          className="fixed inset-x-0 bottom-0 z-[110] border-t border-[rgba(31,44,51,0.1)] bg-[rgba(255,251,245,0.95)] px-3 pb-[calc(0.85rem+env(safe-area-inset-bottom))] pt-3 shadow-[0_-18px_34px_rgba(18,29,35,0.08)] backdrop-blur-xl md:hidden"
-        >
-          <div className="mx-auto grid max-w-xl grid-cols-5 gap-2">
-            {mobileStoreNavLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                data-cart-icon={link.label === "Cart" ? true : undefined}
-                className={`relative flex min-h-[4.3rem] flex-col items-center justify-center gap-1 rounded-[1.2rem] px-2 py-2 text-[0.72rem] font-semibold transition ${
-                  link.active
-                    ? "bg-[rgba(176,114,42,0.12)] text-[#8d5a1f] shadow-[0_12px_24px_rgba(176,114,42,0.12)]"
-                    : "text-[rgba(18,52,60,0.68)] hover:bg-white/78 hover:text-[var(--foreground-strong)]"
-                }`}
-                aria-current={link.active ? "page" : undefined}
-              >
-                <span className="relative inline-flex items-center justify-center text-base">
-                  <FontAwesomeIcon icon={link.icon} />
-                  {typeof link.badge === "number" && link.badge > 0 ? (
-                    <span className="absolute -right-3 -top-2 inline-flex min-w-[1.15rem] items-center justify-center rounded-full bg-[#1f2427] px-1 py-[1px] text-[0.6rem] font-semibold text-white">
-                      {link.badge}
-                    </span>
-                  ) : null}
-                </span>
-                <span>{link.label}</span>
-              </Link>
-            ))}
-          </div>
-        </nav>
-      ) : null}
     </header>
   );
 }

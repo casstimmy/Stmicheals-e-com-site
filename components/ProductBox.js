@@ -130,8 +130,8 @@ export default function ProductBox({
                 </div>
 
                 {cartQuantity > 0 ? (
-                    <div className="mt-4 flex gap-2 sm:mt-auto">
-                        <div className="flex flex-1 items-center justify-between rounded-[1.05rem] border border-[rgba(31,44,51,0.12)] bg-[rgba(255,255,255,0.88)] p-1.5 shadow-sm">
+                    <div className="mt-4 flex flex-col gap-2 sm:mt-auto sm:flex-row">
+                        <div className="flex w-full items-center justify-between rounded-[1.05rem] border border-[rgba(31,44,51,0.12)] bg-[rgba(255,255,255,0.88)] p-1.5 shadow-sm sm:flex-1">
                             <button
                                 type="button"
                                 onClick={() => handleQuantityChange(cartQuantity - 1)}
@@ -158,7 +158,7 @@ export default function ProductBox({
                         <button
                             type="button"
                             onClick={() => removeProductFromCart(_id)}
-                            className="store-button-secondary inline-flex min-h-[3.1rem] items-center justify-center rounded-[1.05rem] px-4 text-sm font-semibold"
+                            className="store-button-secondary inline-flex min-h-[3.1rem] w-full items-center justify-center rounded-[1.05rem] px-4 text-sm font-semibold sm:w-auto"
                         >
                             Remove
                         </button>

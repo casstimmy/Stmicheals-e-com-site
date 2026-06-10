@@ -24,7 +24,7 @@ export async function getServerSideProps() {
       props: {
         site: getPublicSiteConfig(siteKey),
         categories: Object.keys(productsByCategory),
-        productsByCategory,
+        productsByCategory: JSON.parse(JSON.stringify(productsByCategory)),
       },
     };
   } catch (error) {

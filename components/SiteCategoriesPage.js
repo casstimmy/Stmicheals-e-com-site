@@ -11,10 +11,6 @@ export default function SiteCategoriesPage({ site, categories, productsByCategor
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const normalizedQuery = deferredQuery.trim().toLowerCase();
-  const totalProducts = Object.values(productsByCategory).reduce(
-    (runningTotal, products) => runningTotal + products.length,
-    0
-  );
 
   const categoryCards = categories.map((category) => ({
     name: category,
@@ -67,7 +63,7 @@ export default function SiteCategoriesPage({ site, categories, productsByCategor
               </h1>
             </div>
 
-            <div className="mt-6 grid gap-4 lg:grid-cols-[1.35fr_0.65fr]">
+            <div className="mt-6">
               <div className="theme-card-light rounded-[1.5rem] p-4 shadow-sm">
                 <input
                   type="search"
@@ -76,11 +72,6 @@ export default function SiteCategoriesPage({ site, categories, productsByCategor
                   placeholder={`Search inside ${site.shortLabel.toLowerCase()} categories`}
                   className="theme-input-light w-full rounded-2xl px-4 py-3 outline-none"
                 />
-              </div>
-
-              <div className="theme-card-light flex items-center justify-between rounded-[1.5rem] px-5 py-4 text-sm shadow-sm">
-                <span className="font-semibold text-[var(--foreground-strong)]">{categories.length} categories</span>
-                <span className="theme-muted-page">{totalProducts} products</span>
               </div>
             </div>
 

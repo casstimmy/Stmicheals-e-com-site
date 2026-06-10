@@ -84,12 +84,6 @@ h4 {
   overflow-x: hidden;
 }
 
-@media (max-width: 767px) {
-  .store-mobile-nav-shell {
-    padding-bottom: calc(5.8rem + env(safe-area-inset-bottom));
-  }
-}
-
 .app-shell::before {
   content: "";
   position: absolute;
