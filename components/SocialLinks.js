@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFacebookF, faInstagram } from "@fortawesome/free-brands-svg-icons";
 import {
-  faCamera,
   faEnvelope,
   faGlobe,
   faHashtag,
@@ -22,8 +22,9 @@ const PLATFORM_LABELS = {
 };
 
 const PLATFORM_ICONS = {
-  instagram: faCamera,
-  facebook: faShareNodes,
+  instagram: faInstagram,
+  facebook: faFacebookF,
+  fb: faFacebookF,
   tiktok: faPlay,
   x: faHashtag,
   youtube: faPlay,

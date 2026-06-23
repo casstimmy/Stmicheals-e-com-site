@@ -172,20 +172,6 @@ export default function Featured({ product, catalogInsights, site, heroContent }
 
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="store-shell-card rounded-[1.4rem] px-5 py-4.5">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                    Easy checkout
-                  </p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Simple checkout before you place your order.</p>
-                </div>
-                <div className="store-shell-card rounded-[1.4rem] px-5 py-4.5">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
-                    Best for
-                  </p>
-                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Everyday orders and quick restocks.</p>
-                </div>
-              </div>
             </div>
           </div>
         </section>
