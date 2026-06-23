@@ -1,3 +1,15 @@
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faCamera,
+  faEnvelope,
+  faGlobe,
+  faHashtag,
+  faLink,
+  faPhone,
+  faPlay,
+  faShareNodes,
+} from "@fortawesome/free-solid-svg-icons";
+
 const PLATFORM_LABELS = {
   instagram: "Instagram",
   facebook: "Facebook",
@@ -9,13 +21,33 @@ const PLATFORM_LABELS = {
   website: "Website",
 };
 
+const PLATFORM_ICONS = {
+  instagram: faCamera,
+  facebook: faShareNodes,
+  tiktok: faPlay,
+  x: faHashtag,
+  youtube: faPlay,
+  whatsapp: faPhone,
+  linkedin: faShareNodes,
+  website: faGlobe,
+  email: faEnvelope,
+};
+
+function getPlatformKey(platform) {
+  return String(platform || "").trim().toLowerCase();
+}
+
 function getPlatformLabel(platform) {
-  const key = String(platform || "").trim().toLowerCase();
+  const key = getPlatformKey(platform);
   return PLATFORM_LABELS[key] || platform || "Social";
 }
 
 function getDisplayText(link) {
   return link.label || link.handle || getPlatformLabel(link.platform);
+}
+
+function getPlatformIcon(platform) {
+  return PLATFORM_ICONS[getPlatformKey(platform)] || faLink;
 }
 
 export default function SocialLinks({ links = [], variant = "store" }) {
@@ -26,25 +58,31 @@ export default function SocialLinks({ links = [], variant = "store" }) {
   }
 
   const isHotel = variant === "hotel";
-  const shellClass = isHotel
-    ? "hotel-shell-card border border-[rgba(216,172,79,0.12)] bg-[rgba(255,250,243,0.08)]"
-    : "store-shell-card border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.62)]";
-  const textClass = isHotel ? "text-[#fff1dc]" : "text-[var(--foreground-strong)]";
-  const mutedClass = isHotel ? "text-[rgba(245,238,226,0.62)]" : "text-[rgba(18,52,60,0.52)]";
-  const linkClass = isHotel ? "hotel-footer-link" : "store-footer-link";
+  const titleClass = isHotel
+    ? "text-[rgba(245,238,226,0.64)]"
+    : "text-[rgba(18,52,60,0.52)]";
+  const iconClass = isHotel
+    ? "border-[rgba(216,172,79,0.18)] bg-[rgba(255,250,243,0.08)] text-[#f8d78f] hover:bg-[rgba(216,172,79,0.16)] hover:text-[#fff1dc]"
+    : "border-[rgba(31,44,51,0.1)] bg-[rgba(255,255,255,0.82)] text-[#8d5a1f] hover:bg-[rgba(248,242,232,0.96)] hover:text-[var(--foreground-strong)]";
 
   return (
-    <div className={`${shellClass} rounded-[1.25rem] px-4 py-4 shadow-sm`}>
-      <p className={`${mutedClass} text-[0.72rem] font-semibold uppercase tracking-[0.22em]`}>Social media</p>
+    <div className="mt-5">
+      <p className={`${titleClass} text-sm font-semibold uppercase tracking-[0.24em]`}>
+        Social media
+      </p>
       <div className="mt-3 flex flex-wrap gap-2.5">
         {visibleLinks.map((link, index) => {
           const label = getDisplayText(link);
           const platformLabel = getPlatformLabel(link.platform);
-          const content = (
-            <>
-              <span className="text-xs font-semibold uppercase tracking-[0.16em] opacity-70">{platformLabel}</span>
-              <span className={`${textClass} text-sm font-semibold`}>{label}</span>
-            </>
+          const ariaLabel = `${platformLabel}: ${label}`;
+          const icon = (
+            <span
+              className={`${iconClass} inline-flex size-11 items-center justify-center rounded-full border text-base shadow-sm transition hover:-translate-y-0.5`}
+              title={ariaLabel}
+              aria-label={ariaLabel}
+            >
+              <FontAwesomeIcon icon={getPlatformIcon(link.platform)} />
+            </span>
           );
 
           return link.url ? (
@@ -53,17 +91,13 @@ export default function SocialLinks({ links = [], variant = "store" }) {
               href={link.url}
               target="_blank"
               rel="noreferrer"
-              className={`${linkClass} inline-flex min-h-[3rem] items-center gap-2 rounded-[1rem] px-4 py-2`}
+              aria-label={ariaLabel}
+              title={ariaLabel}
             >
-              {content}
+              {icon}
             </a>
           ) : (
-            <span
-              key={`${link.platform}-${link.handle}-${index}`}
-              className={`${linkClass} inline-flex min-h-[3rem] items-center gap-2 rounded-[1rem] px-4 py-2`}
-            >
-              {content}
-            </span>
+            <span key={`${link.platform}-${link.handle}-${index}`}>{icon}</span>
           );
         })}
       </div>

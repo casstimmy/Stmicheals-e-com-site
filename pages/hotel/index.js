@@ -37,7 +37,7 @@ export async function getServerSideProps() {
         rooms: [],
         dining: [],
         sections: resolveHotelCatalogSections([]),
-        heroContent: { activeHero: null, socialLinks: [] },
+        heroContent: { activeHero: null, secondaryHeroes: [], socialLinks: [] },
       },
     };
   }

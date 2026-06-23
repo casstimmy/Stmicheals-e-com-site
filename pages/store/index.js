@@ -36,7 +36,7 @@ export async function getServerSideProps() {
         featuredProduct: null,
         newProducts: [],
         catalogInsights: getCatalogInsights([]),
-        heroContent: { activeHero: null, socialLinks: [] },
+        heroContent: { activeHero: null, secondaryHeroes: [], socialLinks: [] },
       },
     };
   }

@@ -8,7 +8,6 @@ import { CartContext } from "./CartContext";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
 import { getPublicProductPath, getPublicSitePath } from "@/lib/publicSite";
-import SocialLinks from "@/components/SocialLinks";
 
 export default function Featured({ product, catalogInsights, site, heroContent }) {
   const { addProductToCart, cartProducts } = useContext(CartContext);
@@ -31,7 +30,6 @@ export default function Featured({ product, catalogInsights, site, heroContent }
 
   const productImage = getPrimaryProductImage(product.images);
   const activeHero = heroContent?.activeHero || null;
-  const socialLinks = heroContent?.socialLinks || [];
   const heroTitle = activeHero?.title || site.heroTitle;
   const heroDescription = activeHero?.subtitle || site.heroDescription;
   const heroCtaHref = activeHero?.ctaLink || getPublicProductPath(site.key, product._id);
@@ -129,9 +127,6 @@ export default function Featured({ product, catalogInsights, site, heroContent }
                       ? "Cart limit reached"
                       : "Add to Cart"}
                 </button>
-              </div>
-              <div className="mt-6">
-                <SocialLinks links={socialLinks} variant="store" />
               </div>
               {availableQuantity === 0 && (
                 <p className="mt-3 text-sm theme-muted-page">

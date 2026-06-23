@@ -2,7 +2,6 @@ import Head from "next/head";
 import Center from "@/components/Center";
 import Header from "@/components/Header";
 import ProductBox from "@/components/ProductBox";
-import SocialLinks from "@/components/SocialLinks";
 import { getCatalogInsights } from "@/lib/storefront";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,7 +15,7 @@ function readQueryValue(value) {
   return typeof value === "string" ? value : "";
 }
 
-export default function SiteProductsPage({ site, products, activePromotions = [], heroContent }) {
+export default function SiteProductsPage({ site, products, activePromotions = [] }) {
   const router = useRouter();
   const [query, setQuery] = useState(() => readQueryValue(router.query.q));
   const [categoryFilter, setCategoryFilter] = useState(() => {
@@ -41,7 +40,6 @@ export default function SiteProductsPage({ site, products, activePromotions = []
   const normalizedPromotionFilter = selectedPromotion ? promotionFilter : "";
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const isHotelSite = site?.key === "hotel";
-  const socialLinks = heroContent?.socialLinks || [];
   const storeInputClassName = "rounded-[1.1rem] border border-[rgba(31,44,51,0.12)] bg-white/84 px-4 py-3 text-sm text-[var(--foreground-strong)] outline-none transition focus:border-[rgba(176,114,42,0.38)] focus:ring-4 focus:ring-[rgba(176,114,42,0.1)]";
 
   const filteredProducts = (products || [])
@@ -249,8 +247,6 @@ export default function SiteProductsPage({ site, products, activePromotions = []
                       <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{catalogInsights.availableCount}</p>
                     </div>
                   </div>
-
-                  <SocialLinks links={socialLinks} variant="store" />
 
                   <div className="store-shell-card rounded-[1.6rem] p-5 sm:p-6">
                     <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3">
@@ -533,10 +529,6 @@ export default function SiteProductsPage({ site, products, activePromotions = []
               >
                 Browse categories
               </Link>
-            </div>
-
-            <div className="mt-6">
-              <SocialLinks links={socialLinks} variant="hotel" />
             </div>
 
             <div className="max-w-7xl mx-auto px-1 py-8 sm:px-4 sm:py-12">

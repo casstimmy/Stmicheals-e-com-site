@@ -2,7 +2,6 @@ import SiteProductsPage from "@/components/SiteProductsPage";
 import { getStorefrontProducts } from "@/lib/storefrontCatalog";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig } from "@/lib/publicSite";
 import { getActivePublicPromotions } from "@/lib/promotionContent";
-import { getHeroContentForSite } from "@/lib/heroContent";
 
 export default function ProductsPage(props) {
   return <SiteProductsPage {...props} />;
@@ -11,17 +10,15 @@ export default function ProductsPage(props) {
 export async function getServerSideProps() {
   try {
     const siteKey = PUBLIC_SITE_KEYS.STORE;
-    const [resolvedProducts, activePromotions, heroContent] = await Promise.all([
+    const [resolvedProducts, activePromotions] = await Promise.all([
       getStorefrontProducts({ site: siteKey }),
       getActivePublicPromotions(),
-      getHeroContentForSite(siteKey),
     ]);
     return {
       props: {
         site: getPublicSiteConfig(siteKey),
         products: JSON.parse(JSON.stringify(resolvedProducts)),
         activePromotions,
-        heroContent,
       },
     };
   } catch (error) {
@@ -31,7 +28,6 @@ export async function getServerSideProps() {
         site: getPublicSiteConfig(PUBLIC_SITE_KEYS.STORE),
         products: [],
         activePromotions: [],
-        heroContent: { activeHero: null, socialLinks: [] },
       },
     };
   }

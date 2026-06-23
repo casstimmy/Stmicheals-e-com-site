@@ -7,13 +7,11 @@ import HotelRoomCard from "@/components/HotelRoomCard";
 import HotelDiningCard from "@/components/HotelDiningCard";
 import { getPrimaryProductImage, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImages";
 import { PUBLIC_SITE_KEYS, getPublicSitePath } from "@/lib/publicSite";
-import SocialLinks from "@/components/SocialLinks";
 
 export default function HotelHomePage({ site, rooms, dining, featuredRoom, sections, heroContent }) {
   const previewRooms = (rooms || []).slice(0, 3);
   const previewDining = (dining || []).slice(0, 3);
   const activeHero = heroContent?.activeHero || null;
-  const socialLinks = heroContent?.socialLinks || [];
   const fallbackHeroImage = featuredRoom ? getPrimaryProductImage(featuredRoom.images) : PRODUCT_IMAGE_PLACEHOLDER;
   const heroImage = activeHero?.bgImage?.[0]?.full || activeHero?.image?.[0]?.full || fallbackHeroImage;
   const heroTitle = activeHero?.title || site.heroTitle;
@@ -71,9 +69,6 @@ export default function HotelHomePage({ site, rooms, dining, featuredRoom, secti
                   >
                     Book a stay
                   </Link>
-                </div>
-                <div className="mt-6">
-                  <SocialLinks links={socialLinks} variant="hotel" />
                 </div>
               </div>
 

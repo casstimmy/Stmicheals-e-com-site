@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import Center from "./Center";
+import SocialLinks from "@/components/SocialLinks";
 import { COMPANY_LINKS, POLICY_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
 import {
   getPublicSiteLinkLabel,
@@ -13,6 +15,7 @@ import {
 export default function Footer() {
   const router = useRouter();
   const activeSiteKey = normalizePublicSite(inferPublicSiteFromPath(router.pathname));
+  const [socialLinks, setSocialLinks] = useState([]);
   const site = getPublicSiteConfig(activeSiteKey);
   const isHotelSite = site.key === "hotel";
   const profileLabel = site.key === "hotel" ? "Hotel profile" : "Store profile";
@@ -33,6 +36,31 @@ export default function Footer() {
     href: link.href === "/" ? "/" : getPublicScopedHref(activeSiteKey, link.href),
   }));
   const currentYear = new Date().getFullYear();
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSocialLinks() {
+      try {
+        const response = await fetch(`/api/public/social-links?site=${activeSiteKey}`);
+        if (!response.ok) throw new Error("Social links unavailable");
+        const data = await response.json();
+        if (!cancelled) {
+          setSocialLinks(Array.isArray(data.socialLinks) ? data.socialLinks : []);
+        }
+      } catch {
+        if (!cancelled) {
+          setSocialLinks([]);
+        }
+      }
+    }
+
+    loadSocialLinks();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeSiteKey]);
 
   return (
     <footer className="site-footer">
@@ -63,6 +91,8 @@ export default function Footer() {
                   </Link>
                 ))}
               </div>
+
+              <SocialLinks links={socialLinks} variant={isHotelSite ? "hotel" : "store"} />
             </div>
 
             <div>
