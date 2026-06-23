@@ -10,12 +10,7 @@ import { getAvailableInventoryQuantity } from "@/lib/inventory";
 import { getPublicProductPath, getPublicSitePath } from "@/lib/publicSite";
 
 export default function Featured({ product, catalogInsights, site }) {
-  const {
-    addProductToCart,
-    cartProducts,
-    removeProductFromCart,
-    updateProductQuantity,
-  } = useContext(CartContext);
+  const { addProductToCart, cartProducts } = useContext(CartContext);
   const availableQuantity = getAvailableInventoryQuantity(product);
   const cartQuantity = cartProducts.find((item) => item.id === product._id)?.qty || 0;
   const hasReachedCartLimit = availableQuantity > 0 && cartQuantity >= availableQuantity;
@@ -35,13 +30,11 @@ export default function Featured({ product, catalogInsights, site }) {
 
   const productImage = getPrimaryProductImage(product.images);
   const topCategories = catalogInsights?.topCategories || [];
-
-  function handleQuantityChange(nextQuantity) {
-    updateProductQuantity(product._id, Math.max(1, Math.min(nextQuantity, availableQuantity)), {
-      maxQuantity: availableQuantity,
-    });
-  }
-
+  const normalizedDescription = product.description?.trim() || "";
+  const productDescription =
+    normalizedDescription && normalizedDescription.toLowerCase() !== (product.name || "").trim().toLowerCase()
+      ? normalizedDescription
+      : "";
   return (
     <div className="px-4 py-8 sm:px-8 lg:py-10">
       <Center>
@@ -57,12 +50,17 @@ export default function Featured({ product, catalogInsights, site }) {
               <p className="mt-4 max-w-3xl text-base leading-8 store-shell-muted lg:text-lg">
                 {site.heroDescription}
               </p>
+              {productDescription ? (
+                <p className="mt-3 max-w-3xl text-sm leading-7 text-[rgba(18,52,60,0.66)] sm:text-base">
+                  Featured pick: {productDescription}
+                </p>
+              ) : null}
 
               <div className="mt-6 rounded-[1.5rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.56)] p-4 sm:p-5">
                 <div className="flex flex-col gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <h2 className="text-2xl font-bold text-[var(--foreground-strong)]">
-                      Shop by category
+                      Browse the latest products.
                     </h2>
                   </div>
                   <Link
@@ -107,57 +105,22 @@ export default function Featured({ product, catalogInsights, site }) {
                 >
                   {site.secondaryCtaLabel}
                 </Link>
-                {cartQuantity > 0 ? (
-                  <div className="flex flex-1 flex-col gap-3 sm:flex-row sm:flex-none">
-                    <div className="flex min-h-[3.6rem] flex-1 items-center justify-between rounded-[1.1rem] border border-[rgba(31,44,51,0.12)] bg-white/84 px-2 py-2 shadow-sm sm:min-w-[12rem]">
-                      <button
-                        type="button"
-                        onClick={() => handleQuantityChange(cartQuantity - 1)}
-                        disabled={cartQuantity <= 1}
-                        aria-label={`Decrease ${product.name} quantity`}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-[0.9rem] text-lg font-bold text-[var(--foreground-strong)] disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        -
-                      </button>
-                      <span className="min-w-[2rem] text-center text-base font-semibold text-[var(--foreground-strong)]">
-                        {cartQuantity}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => handleQuantityChange(cartQuantity + 1)}
-                        disabled={!canAddFeaturedProduct}
-                        aria-label={`Increase ${product.name} quantity`}
-                        className="inline-flex h-10 w-10 items-center justify-center rounded-[0.9rem] text-lg font-bold text-[var(--foreground-strong)] disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => removeProductFromCart(product._id)}
-                      className="store-button-secondary inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.1rem] px-5 py-3 font-semibold"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    onClick={addFeatureProductToCart}
-                    disabled={!canAddFeaturedProduct}
-                    className={`flex min-h-[3.6rem] items-center justify-center gap-2 rounded-[1.1rem] px-6 py-3 font-semibold transition sm:min-w-[12rem] ${
-                      canAddFeaturedProduct
-                        ? "store-button-accent cursor-pointer"
-                        : "bg-[rgba(18,52,60,0.08)] text-[rgba(18,52,60,0.4)] cursor-not-allowed"
-                    }`}
-                  >
-                    <FontAwesomeIcon icon={faCartShopping} />
-                    {availableQuantity === 0
-                      ? "Unavailable"
-                      : hasReachedCartLimit
-                        ? "Cart limit reached"
-                        : "Add to Cart"}
-                  </button>
-                )}
+                <button
+                  onClick={addFeatureProductToCart}
+                  disabled={!canAddFeaturedProduct}
+                  className={`flex min-h-[3.6rem] items-center justify-center gap-2 rounded-[1.1rem] px-6 py-3 font-semibold transition sm:min-w-[12rem] ${
+                    canAddFeaturedProduct
+                      ? "store-button-accent cursor-pointer"
+                      : "bg-[rgba(18,52,60,0.08)] text-[rgba(18,52,60,0.4)] cursor-not-allowed"
+                  }`}
+                >
+                  <FontAwesomeIcon icon={faCartShopping} />
+                  {availableQuantity === 0
+                    ? "Unavailable"
+                    : hasReachedCartLimit
+                      ? "Cart limit reached"
+                      : "Add to Cart"}
+                </button>
               </div>
               {availableQuantity === 0 && (
                 <p className="mt-3 text-sm theme-muted-page">
@@ -198,12 +161,24 @@ export default function Featured({ product, catalogInsights, site }) {
                     <p className="mt-2 text-2xl font-bold text-[#8d5a1f]">
                       ₦{product.salePriceIncTax?.toLocaleString()}
                     </p>
-                    <p className="mt-2 text-sm font-medium text-[rgba(18,52,60,0.62)]">
-                      {availableQuantity > 0 ? `${availableQuantity} available now` : "Currently unavailable"}
-                    </p>
                   </div>
                 </div>
 
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="store-shell-card rounded-[1.4rem] px-5 py-4.5">
+                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                    Easy checkout
+                  </p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Simple checkout before you place your order.</p>
+                </div>
+                <div className="store-shell-card rounded-[1.4rem] px-5 py-4.5">
+                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.48)]">
+                    Best for
+                  </p>
+                  <p className="mt-3 text-base font-semibold text-[var(--foreground-strong)]">Everyday orders and quick restocks.</p>
+                </div>
               </div>
             </div>
           </div>

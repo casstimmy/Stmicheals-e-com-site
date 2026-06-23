@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import Center from "./Center";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { CartContext } from "./CartContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -11,10 +11,6 @@ import {
   faArrowRight,
   faEnvelope,
   faPhone,
-  faHouse,
-  faTableCellsLarge,
-  faStore,
-  faUser,
 } from "@fortawesome/free-solid-svg-icons";
 import { useRouter } from "next/router";
 import { COMPANY_LINKS, STORE_DETAILS } from "@/lib/storeDetails";
@@ -29,8 +25,6 @@ import {
 export default function Header({ siteKey }) {
   const { cartCount } = useContext(CartContext);
   const [navOpen, setNavOpen] = useState(false);
-  const [headerHeight, setHeaderHeight] = useState(0);
-  const headerRef = useRef(null);
   const router = useRouter();
   const activeSiteKey = normalizePublicSite(siteKey || inferPublicSiteFromPath(router.pathname));
   const site = getPublicSiteConfig(activeSiteKey);
@@ -47,12 +41,6 @@ export default function Header({ siteKey }) {
   const cartHref = getPublicScopedHref(activeSiteKey, "/cart");
   const showCart = site.showCart !== false;
   const cartIsActive = router.asPath === cartHref || router.asPath.startsWith(`${cartHref}?`);
-  const currentPath = router.asPath.split("?")[0];
-  const homeHref = getPublicScopedHref(activeSiteKey, "/");
-  const categoriesHref = getPublicScopedHref(activeSiteKey, "/categories");
-  const productsHref = getPublicScopedHref(activeSiteKey, "/products");
-  const productDetailBaseHref = getPublicScopedHref(activeSiteKey, "/product");
-  const accountHref = getPublicScopedHref(activeSiteKey, "/account");
 
   useEffect(() => {
     const closeMobileNav = () => {
@@ -103,39 +91,9 @@ export default function Header({ siteKey }) {
     };
   }, []);
 
-  useEffect(() => {
-    const headerNode = headerRef.current;
-
-    if (!headerNode) {
-      return undefined;
-    }
-
-    const updateHeaderHeight = () => {
-      setHeaderHeight(headerNode.getBoundingClientRect().height);
-    };
-
-    updateHeaderHeight();
-
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", updateHeaderHeight);
-
-      return () => {
-        window.removeEventListener("resize", updateHeaderHeight);
-      };
-    }
-
-    const resizeObserver = new ResizeObserver(() => {
-      updateHeaderHeight();
-    });
-
-    resizeObserver.observe(headerNode);
-
-    return () => {
-      resizeObserver.disconnect();
-    };
-  }, []);
-
   const isActiveRoute = (href) => {
+    const currentPath = router.asPath.split("?")[0];
+
     if (href === getPublicScopedHref(activeSiteKey, "/")) {
       return currentPath === href;
     }
@@ -157,50 +115,10 @@ export default function Header({ siteKey }) {
       icon: faPhone,
     },
   ];
-  const mobileStoreNavLinks = [
-    {
-      href: homeHref,
-      label: "Home",
-      icon: faHouse,
-      active: currentPath === homeHref,
-    },
-    {
-      href: categoriesHref,
-      label: "Categories",
-      icon: faTableCellsLarge,
-      active: currentPath === categoriesHref || currentPath.startsWith(`${categoriesHref}/`),
-    },
-    {
-      href: productsHref,
-      label: "Products",
-      icon: faStore,
-      active:
-        currentPath === productsHref ||
-        currentPath.startsWith(`${productsHref}/`) ||
-        currentPath.startsWith(`${productDetailBaseHref}/`),
-    },
-    ...(showCart
-      ? [
-          {
-            href: cartHref,
-            label: "Cart",
-            icon: faCartShopping,
-            active: cartIsActive,
-            badge: cartCount || 0,
-          },
-        ]
-      : []),
-    {
-      href: accountHref,
-      label: "Account",
-      icon: faUser,
-      active: currentPath === accountHref || currentPath.startsWith(`${accountHref}/`),
-    },
-  ];
+
   return (
-    <>
-    <header ref={headerRef} className={isHotelSite ? "hotel-header fixed inset-x-0 top-0 z-[110] w-full" : "store-header fixed inset-x-0 top-0 z-[110] w-full"}>
-      <div className={isHotelSite ? "hotel-header-topbar text-[0.72rem] uppercase tracking-[0.24em]" : "store-header-topbar hidden text-[0.72rem] uppercase tracking-[0.24em] md:block"}>
+    <header className={isHotelSite ? "hotel-header sticky top-0 z-[100] w-full" : "store-header sticky top-0 z-[100] w-full"}>
+      <div className={isHotelSite ? "hotel-header-topbar text-[0.72rem] uppercase tracking-[0.24em]" : "store-header-topbar text-[0.72rem] uppercase tracking-[0.24em]"}>
         <Center>
           <div className="flex flex-col items-start justify-between gap-2 px-4 py-2 sm:flex-row sm:items-center sm:gap-3 sm:px-6">
             <span className="text-[0.62rem] tracking-[0.18em] sm:text-[0.72rem] sm:tracking-[0.24em]">
@@ -240,49 +158,45 @@ export default function Header({ siteKey }) {
             </Link>
 
             <div className="flex shrink-0 items-center gap-2 md:hidden">
-              {isStoreSite ? null : (
-                <>
-                  {showCart ? (
-                    <Link
-                      href={cartHref}
-                      data-cart-icon
-                      className={`inline-flex h-11 min-w-[3rem] items-center justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm transition ${
-                        cartIsActive
-                          ? isHotelSite ? "hotel-button-primary" : "store-button-accent"
-                          : isHotelSite ? "hotel-button-secondary" : "store-button-primary"
-                      }`}
-                      aria-label="View cart"
-                    >
-                      <span className="relative inline-flex items-center justify-center">
-                        <FontAwesomeIcon icon={faCartShopping} className="text-sm" />
-                        <span className="absolute -right-3 -top-3 rounded-full bg-[var(--foreground-strong)] px-1.5 py-[1px] text-[0.62rem] font-semibold text-white shadow-sm">
-                          {cartCount || 0}
-                        </span>
-                      </span>
-                    </Link>
-                  ) : null}
+              {showCart ? (
+                <Link
+                  href={cartHref}
+                  data-cart-icon
+                  className={`inline-flex h-11 min-w-[3rem] items-center justify-center rounded-full px-3 py-2 text-sm font-semibold shadow-sm transition ${
+                    cartIsActive
+                      ? isHotelSite ? "hotel-button-primary" : "store-button-accent"
+                      : isHotelSite ? "hotel-button-secondary" : "store-button-primary"
+                  }`}
+                  aria-label="View cart"
+                >
+                  <span className="relative inline-flex items-center justify-center">
+                    <FontAwesomeIcon icon={faCartShopping} className="text-sm" />
+                    <span className="absolute -right-3 -top-3 rounded-full bg-[var(--foreground-strong)] px-1.5 py-[1px] text-[0.62rem] font-semibold text-white shadow-sm">
+                      {cartCount || 0}
+                    </span>
+                  </span>
+                </Link>
+              ) : null}
 
-                  <button
-                    type="button"
-                    className={`inline-flex min-h-[2.85rem] items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold shadow-sm transition ${
-                      navOpen
-                        ? isHotelSite
-                          ? "border-[rgba(216,172,79,0.24)] bg-[rgba(255,250,243,0.12)] text-[#f8edd8]"
-                          : "border-[rgba(176,114,42,0.2)] bg-[rgba(247,241,232,0.96)] text-[#213238]"
-                        : isHotelSite
-                          ? "border-[rgba(216,172,79,0.14)] bg-[rgba(255,250,243,0.06)] text-[#f8edd8]"
-                          : "border-[rgba(31,44,51,0.12)] bg-white/82 text-[#213238]"
-                    }`}
-                    onClick={() => setNavOpen((currentValue) => !currentValue)}
-                    aria-controls="mobile-site-nav"
-                    aria-expanded={navOpen}
-                    aria-label={navOpen ? "Close navigation menu" : "Open navigation menu"}
-                  >
-                    <FontAwesomeIcon icon={navOpen ? faTimes : faBars} className="text-sm" />
-                    <span>{navOpen ? "Close" : "Menu"}</span>
-                  </button>
-                </>
-              )}
+              <button
+                type="button"
+                className={`inline-flex min-h-[2.85rem] items-center gap-2 rounded-full border px-3 py-2 text-sm font-semibold shadow-sm transition ${
+                  navOpen
+                    ? isHotelSite
+                      ? "border-[rgba(216,172,79,0.24)] bg-[rgba(255,250,243,0.12)] text-[#f8edd8]"
+                      : "border-[rgba(176,114,42,0.2)] bg-[rgba(247,241,232,0.96)] text-[#213238]"
+                    : isHotelSite
+                      ? "border-[rgba(216,172,79,0.14)] bg-[rgba(255,250,243,0.06)] text-[#f8edd8]"
+                      : "border-[rgba(31,44,51,0.12)] bg-white/82 text-[#213238]"
+                }`}
+                onClick={() => setNavOpen((currentValue) => !currentValue)}
+                aria-controls="mobile-site-nav"
+                aria-expanded={navOpen}
+                aria-label={navOpen ? "Close navigation menu" : "Open navigation menu"}
+              >
+                <FontAwesomeIcon icon={navOpen ? faTimes : faBars} className="text-sm" />
+                <span>{navOpen ? "Close" : "Menu"}</span>
+              </button>
             </div>
 
             <nav className={isHotelSite ? "hidden items-center gap-3 font-medium text-[#f5eee2] md:flex" : "hidden items-center gap-3 font-medium text-[#213238] md:flex"}>
@@ -315,7 +229,7 @@ export default function Header({ siteKey }) {
             </nav>
           </div>
 
-          {navOpen && !isStoreSite && (
+          {navOpen && (
             <div className="absolute inset-x-0 top-full z-[90] pt-3 md:hidden">
               <nav
                 id="mobile-site-nav"
@@ -443,44 +357,8 @@ export default function Header({ siteKey }) {
               </nav>
             </div>
           )}
-
-          {isStoreSite ? (
-            <div className="mt-3 border-t border-[rgba(31,44,51,0.08)] pt-3 md:hidden">
-              <nav aria-label={`${site.shortLabel} mobile navigation`} className="grid grid-cols-5 gap-1.5">
-                {mobileStoreNavLinks.map((link) => (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    data-cart-icon={link.label === "Cart" ? true : undefined}
-                    className={`relative flex min-h-[4rem] flex-col items-center justify-center gap-1 rounded-[1rem] px-2 py-2 text-[0.68rem] font-semibold transition ${
-                      link.active
-                        ? "bg-[rgba(176,114,42,0.12)] text-[#8d5a1f] shadow-[0_12px_22px_rgba(176,114,42,0.1)]"
-                        : "text-[rgba(18,52,60,0.68)] hover:bg-white/76 hover:text-[var(--foreground-strong)]"
-                    }`}
-                    aria-current={link.active ? "page" : undefined}
-                  >
-                    <span className="relative inline-flex items-center justify-center text-base">
-                      <FontAwesomeIcon icon={link.icon} />
-                      {typeof link.badge === "number" && link.badge > 0 ? (
-                        <span className="absolute -right-3 -top-2 inline-flex min-w-[1.15rem] items-center justify-center rounded-full bg-[#1f2427] px-1 py-[1px] text-[0.6rem] font-semibold text-white">
-                          {link.badge}
-                        </span>
-                      ) : null}
-                    </span>
-                    <span>{link.label}</span>
-                  </Link>
-                ))}
-              </nav>
-            </div>
-          ) : null}
         </div>
       </Center>
     </header>
-    <div
-      aria-hidden="true"
-      className={isStoreSite ? "h-[10.5rem] md:h-[6.5rem]" : "h-[6.5rem] md:h-[6.5rem]"}
-      style={headerHeight > 0 ? { height: `${headerHeight}px` } : undefined}
-    />
-    </>
   );
 }
