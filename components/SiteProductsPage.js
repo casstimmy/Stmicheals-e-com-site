@@ -2,11 +2,13 @@ import Head from "next/head";
 import Center from "@/components/Center";
 import Header from "@/components/Header";
 import ProductBox from "@/components/ProductBox";
+import SocialLinks from "@/components/SocialLinks";
 import { getCatalogInsights } from "@/lib/storefront";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { getPublicSitePath } from "@/lib/publicSite";
+import { promotionAppliesToProduct } from "@/lib/promotionFilters";
 
 const SORT_OPTIONS = new Set(["featured", "price-asc", "price-desc", "name"]);
 
@@ -14,13 +16,14 @@ function readQueryValue(value) {
   return typeof value === "string" ? value : "";
 }
 
-export default function SiteProductsPage({ site, products }) {
+export default function SiteProductsPage({ site, products, activePromotions = [], heroContent }) {
   const router = useRouter();
   const [query, setQuery] = useState(() => readQueryValue(router.query.q));
   const [categoryFilter, setCategoryFilter] = useState(() => {
     const initialCategory = readQueryValue(router.query.category);
     return initialCategory || "all";
   });
+  const [promotionFilter, setPromotionFilter] = useState(() => readQueryValue(router.query.promotion));
   const [sortBy, setSortBy] = useState(() => {
     const initialSort = readQueryValue(router.query.sort);
     return SORT_OPTIONS.has(initialSort) ? initialSort : "featured";
@@ -34,8 +37,11 @@ export default function SiteProductsPage({ site, products }) {
   const catalogInsights = getCatalogInsights(products || []);
   const normalizedCategoryFilter = categories.includes(categoryFilter) ? categoryFilter : "all";
   const normalizedSortBy = SORT_OPTIONS.has(sortBy) ? sortBy : "featured";
+  const selectedPromotion = (activePromotions || []).find((promotion) => promotion._id === promotionFilter) || null;
+  const normalizedPromotionFilter = selectedPromotion ? promotionFilter : "";
   const normalizedQuery = deferredQuery.trim().toLowerCase();
   const isHotelSite = site?.key === "hotel";
+  const socialLinks = heroContent?.socialLinks || [];
   const storeInputClassName = "rounded-[1.1rem] border border-[rgba(31,44,51,0.12)] bg-white/84 px-4 py-3 text-sm text-[var(--foreground-strong)] outline-none transition focus:border-[rgba(176,114,42,0.38)] focus:ring-4 focus:ring-[rgba(176,114,42,0.1)]";
 
   const filteredProducts = (products || [])
@@ -50,7 +56,8 @@ export default function SiteProductsPage({ site, products }) {
         .toLowerCase();
 
       const matchesQuery = !normalizedQuery || haystack.includes(normalizedQuery);
-      return matchesCategory && matchesQuery;
+      const matchesPromotion = !selectedPromotion || promotionAppliesToProduct(selectedPromotion, product);
+      return matchesCategory && matchesQuery && matchesPromotion;
     })
     .sort((leftProduct, rightProduct) => {
       if (normalizedSortBy === "price-asc") {
@@ -86,10 +93,15 @@ export default function SiteProductsPage({ site, products }) {
       nextQuery.sort = normalizedSortBy;
     }
 
+    if (normalizedPromotionFilter) {
+      nextQuery.promotion = normalizedPromotionFilter;
+    }
+
     if (
       readQueryValue(router.query.q) === (nextQuery.q || "") &&
       readQueryValue(router.query.category) === (nextQuery.category || "") &&
-      readQueryValue(router.query.sort) === (nextQuery.sort || "")
+      readQueryValue(router.query.sort) === (nextQuery.sort || "") &&
+      readQueryValue(router.query.promotion) === (nextQuery.promotion || "")
     ) {
       return;
     }
@@ -102,14 +114,15 @@ export default function SiteProductsPage({ site, products }) {
       undefined,
       { shallow: true, scroll: false }
     );
-  }, [normalizedCategoryFilter, normalizedSortBy, query, router]);
+  }, [normalizedCategoryFilter, normalizedPromotionFilter, normalizedSortBy, query, router]);
 
   const hasActiveFilters =
-    Boolean(query.trim()) || normalizedCategoryFilter !== "all" || normalizedSortBy !== "featured";
+    Boolean(query.trim()) || normalizedCategoryFilter !== "all" || normalizedPromotionFilter || normalizedSortBy !== "featured";
 
   const resetFilters = () => {
     setQuery("");
     setCategoryFilter("all");
+    setPromotionFilter("");
     setSortBy("featured");
   };
 
@@ -170,6 +183,26 @@ export default function SiteProductsPage({ site, products }) {
                         </select>
                       </div>
 
+                      {activePromotions.length > 0 ? (
+                        <div>
+                          <label className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.5)]">
+                            Promotion
+                          </label>
+                          <select
+                            value={normalizedPromotionFilter}
+                            onChange={(event) => setPromotionFilter(event.target.value)}
+                            className={`${storeInputClassName} mt-2 w-full`}
+                          >
+                            <option value="">All promotions</option>
+                            {activePromotions.map((promotion) => (
+                              <option key={promotion._id} value={promotion._id}>
+                                {promotion.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      ) : null}
+
                       <div>
                         <label className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[rgba(18,52,60,0.5)]">
                           Sort order
@@ -216,6 +249,8 @@ export default function SiteProductsPage({ site, products }) {
                       <p className="mt-2 text-3xl font-bold text-[var(--foreground-strong)]">{catalogInsights.availableCount}</p>
                     </div>
                   </div>
+
+                  <SocialLinks links={socialLinks} variant="store" />
 
                   <div className="store-shell-card rounded-[1.6rem] p-5 sm:p-6">
                     <div className="flex items-center justify-between gap-3 border-b border-[rgba(31,44,51,0.08)] pb-3">
@@ -311,6 +346,7 @@ export default function SiteProductsPage({ site, products }) {
                             <span className="font-semibold">View</span>
                             <span>
                               {normalizedCategoryFilter === "all" ? "All categories" : normalizedCategoryFilter}
+                              {selectedPromotion ? ` / ${selectedPromotion.name}` : ""}
                               {query.trim() ? ` · “${query.trim()}”` : ""}
                             </span>
                           </div>
@@ -395,7 +431,7 @@ export default function SiteProductsPage({ site, products }) {
               </div>
             </div>
 
-            <div className="theme-card-light mt-6 grid gap-3 rounded-[1.5rem] p-3 shadow-sm sm:gap-4 sm:p-4 md:grid-cols-[2fr_1fr_1fr]">
+            <div className="theme-card-light mt-6 grid gap-3 rounded-[1.5rem] p-3 shadow-sm sm:gap-4 sm:p-4 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
               <input
                 type="search"
                 value={query}
@@ -412,6 +448,18 @@ export default function SiteProductsPage({ site, products }) {
                 {categories.map((category) => (
                   <option key={category} value={category}>
                     {category}
+                  </option>
+                ))}
+              </select>
+              <select
+                value={normalizedPromotionFilter}
+                onChange={(event) => setPromotionFilter(event.target.value)}
+                className="theme-input-light rounded-2xl px-4 py-3 outline-none"
+              >
+                <option value="">All promotions</option>
+                {activePromotions.map((promotion) => (
+                  <option key={promotion._id} value={promotion._id}>
+                    {promotion.name}
                   </option>
                 ))}
               </select>
@@ -462,6 +510,7 @@ export default function SiteProductsPage({ site, products }) {
                     <span className="font-semibold">View</span>
                     <span>
                       {normalizedCategoryFilter === "all" ? "All categories" : normalizedCategoryFilter}
+                      {selectedPromotion ? ` / ${selectedPromotion.name}` : ""}
                       {query.trim() ? ` · “${query.trim()}”` : ""}
                     </span>
                   </div>
@@ -484,6 +533,10 @@ export default function SiteProductsPage({ site, products }) {
               >
                 Browse categories
               </Link>
+            </div>
+
+            <div className="mt-6">
+              <SocialLinks links={socialLinks} variant="hotel" />
             </div>
 
             <div className="max-w-7xl mx-auto px-1 py-8 sm:px-4 sm:py-12">

@@ -2,6 +2,7 @@ import HotelLandingPage from "@/components/HotelHomePage";
 import { resolveHotelCatalogSections } from "@/lib/hotelStorefront";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig } from "@/lib/publicSite";
 import { getStorefrontProducts } from "@/lib/storefrontCatalog";
+import { getHeroContentForSite } from "@/lib/heroContent";
 
 export default function HotelHomePage(props) {
   return <HotelLandingPage {...props} />;
@@ -10,7 +11,10 @@ export default function HotelHomePage(props) {
 export async function getServerSideProps() {
   try {
     const siteKey = PUBLIC_SITE_KEYS.HOTEL;
-    const resolvedProducts = await getStorefrontProducts({ limit: 12, site: siteKey });
+    const [resolvedProducts, heroContent] = await Promise.all([
+      getStorefrontProducts({ limit: 12, site: siteKey }),
+      getHeroContentForSite(siteKey),
+    ]);
     const sections = resolveHotelCatalogSections(resolvedProducts);
     const featuredRoom = sections.featuredRoom;
 
@@ -21,6 +25,7 @@ export async function getServerSideProps() {
         rooms: JSON.parse(JSON.stringify(sections.rooms)),
         dining: JSON.parse(JSON.stringify(sections.dining)),
         sections: JSON.parse(JSON.stringify(sections)),
+        heroContent,
       },
     };
   } catch (error) {
@@ -32,6 +37,7 @@ export async function getServerSideProps() {
         rooms: [],
         dining: [],
         sections: resolveHotelCatalogSections([]),
+        heroContent: { activeHero: null, socialLinks: [] },
       },
     };
   }

@@ -3,7 +3,7 @@ import Featured from "@/components/Featured";
 import NewProducts from "@/components/NewProducts";
 import Header from "@/components/Header";
 
-export default function SiteHomePage({ site, featuredProduct, newProducts, catalogInsights }) {
+export default function SiteHomePage({ site, featuredProduct, newProducts, catalogInsights, heroContent }) {
   return (
     <div>
       <Head>
@@ -11,7 +11,7 @@ export default function SiteHomePage({ site, featuredProduct, newProducts, catal
         <meta name="description" content={site.heroDescription} />
       </Head>
       <Header siteKey={site.key} />
-      <Featured product={featuredProduct} catalogInsights={catalogInsights} site={site} />
+      <Featured product={featuredProduct} catalogInsights={catalogInsights} site={site} heroContent={heroContent} />
       <NewProducts newProducts={newProducts} catalogInsights={catalogInsights} site={site} />
     </div>
   );

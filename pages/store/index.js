@@ -2,6 +2,7 @@ import SiteHomePage from "@/components/SiteHomePage";
 import { getCatalogInsights } from "@/lib/storefront";
 import { PUBLIC_SITE_KEYS, getPublicSiteConfig } from "@/lib/publicSite";
 import { getStorefrontProductById, getStorefrontProducts } from "@/lib/storefrontCatalog";
+import { getHeroContentForSite } from "@/lib/heroContent";
 
 export default function StoreHomePage(props) {
   return <SiteHomePage {...props} />;
@@ -11,9 +12,10 @@ export async function getServerSideProps() {
   try {
     const siteKey = PUBLIC_SITE_KEYS.STORE;
     const featuredProductId = process.env.FEATURED_PRODUCT_ID;
-    const [resolvedFeaturedProduct, resolvedNewProducts] = await Promise.all([
+    const [resolvedFeaturedProduct, resolvedNewProducts, heroContent] = await Promise.all([
       getStorefrontProductById(featuredProductId, { fallbackToLatest: true, site: siteKey }),
       getStorefrontProducts({ limit: 12, site: siteKey }),
+      getHeroContentForSite(siteKey),
     ]);
     const catalogInsights = getCatalogInsights(resolvedNewProducts);
 
@@ -23,6 +25,7 @@ export async function getServerSideProps() {
         featuredProduct: JSON.parse(JSON.stringify(resolvedFeaturedProduct)),
         newProducts: JSON.parse(JSON.stringify(resolvedNewProducts)),
         catalogInsights,
+        heroContent,
       },
     };
   } catch (error) {
@@ -33,6 +36,7 @@ export async function getServerSideProps() {
         featuredProduct: null,
         newProducts: [],
         catalogInsights: getCatalogInsights([]),
+        heroContent: { activeHero: null, socialLinks: [] },
       },
     };
   }

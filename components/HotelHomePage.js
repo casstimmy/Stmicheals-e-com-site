@@ -7,10 +7,19 @@ import HotelRoomCard from "@/components/HotelRoomCard";
 import HotelDiningCard from "@/components/HotelDiningCard";
 import { getPrimaryProductImage, PRODUCT_IMAGE_PLACEHOLDER } from "@/lib/productImages";
 import { PUBLIC_SITE_KEYS, getPublicSitePath } from "@/lib/publicSite";
+import SocialLinks from "@/components/SocialLinks";
 
-export default function HotelHomePage({ site, rooms, dining, featuredRoom, sections }) {
+export default function HotelHomePage({ site, rooms, dining, featuredRoom, sections, heroContent }) {
   const previewRooms = (rooms || []).slice(0, 3);
   const previewDining = (dining || []).slice(0, 3);
+  const activeHero = heroContent?.activeHero || null;
+  const socialLinks = heroContent?.socialLinks || [];
+  const fallbackHeroImage = featuredRoom ? getPrimaryProductImage(featuredRoom.images) : PRODUCT_IMAGE_PLACEHOLDER;
+  const heroImage = activeHero?.bgImage?.[0]?.full || activeHero?.image?.[0]?.full || fallbackHeroImage;
+  const heroTitle = activeHero?.title || site.heroTitle;
+  const heroDescription = activeHero?.subtitle || "Discover a slower, more polished hotel experience with quiet room choices, direct reservations, and lounge moments that read like hospitality instead of ecommerce.";
+  const heroCtaHref = activeHero?.ctaLink || getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/rooms");
+  const heroCtaLabel = activeHero?.ctaText || "Explore rooms";
 
   return (
     <>
@@ -28,10 +37,10 @@ export default function HotelHomePage({ site, rooms, dining, featuredRoom, secti
                   {site.heroEyebrow}
                 </span>
                 <h1 className="mt-5 max-w-3xl text-4xl font-extrabold leading-[1.02] text-[#fff3df] lg:text-6xl">
-                  {site.heroTitle}
+                  {heroTitle}
                 </h1>
                 <p className="hotel-shell-muted mt-5 max-w-2xl text-base leading-8 lg:text-lg">
-                  Discover a slower, more polished hotel experience with quiet room choices, direct reservations, and lounge moments that read like hospitality instead of ecommerce.
+                  {heroDescription}
                 </p>
 
                 <div className="mt-8 grid gap-3 sm:grid-cols-3">
@@ -51,10 +60,10 @@ export default function HotelHomePage({ site, rooms, dining, featuredRoom, secti
 
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <Link
-                    href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/rooms")}
+                    href={heroCtaHref}
                     className="hotel-button-primary inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.1rem] px-6 py-3 font-semibold"
                   >
-                    Explore rooms
+                    {heroCtaLabel}
                   </Link>
                   <Link
                     href={getPublicSitePath(PUBLIC_SITE_KEYS.HOTEL, "/booking")}
@@ -63,13 +72,16 @@ export default function HotelHomePage({ site, rooms, dining, featuredRoom, secti
                     Book a stay
                   </Link>
                 </div>
+                <div className="mt-6">
+                  <SocialLinks links={socialLinks} variant="hotel" />
+                </div>
               </div>
 
               <div className="hotel-card relative overflow-hidden rounded-[1.75rem] p-4 shadow-[0_24px_48px_rgba(7,13,16,0.16)]">
                 <div className="relative h-[24rem] overflow-hidden rounded-[1.4rem] bg-[rgba(17,22,25,0.08)] sm:h-[28rem]">
                   <Image
-                    src={featuredRoom ? getPrimaryProductImage(featuredRoom.images) : PRODUCT_IMAGE_PLACEHOLDER}
-                    alt={featuredRoom?.name || site.displayName}
+                    src={heroImage}
+                    alt={activeHero?.title || featuredRoom?.name || site.displayName}
                     fill
                     priority
                     sizes="(max-width: 1024px) 100vw, 48vw"

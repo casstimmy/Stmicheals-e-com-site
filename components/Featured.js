@@ -8,8 +8,9 @@ import { CartContext } from "./CartContext";
 import { getPrimaryProductImage } from "@/lib/productImages";
 import { getAvailableInventoryQuantity } from "@/lib/inventory";
 import { getPublicProductPath, getPublicSitePath } from "@/lib/publicSite";
+import SocialLinks from "@/components/SocialLinks";
 
-export default function Featured({ product, catalogInsights, site }) {
+export default function Featured({ product, catalogInsights, site, heroContent }) {
   const { addProductToCart, cartProducts } = useContext(CartContext);
   const availableQuantity = getAvailableInventoryQuantity(product);
   const cartQuantity = cartProducts.find((item) => item.id === product._id)?.qty || 0;
@@ -29,6 +30,13 @@ export default function Featured({ product, catalogInsights, site }) {
   }
 
   const productImage = getPrimaryProductImage(product.images);
+  const activeHero = heroContent?.activeHero || null;
+  const socialLinks = heroContent?.socialLinks || [];
+  const heroTitle = activeHero?.title || site.heroTitle;
+  const heroDescription = activeHero?.subtitle || site.heroDescription;
+  const heroCtaHref = activeHero?.ctaLink || getPublicProductPath(site.key, product._id);
+  const heroCtaLabel = activeHero?.ctaText || "View featured item";
+  const heroImage = activeHero?.bgImage?.[0]?.full || activeHero?.image?.[0]?.full || productImage;
   const topCategories = catalogInsights?.topCategories || [];
   const normalizedDescription = product.description?.trim() || "";
   const productDescription =
@@ -45,10 +53,10 @@ export default function Featured({ product, catalogInsights, site }) {
                 {site.heroEyebrow}
               </span>
               <h1 className="mt-4 max-w-4xl text-4xl font-extrabold leading-[1.02] text-[var(--foreground-strong)] lg:text-[3.95rem]">
-                {site.heroTitle}
+                {heroTitle}
               </h1>
               <p className="mt-4 max-w-3xl text-base leading-8 store-shell-muted lg:text-lg">
-                {site.heroDescription}
+                {heroDescription}
               </p>
               {productDescription ? (
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-[rgba(18,52,60,0.66)] sm:text-base">
@@ -94,10 +102,10 @@ export default function Featured({ product, catalogInsights, site }) {
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link
-                  href={getPublicProductPath(site.key, product._id)}
+                  href={heroCtaHref}
                   className="store-button-primary inline-flex min-h-[3.6rem] items-center justify-center rounded-[1.1rem] px-6 py-3 font-semibold sm:min-w-[12rem]"
                 >
-                  View featured item
+                  {heroCtaLabel}
                 </Link>
                 <Link
                   href={getPublicSitePath(site.key, "/categories")}
@@ -122,6 +130,9 @@ export default function Featured({ product, catalogInsights, site }) {
                       : "Add to Cart"}
                 </button>
               </div>
+              <div className="mt-6">
+                <SocialLinks links={socialLinks} variant="store" />
+              </div>
               {availableQuantity === 0 && (
                 <p className="mt-3 text-sm theme-muted-page">
                   This item is currently unavailable.
@@ -134,13 +145,13 @@ export default function Featured({ product, catalogInsights, site }) {
                 <div className="rounded-[1.45rem] border border-[rgba(31,44,51,0.08)] bg-[rgba(255,255,255,0.9)] p-4">
                   <div className="aspect-[4/3] overflow-hidden rounded-[1.35rem] bg-[linear-gradient(180deg,_rgba(248,243,236,0.96),_rgba(255,255,255,0.98))]">
                 <Image
-                  src={productImage}
-                  alt={product.name || "Featured Product"}
+                    src={heroImage}
+                    alt={activeHero?.title || product.name || "Featured Product"}
                   width={600}
                   height={400}
                   priority
                   sizes="(max-width: 768px) 90vw, 48vw"
-                      className="h-full w-full object-contain p-4"
+                      className={activeHero ? "h-full w-full object-cover" : "h-full w-full object-contain p-4"}
                 />
                   </div>
                 </div>
