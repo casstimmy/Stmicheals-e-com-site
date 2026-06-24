@@ -86,7 +86,7 @@ export default function ProductBox({
                                 ? "bg-emerald-50 text-emerald-700"
                                 : "bg-rose-50 text-rose-700"
                         }`}>
-                            {isInStock ? "200 Ready" : "Sold out"}
+                            {isInStock ? `${availableQuantity.toLocaleString()} Ready` : "Sold out"}
                         </span>
                     </div>
 
