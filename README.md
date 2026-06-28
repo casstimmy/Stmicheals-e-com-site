@@ -67,3 +67,4 @@ npm run test:integration
 - The storefront includes seeded catalog fallback behavior for preview resilience when MongoDB is unavailable.
 - Customer account sign-in uses email OTP. In development, if mail delivery is not configured, the API can return a console-delivered debug OTP instead of pretending email was sent.
 - Order confirmation reads through the stable `/api/orders?id=<orderId>` lookup path.
+# StMichaelshubSite
